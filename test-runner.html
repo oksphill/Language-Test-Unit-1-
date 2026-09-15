@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Unit Test Suite - English Language Test Unit 1</title>
+</head>
+<body>
+  <h1>Running Automated Test Suite...</h1>
+  <div id="test-results"></div>
+
+  <!-- Load Modules -->
+  <script src="js/test-data.js"></script>
+  <script src="js/illustrations.js"></script>
+  <script src="js/validator.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/teacher-service.js"></script>
+
+  <script>
+    const results = [];
+    function assert(name, condition, details = "") {
+      if (condition) {
+        results.push({ name, pass: true });
+        console.log("PASS:", name);
+      } else {
+        results.push({ name, pass: false, details });
+        console.error("FAIL:", name, details);
+      }
+    }
+
+    try {
+      // 1. Structure Tests
+      assert("TEST_DATA exists", typeof TEST_DATA === "object");
+      assert("Variant A defined", !!TEST_DATA.variantA);
+      assert("Variant B defined", !!TEST_DATA.variantB);
+      assert("Variant A total points is 35", TEST_DATA.variantA.totalPoints === 35);
+      assert("Variant B total points is 35", TEST_DATA.variantB.totalPoints === 35);
+
+      // 2. Question Counts
+      const countQuestions = (variant) => {
+        let count = 0;
+        for (const sec of Object.values(variant.sections)) {
+          for (const task of sec.tasks) {
+            count += Object.keys(task.answers).length;
+          }
+        }
+        return count;
+      };
+      assert("Variant A has 35 questions", countQuestions(TEST_DATA.variantA) === 35);
+      assert("Variant B has 35 questions", countQuestions(TEST_DATA.variantB) === 35);
+
+      // 3. Normalization & Contractions
+      assert("Normalizes lowercase", Validator.normalize("  SHIRT  ") === "shirt");
+      assert("Normalizes smart apostrophe", Validator.normalize("didn’t") === "didn't");
+      assert("Removes trailing dot", Validator.normalize("baggy.") === "baggy");
+      assert("Handles didn't as did not", Validator.checkAnswer("didn't", ["did not"]));
+      assert("Handles did not as didn't", Validator.checkAnswer("did not", ["didn't"]));
+
+      // 4. Variant A Perfect Score
+      const perfectAnswersA = {
+        // Task 1 (5 pts)
+        "A_1_1": "bracelets",
+        "A_1_2": "rings",
+        "A_1_3": "floral",
+        "A_1_4": "tie",
+        "A_1_5": "handbag",
+        // Task 2 (6 pts)
+        "A_2_1": "shirt",
+        "A_2_2": "checked",
+        "A_2_3": "baggy",
+        "A_2_4": "hoodie",
+        "A_2_5": "straight",
+        "A_2_6": "moustache",
+        // Task 3 (5 pts)
+        "A_3_1": "selfish",
+        "A_3_2": "impatient",
+        "A_3_3": "dishonest",
+        "A_3_4": "generous",
+        "A_3_5": "polite",
+        // Task 4 (7 pts)
+        "A_4_1": "Did you have",
+        "A_4_2": "took",
+        "A_4_3": "put",
+        "A_4_4": "Did you drop",
+        "A_4_5": "did",
+        "A_4_6": "forgot",
+        "A_4_7": "found",
+        // Task 5 (7 pts)
+        "A_5_1": "was waiting",
+        "A_5_2": "called",
+        "A_5_3": "was cycling",
+        "A_5_4": "met",
+        "A_5_5": "were you doing",
+        "A_5_6": "were sleeping",
+        "A_5_7": "got",
+        // Task 6 (5 pts)
+        "A_6_1": "First",
+        "A_6_2": "Lucky her",
+        "A_6_3": "what happened",
+        "A_6_4": "No way",
+        "A_6_5": "Poor you"
+      };
+
+      const evalA = Validator.evaluateTest("variantA", perfectAnswersA);
+      assert("Eval A Total Score is 35/35", evalA.totalScore === 35, `Got: ${evalA.totalScore}`);
+      assert("Eval A Percentage is 100%", evalA.percentage === 100);
+      assert("Eval A Vocab is 16/16", evalA.sections.vocabulary.score === 16);
+      assert("Eval A Grammar is 14/14", evalA.sections.grammar.score === 14);
+      assert("Eval A Comm is 5/5", evalA.sections.communication.score === 5);
+      assert("Eval A Mistakes count is 0", evalA.mistakes.length === 0);
+
+      // 5. Variant B Perfect Score
+      const perfectAnswersB = {
+        // Task 1 (5 pts)
+        "B_1_1": "scarf",
+        "B_1_2": "bracelets",
+        "B_1_3": "rings",
+        "B_1_4": "handbag",
+        "B_1_5": "spotted",
+        // Task 2 (6 pts)
+        "B_2_1": "checked",
+        "B_2_2": "shirt",
+        "B_2_3": "hoodie",
+        "B_2_4": "baggy",
+        "B_2_5": "beard",
+        "B_2_6": "straight",
+        // Task 3 (5 pts)
+        "B_3_1": "lazy",
+        "B_3_2": "impolite",
+        "B_3_3": "generous",
+        "B_3_4": "impatient",
+        "B_3_5": "serious",
+        // Task 4 (7 pts)
+        "B_4_1": "Did you use",
+        "B_4_2": "came",
+        "B_4_3": "opened",
+        "B_4_4": "Did you put",
+        "B_4_5": "went",
+        "B_4_6": "fell",
+        "B_4_7": "found",
+        // Task 5 (7 pts)
+        "B_5_1": "was getting",
+        "B_5_2": "got",
+        "B_5_3": "was making",
+        "B_5_4": "dropped",
+        "B_5_5": "were laughing",
+        "B_5_6": "came",
+        "B_5_7": "was he doing",
+        // Task 6 (5 pts)
+        "B_6_1": "Then",
+        "B_6_2": "Lucky him",
+        "B_6_3": "guess what",
+        "B_6_4": "No way",
+        "B_6_5": "Poor you"
+      };
+
+      const evalB = Validator.evaluateTest("variantB", perfectAnswersB);
+      assert("Eval B Total Score is 35/35", evalB.totalScore === 35, `Got: ${evalB.totalScore}`);
+      assert("Eval B Percentage is 100%", evalB.percentage === 100);
+      assert("Eval B Vocab is 16/16", evalB.sections.vocabulary.score === 16);
+      assert("Eval B Grammar is 14/14", evalB.sections.grammar.score === 14);
+      assert("Eval B Comm is 5/5", evalB.sections.communication.score === 5);
+      assert("Eval B Mistakes count is 0", evalB.mistakes.length === 0);
+
+      // 6. Partial Mistakes Tracking
+      const partialAnswers = { ...perfectAnswersA };
+      partialAnswers["A_2_1"] = "t-shirt"; // Wrong
+      partialAnswers["A_4_2"] = "taked";   // Wrong
+      partialAnswers["A_5_1"] = "waited";  // Wrong
+      const evalPartial = Validator.evaluateTest("variantA", partialAnswers);
+      assert("Partial evaluation total is 32/35", evalPartial.totalScore === 32);
+      assert("Partial evaluation has 3 mistakes", evalPartial.mistakes.length === 3);
+
+      // 7. 3D Animated Illustrations
+      assert("Mrs Cook illustration generated", Illustrations.renderIllustration("mrs_cook").includes("<img"));
+      assert("Mrs Smith illustration generated", Illustrations.renderIllustration("mrs_smith").includes("<img"));
+      assert("Gregory Cook illustration generated", Illustrations.renderIllustration("gregory_cook").includes("<img"));
+      assert("Lee illustration generated", Illustrations.renderIllustration("lee").includes("<img"));
+
+    } catch (e) {
+      assert("Unhandled Exception in Test Suite", false, e.toString());
+    }
+
+    const passCount = results.filter(r => r.pass).length;
+    const failCount = results.filter(r => !r.pass).length;
+    const summary = `RESULTS: ${passCount} PASSED, ${failCount} FAILED`;
+    console.log(summary);
+
+    document.getElementById("test-results").innerHTML = `
+      <h2>${summary}</h2>
+      <ul>
+        ${results.map(r => `<li style="color:${r.pass ? 'green' : 'red'}">${r.pass ? '✓' : '✗'} ${r.name} ${r.details || ''}</li>`).join('')}
+      </ul>
+    `;
+  </script>
+</body>
+</html>
