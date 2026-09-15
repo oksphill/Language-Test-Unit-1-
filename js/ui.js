@@ -265,8 +265,7 @@ const UI = {
     // Word Bank chips
     const wordBankHtml = task.wordBank
       .map((w) => {
-        const isExample = task.usedInExample && task.usedInExample.includes(w);
-        return `<button type="button" class="word-chip ${isExample ? 'used' : ''}" data-word="${w}" data-task="${task.id}">${w}</button>`;
+        return `<button type="button" class="word-chip" data-word="${w}" data-task="${task.id}">${w}</button>`;
       })
       .join("");
 
@@ -560,8 +559,7 @@ const UI = {
     const task = section.tasks[0];
     const wordBankHtml = task.wordBank
       .map((w) => {
-        const isExample = task.usedInExample && task.usedInExample.includes(w);
-        return `<button type="button" class="word-chip ${isExample ? 'used' : ''}" data-word="${w}" data-task="${task.id}">${w}</button>`;
+        return `<button type="button" class="word-chip" data-word="${w}" data-task="${task.id}">${w}</button>`;
       })
       .join("");
 
@@ -657,7 +655,6 @@ const UI = {
     const chips = container.querySelectorAll(".word-chip");
     chips.forEach((chip) => {
       chip.addEventListener("click", () => {
-        if (chip.classList.contains("used")) return;
         const word = chip.getAttribute("data-word");
         const taskId = chip.getAttribute("data-task");
         this.insertWordIntoGap(taskId, word);
@@ -712,31 +709,10 @@ const UI = {
   },
 
   /**
-   * Updates strikethrough status of words in Word Banks when typed/used.
+   * Word Bank chip state (strikethrough disabled per user request)
    */
   updateWordBankUsedState() {
-    const currentValues = Object.values(this.answers).map((v) =>
-      v ? v.trim().toLowerCase() : ""
-    );
-
-    document.querySelectorAll(".word-bank-container").forEach((bank) => {
-      const taskId = bank.getAttribute("data-task");
-      const chips = bank.querySelectorAll(".word-chip");
-
-      chips.forEach((chip) => {
-        const word = chip.getAttribute("data-word").toLowerCase();
-        // Check if word is used in this task
-        const isUsed = currentValues.includes(word);
-        // Do not unmark default examples
-        const isExample = chip.closest(".task-card")?.querySelector(".task-example-banner")?.textContent.toLowerCase().includes(word);
-
-        if (isExample) {
-          chip.classList.add("used");
-        } else {
-          chip.classList.toggle("used", isUsed);
-        }
-      });
-    });
+    // No words are strikethrough or crossed out per user requirement
   },
 
   /**

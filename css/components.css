@@ -189,12 +189,12 @@
 }
 
 .word-chip.used {
-  opacity: 0.45;
-  text-decoration: line-through;
-  background: #E2E8F0;
+  /* No strikethrough per user request */
+  opacity: 0.85;
+  background: #F1F5F9;
   border-color: #CBD5E1;
-  cursor: default;
-  transform: none;
+  color: var(--text-main);
+  cursor: pointer;
 }
 
 /* ==========================================================================
