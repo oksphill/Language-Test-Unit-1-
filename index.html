@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Language Test Unit 1 — Pearson English Interactive Testing</title>
-  <meta name="description" content="Interactive English Language Test Unit 1 based on Pearson Tests with automatic grading, error review, and teacher reporting.">
+  <title>Language Tests Units 1–8 — Pearson English Interactive Testing</title>
+  <meta name="description" content="Interactive English Language Tests Units 1 to 8 based on Pearson Tests with automatic grading, error review, and teacher reporting.">
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
@@ -19,14 +19,19 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="brand-wrapper">
-        <div class="app-logo-badge" title="Language Test Unit 1">1</div>
+        <div class="app-logo-badge" id="app-logo-badge" title="Language Test">1</div>
         <div class="brand-titles">
-          <h1>Language Test • Unit 1</h1>
-          <div class="subtitle">Vocabulary, Grammar & Communication</div>
+          <h1 id="app-header-title">Language Test • Unit 1</h1>
+          <div class="subtitle" id="app-header-subtitle">Clothes and Appearance</div>
         </div>
       </div>
 
       <div class="header-status-group">
+        <!-- Change Unit Button (Visible during test) -->
+        <button type="button" class="btn btn-sm btn-outline-secondary btn-change-unit" id="btn-header-change-unit" style="display: none;" title="Switch Unit or Variant">
+          🔄 Units
+        </button>
+
         <!-- Student Info Tag (Visible during test & review) -->
         <div class="student-tag" id="header-student-tag" style="display: none;">
           <span>👤</span>
@@ -70,15 +75,128 @@
           </div>
 
 
+          <!-- Unit Selector (Units 1 to 8) -->
+          <div class="form-group">
+            <span class="unit-selector-label">
+              <span>Select Unit (1 – 8):</span>
+              <span id="selected-unit-badge" style="font-weight: 700; color: var(--primary);">Unit 1 • Clothes & Appearance</span>
+            </span>
+            <div class="unit-cards-grid" id="unit-selector-grid">
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit1" checked>
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">1</span>
+                    <span class="unit-card-icon">👔</span>
+                  </div>
+                  <span class="unit-card-title">Clothes</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit2">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">2</span>
+                    <span class="unit-card-icon">💼</span>
+                  </div>
+                  <span class="unit-card-title">Jobs & Work</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit3">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">3</span>
+                    <span class="unit-card-icon">🏅</span>
+                  </div>
+                  <span class="unit-card-title">Sports</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit4">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">4</span>
+                    <span class="unit-card-icon">🎬</span>
+                  </div>
+                  <span class="unit-card-title">Films & Books</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit5">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">5</span>
+                    <span class="unit-card-icon">🎵</span>
+                  </div>
+                  <span class="unit-card-title">Music & Crime</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit6">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">6</span>
+                    <span class="unit-card-icon">🌿</span>
+                  </div>
+                  <span class="unit-card-title">Nature</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit7">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">7</span>
+                    <span class="unit-card-icon">💡</span>
+                  </div>
+                  <span class="unit-card-title">Technology</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+
+              <label class="unit-card-radio">
+                <input type="radio" name="test-unit" value="unit8">
+                <div class="unit-card-box">
+                  <div class="unit-card-top">
+                    <span class="unit-card-num-badge">8</span>
+                    <span class="unit-card-icon">🤝</span>
+                  </div>
+                  <span class="unit-card-title">Feelings</span>
+                  <span class="unit-card-pts">35 pts</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Selected Unit Preview Banner -->
+          <div class="unit-preview-banner" id="unit-preview-banner">
+            <div class="unit-preview-info">
+              <span class="unit-preview-name" id="preview-unit-name">Unit 1: Clothes & Appearance</span>
+              <span class="unit-preview-topics" id="preview-unit-topics">Vocabulary: Clothes, Patterns, Personality • Grammar: Past Simple & Past Continuous • 35 pts</span>
+            </div>
+          </div>
+
           <!-- Variant Selector -->
           <div class="form-group">
-            <span class="variant-selector-label">Select Your Test Variant:</span>
+            <span class="variant-selector-label">Select Test Variant:</span>
             <div class="variant-cards-grid">
               <label class="variant-card-radio">
                 <input type="radio" name="test-variant" value="variantA" checked>
                 <div class="variant-card-box">
                   <span class="variant-card-title">Variant A</span>
-                  <span class="variant-card-desc">Mrs Cook & Gregory Cook</span>
+                  <span class="variant-card-desc" id="variant-a-desc">Photocopiable Test A</span>
                 </div>
               </label>
 
@@ -86,7 +204,7 @@
                 <input type="radio" name="test-variant" value="variantB">
                 <div class="variant-card-box">
                   <span class="variant-card-title">Variant B</span>
-                  <span class="variant-card-desc">Mrs Smith & Lee</span>
+                  <span class="variant-card-desc" id="variant-b-desc">Photocopiable Test B</span>
                 </div>
               </label>
             </div>
@@ -313,6 +431,14 @@
   </div>
 
   <!-- JavaScript Modules in Dependency Order -->
+  <script src="js/data/unit1.js"></script>
+  <script src="js/data/unit2.js"></script>
+  <script src="js/data/unit3.js"></script>
+  <script src="js/data/unit4.js"></script>
+  <script src="js/data/unit5.js"></script>
+  <script src="js/data/unit6.js"></script>
+  <script src="js/data/unit7.js"></script>
+  <script src="js/data/unit8.js"></script>
   <script src="js/test-data.js"></script>
   <script src="js/illustrations.js"></script>
   <script src="js/validator.js"></script>

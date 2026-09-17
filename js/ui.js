@@ -1,17 +1,21 @@
 /**
- * Language Test Unit 1 - UI Rendering and View Controller
+ * Language Test Units 1 to 8 - UI Rendering and View Controller
+ * Pure Vanilla JavaScript SPA controller
  */
 
 const UI = {
   activeScreen: "start",
   activeSection: "vocabulary",
+  currentUnit: "unit1",
   currentVariant: "variantA",
   student: null,
   answers: {},
   focusedInputId: null,
+  saveTimer: null,
 
   init() {
     this.bindEvents();
+    this.initUnitSelector();
     this.checkForResume();
   },
 
@@ -51,6 +55,23 @@ const UI = {
       settingsBtn.addEventListener("click", () => this.openTeacherSettingsModal());
     }
 
+    // Header "Change Unit" button
+    const changeUnitBtn = document.getElementById("btn-header-change-unit");
+    if (changeUnitBtn) {
+      changeUnitBtn.addEventListener("click", () => {
+        if (this.activeScreen === "test") {
+          if (confirm("Switch Unit or Variant? Your current answers will be saved so you can resume later.")) {
+            this.saveCurrentSession();
+            this.switchScreen("start");
+            this.checkForResume();
+          }
+        } else if (this.activeScreen === "review") {
+          this.switchScreen("start");
+          this.checkForResume();
+        }
+      });
+    }
+
     // Next / Prev Section buttons
     const prevSecBtn = document.getElementById("btn-prev-section");
     if (prevSecBtn) {
@@ -63,6 +84,77 @@ const UI = {
   },
 
   /**
+   * Initializes Unit Radio Selector on the start screen
+   */
+  initUnitSelector() {
+    const unitRadios = document.querySelectorAll('input[name="test-unit"]');
+    unitRadios.forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          this.onSelectUnit(e.target.value);
+        }
+      });
+    });
+
+    // Initialize with current unit
+    this.onSelectUnit(this.currentUnit);
+  },
+
+  /**
+   * Updates start screen UI when a unit card is chosen
+   */
+  onSelectUnit(unitKey) {
+    this.currentUnit = unitKey;
+    const unitsList = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList() : [];
+    const info = unitsList.find((u) => u.id === unitKey) || {
+      id: unitKey,
+      number: unitKey.replace("unit", ""),
+      title: `Unit ${unitKey.replace("unit", "")}`,
+      description: "35 pts Photocopiable Language Test"
+    };
+
+    const badge = document.getElementById("selected-unit-badge");
+    if (badge) {
+      badge.textContent = `Unit ${info.number} • ${info.title}`;
+    }
+
+    const previewName = document.getElementById("preview-unit-name");
+    if (previewName) {
+      previewName.textContent = `Unit ${info.number}: ${info.title}`;
+    }
+
+    const previewTopics = document.getElementById("preview-unit-topics");
+    if (previewTopics) {
+      previewTopics.textContent = `${info.description} • 35 pts total`;
+    }
+
+    const varADesc = document.getElementById("variant-a-desc");
+    if (varADesc) {
+      varADesc.textContent = `Photocopiable Unit ${info.number} Test A (35 pts)`;
+    }
+
+    const varBDesc = document.getElementById("variant-b-desc");
+    if (varBDesc) {
+      varBDesc.textContent = `Photocopiable Unit ${info.number} Test B (35 pts)`;
+    }
+
+    const headerLogoBadge = document.getElementById("app-logo-badge");
+    if (headerLogoBadge && this.activeScreen === "start") {
+      headerLogoBadge.textContent = info.number;
+    }
+
+    const headerTitle = document.getElementById("app-header-title");
+    if (headerTitle && this.activeScreen === "start") {
+      headerTitle.textContent = `Language Test • Unit ${info.number}`;
+    }
+
+    const headerSubtitle = document.getElementById("app-header-subtitle");
+    if (headerSubtitle && this.activeScreen === "start") {
+      headerSubtitle.textContent = info.title;
+    }
+  },
+
+  /**
    * Check if an in-progress session exists in LocalStorage.
    */
   checkForResume() {
@@ -70,13 +162,17 @@ const UI = {
     const resumeContainer = document.getElementById("resume-session-prompt");
     const studentName = saved?.student ? (saved.student.fullName || saved.student.firstName || "") : "";
     if (saved && saved.student && studentName && resumeContainer) {
+      const savedUnit = saved.unit || saved.student.unit || "unit1";
+      const unitNum = savedUnit.replace("unit", "");
+      const variantName = saved.student.variant === "variantA" ? "Variant A" : "Variant B";
+
       resumeContainer.innerHTML = `
         <div class="resume-banner">
           <div class="resume-banner-text">
             <strong>Welcome back, ${studentName}!</strong>
-            <span>You have an unfinished test (${saved.student.variant === "variantA" ? "Variant A" : "Variant B"}).</span>
+            <span>You have an unfinished test (Unit ${unitNum}, ${variantName}).</span>
           </div>
-          <div style="display:flex; gap: 0.5rem;">
+          <div style="display:flex; gap: 0.5rem; flex-wrap:wrap;">
             <button type="button" class="btn btn-sm btn-primary" id="btn-resume-session">Resume Test</button>
             <button type="button" class="btn btn-sm btn-secondary" id="btn-discard-session">Start Fresh</button>
           </div>
@@ -91,6 +187,8 @@ const UI = {
         Storage.clearSession();
         resumeContainer.style.display = "none";
       });
+    } else if (resumeContainer) {
+      resumeContainer.style.display = "none";
     }
   },
 
@@ -99,9 +197,18 @@ const UI = {
    */
   resumeSession(saved) {
     this.student = saved.student;
+    this.currentUnit = saved.unit || saved.student.unit || "unit1";
     this.currentVariant = saved.student.variant || "variantA";
     this.answers = saved.answers || {};
     this.activeSection = saved.currentSection || "vocabulary";
+
+    // Check the corresponding unit radio button
+    const unitRadio = document.querySelector(`input[name="test-unit"][value="${this.currentUnit}"]`);
+    if (unitRadio) unitRadio.checked = true;
+    this.onSelectUnit(this.currentUnit);
+
+    const variantRadio = document.querySelector(`input[name="test-variant"][value="${this.currentVariant}"]`);
+    if (variantRadio) variantRadio.checked = true;
 
     this.renderTestUI();
     this.switchScreen("test");
@@ -115,6 +222,8 @@ const UI = {
   handleStartTest() {
     const nameEl = document.getElementById("student-name");
     const fullName = nameEl ? nameEl.value.trim() : "";
+    const unitRadio = document.querySelector('input[name="test-unit"]:checked');
+    const unit = unitRadio ? unitRadio.value : "unit1";
     const variantRadio = document.querySelector('input[name="test-variant"]:checked');
     const variant = variantRadio ? variantRadio.value : "variantA";
 
@@ -127,8 +236,9 @@ const UI = {
     const firstName = parts[0] || fullName;
     const lastName = parts.slice(1).join(" ") || "";
 
-    this.student = { fullName, firstName, lastName, studentClass: "", variant };
+    this.currentUnit = unit;
     this.currentVariant = variant;
+    this.student = { fullName, firstName, lastName, studentClass: "", variant, unit };
     this.answers = {};
     this.activeSection = "vocabulary";
 
@@ -152,7 +262,7 @@ const UI = {
     const target = document.getElementById(`screen-${screenName}`);
     if (target) target.classList.add("active");
 
-    // Update Header student badge
+    // Header student tag
     const studentTag = document.getElementById("header-student-tag");
     if (this.student && screenName !== "start") {
       studentTag.style.display = "flex";
@@ -162,6 +272,12 @@ const UI = {
         : displayName;
     } else if (studentTag) {
       studentTag.style.display = "none";
+    }
+
+    // Change Unit button in header
+    const changeUnitBtn = document.getElementById("btn-header-change-unit");
+    if (changeUnitBtn) {
+      changeUnitBtn.style.display = screenName === "start" ? "none" : "inline-flex";
     }
 
     // Toggle Floating Help button visibility
@@ -212,171 +328,226 @@ const UI = {
   },
 
   /**
-   * Renders the complete test questions according to the active variant.
+   * Renders the complete test questions according to the active unit and variant.
    */
   renderTestUI() {
-    const variant = TEST_DATA[this.currentVariant];
+    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
     if (!variant) return;
 
     // Header badge
     const badge = document.getElementById("active-variant-badge");
     if (badge) badge.textContent = variant.title;
 
+    // Header logo badge and title
+    const unitNum = this.currentUnit.replace("unit", "");
+    const logoBadge = document.getElementById("app-logo-badge");
+    if (logoBadge) logoBadge.textContent = unitNum;
+
+    const headerTitle = document.getElementById("app-header-title");
+    if (headerTitle) headerTitle.textContent = `Language Test • Unit ${unitNum}`;
+
+    const headerSubtitle = document.getElementById("app-header-subtitle");
+    if (headerSubtitle) {
+      const unitInfo = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList().find(u => u.id === this.currentUnit) : null;
+      headerSubtitle.textContent = unitInfo ? unitInfo.title : variant.title;
+    }
+
     // Render Section 1: Vocabulary
-    this.renderVocabularySection(variant.sections.vocabulary);
+    this.renderSection("vocabulary", variant.sections.vocabulary);
 
     // Render Section 2: Grammar
-    this.renderGrammarSection(variant.sections.grammar);
+    this.renderSection("grammar", variant.sections.grammar);
 
     // Render Section 3: Communication
-    this.renderCommunicationSection(variant.sections.communication);
+    this.renderSection("communication", variant.sections.communication);
 
     // Restore saved answers into inputs
     this.populateSavedAnswers();
   },
 
   /**
-   * Vocabulary Section: Task 1 (Word Bank + Picture), Task 2 (Letter-hint + Picture), Task 3 (Personality)
+   * Generic Section Renderer
    */
-  renderVocabularySection(section) {
-    const container = document.getElementById("section-panel-vocabulary");
-    if (!container) return;
+  renderSection(sectionKey, sectionData) {
+    const container = document.getElementById(`section-panel-${sectionKey}`);
+    if (!container || !sectionData) return;
 
     let html = "";
-    for (const task of section.tasks) {
-      if (task.id === "task_1") {
-        html += this.renderTask1(task);
-      } else if (task.id === "task_2") {
-        html += this.renderTask2(task);
-      } else if (task.id === "task_3") {
-        html += this.renderTask3(task);
-      }
+    for (const task of sectionData.tasks) {
+      html += this.renderTaskCard(task);
     }
     container.innerHTML = html;
     this.bindTaskInputs(container);
   },
 
   /**
-   * Task 1: Word Bank & Gap Filling with Character Illustration
+   * Generic Task Card Generator
    */
-  renderTask1(task) {
-    const illSvg = Illustrations.renderIllustration(task.imageKey);
+  renderTaskCard(task) {
+    let html = `
+      <div class="task-card" id="card-${task.id}">
+        <div class="task-header">
+          <div class="task-title-group">
+            <div class="task-number-badge">${task.number}</div>
+            <div class="task-instructions">${task.title}</div>
+          </div>
+          <div class="task-points-badge">${task.points} points</div>
+        </div>
+    `;
 
-    // Word Bank chips
-    const wordBankHtml = task.wordBank
-      .map((w) => {
-        return `<button type="button" class="word-chip" data-word="${w}" data-task="${task.id}">${w}</button>`;
-      })
-      .join("");
-
-    // Sentences with gaps
-    let sentencesHtml = "";
-    for (const s of task.sentences) {
-      let line = `<p style="margin-bottom:0.75rem;">${s.textBefore || ""} `;
-      if (s.gapId) {
-        line += `
-          <span class="gap-inline-wrapper">
-            <span class="gap-label">${s.label}</span>
-            <input type="text" class="gap-input test-gap" id="input-${s.gapId}" data-qid="${s.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type or click word">
-          </span>
-        `;
-      }
-      line += `${s.textAfter || ""} `;
-      if (s.gapId2) {
-        line += `
-          <span class="gap-inline-wrapper">
-            <span class="gap-label">${s.label2}</span>
-            <input type="text" class="gap-input test-gap" id="input-${s.gapId2}" data-qid="${s.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type or click word">
-          </span>
-        `;
-      }
-      line += `${s.textAfter2 || ""}</p>`;
-      sentencesHtml += line;
+    if (task.example) {
+      html += `
+        <div class="task-example-banner">
+          <strong>Example:</strong> ${task.example}
+        </div>
+      `;
     }
 
-    return `
-      <div class="task-card" id="card-${task.id}">
-        <div class="task-header">
-          <div class="task-title-group">
-            <div class="task-number-badge">${task.number}</div>
-            <div class="task-instructions">${task.title}</div>
-          </div>
-          <div class="task-points-badge">${task.points} points</div>
+    if (task.context) {
+      html += `
+        <div style="font-weight: 700; margin-bottom: 0.75rem; color: #1E293B; font-size: 0.95rem;">
+          📖 ${task.context}
         </div>
+      `;
+    }
 
-        <div class="task-example-banner">
-          <strong>Example:</strong> ${task.example}
-        </div>
+    // Illustration (Unit 1 only)
+    if (task.hasIllustration && task.imageKey && typeof Illustrations !== "undefined") {
+      const illSvg = Illustrations.renderIllustration(task.imageKey);
+      html += `<div class="illustration-wrapper">${illSvg}</div>`;
+    }
 
-        <div class="illustration-wrapper">
-          ${illSvg}
-        </div>
+    // Task Body by Type
+    html += this.renderTaskBody(task);
 
-        <div class="word-bank-container" data-task="${task.id}">
-          <div class="word-bank-header">
-            <span>📦 Word Bank (Click a word to fill the active blank):</span>
-          </div>
-          <div class="word-bank-chips">
-            ${wordBankHtml}
-          </div>
-        </div>
-
-        <div class="story-text-flow">
-          ${sentencesHtml}
-        </div>
-      </div>
-    `;
+    html += `</div>`;
+    return html;
   },
 
   /**
-   * Task 2: Clothes and Appearance with Letter-Hints & Illustration
+   * Task Body Dispatcher
    */
-  renderTask2(task) {
-    const illSvg = Illustrations.renderIllustration(task.imageKey);
+  renderTaskBody(task) {
+    // 1. Circle Choice (or Relative Pronouns with choices)
+    if (task.type === "circle-choice" || task.type === "relative-pronouns-gap") {
+      return this.renderCircleChoiceTask(task);
+    }
 
-    const rowsHtml = task.items
-      .map((it) => {
-        return `
-          <div class="letter-hint-row">
+    // 2. Sentence Order (Unit 7 passive unscramble)
+    if (task.type === "sentence-order") {
+      return this.renderSentenceOrderTask(task);
+    }
+
+    // 3. Letter hint
+    if (task.type === "letter-hint") {
+      return this.renderLetterHintTask(task);
+    }
+
+    // 4. Personality Adjectives (Unit 1 Task 3)
+    if (task.type === "personality-adjectives") {
+      return this.renderPersonalityTask(task);
+    }
+
+    // 5. Grammar Gap (Verb in brackets)
+    if (task.type === "grammar-gap") {
+      return this.renderGrammarGapTask(task);
+    }
+
+    // 6. Grammar Mix (Unit 1 Task 5)
+    if (task.type === "grammar-mix") {
+      return this.renderGrammarMixTask(task);
+    }
+
+    // 7. Dialogue Box or Dialogue Gap
+    if (task.type === "dialogue-box" || task.type === "dialogue-gap") {
+      if (task.dialogue) {
+        return this.renderDialogueTask(task);
+      } else if (task.items) {
+        return this.renderGrammarGapTask(task);
+      }
+    }
+
+    // 8. Word Bank / Collocations Choice / Word Gap (Default to text flow with gaps)
+    return this.renderWordBankOrGapTask(task);
+  },
+
+  /**
+   * Renders circle-choice pills
+   */
+  renderCircleChoiceTask(task) {
+    let html = `<div class="choice-items-list">`;
+    for (const it of task.items) {
+      html += `
+        <div class="circle-choice-item">
+          <span class="gap-label">${it.label}</span>
+          ${it.before ? `<span>${it.before}</span> ` : ""}
+          <span class="choice-pills-group" data-qid="${it.id}">
+            ${it.options.map(opt => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
+            <input type="hidden" class="test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" value="">
+          </span>
+          ${it.after ? ` <span>${it.after}</span>` : ""}
+        </div>
+      `;
+    }
+    html += `</div>`;
+    return html;
+  },
+
+  /**
+   * Renders sentence-order unscramble tasks (Unit 7)
+   */
+  renderSentenceOrderTask(task) {
+    let html = `<div class="sentence-order-list">`;
+    for (const it of task.items) {
+      const tokens = it.prompt.split("/").map(t => t.trim()).filter(Boolean);
+      const tokenChips = tokens
+        .map(tok => `<button type="button" class="sentence-order-chip" data-qid="${it.id}" data-token="${tok}">${tok}</button>`)
+        .join("");
+
+      html += `
+        <div class="sentence-order-item">
+          <div class="sentence-order-prompt">
             <span class="gap-label">${it.label}</span>
-            <span>${it.textBefore}</span>
-            <span class="hint-capsule">${it.displayHint}</span>
-            <input type="text" class="hint-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type word...">
-            <span>${it.textAfter}</span>
+            <span class="scrambled-words">${it.prompt}</span>
           </div>
-        `;
-      })
-      .join("");
-
-    return `
-      <div class="task-card" id="card-${task.id}">
-        <div class="task-header">
-          <div class="task-title-group">
-            <div class="task-number-badge">${task.number}</div>
-            <div class="task-instructions">${task.title}</div>
+          <div class="sentence-order-chips">
+            <span style="font-size: 0.8rem; color: #64748B; margin-right: 0.25rem; align-self: center;">💡 Tap to append:</span>
+            ${tokenChips}
           </div>
-          <div class="task-points-badge">${task.points} points</div>
+          <div class="sentence-order-input-wrap">
+            <input type="text" class="form-control test-gap sentence-order-input" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Type the complete passive sentence here...">
+          </div>
         </div>
-
-        <div class="task-example-banner">
-          <strong>Example:</strong> ${task.example}
-        </div>
-
-        <div class="illustration-wrapper">
-          ${illSvg}
-        </div>
-
-        <div class="letter-hint-list">
-          ${rowsHtml}
-        </div>
-      </div>
-    `;
+      `;
+    }
+    html += `</div>`;
+    return html;
   },
 
   /**
-   * Task 3: Personality Adjectives
+   * Renders letter hint items
    */
-  renderTask3(task) {
+  renderLetterHintTask(task) {
+    let rowsHtml = "";
+    for (const it of task.items) {
+      const hintDisplay = it.displayHint || (it.prefix ? it.prefix.toUpperCase() + "..." : "");
+      rowsHtml += `
+        <div class="letter-hint-row">
+          <span class="gap-label">${it.label}</span>
+          <span>${it.textBefore || it.before || ""}</span>
+          ${hintDisplay ? `<span class="hint-capsule">${hintDisplay}</span>` : ""}
+          <input type="text" class="hint-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type word...">
+          <span>${it.textAfter || it.after || ""}</span>
+        </div>
+      `;
+    }
+    return `<div class="letter-hint-list">${rowsHtml}</div>`;
+  },
+
+  /**
+   * Renders Personality Adjectives task
+   */
+  renderPersonalityTask(task) {
     const itemsHtml = task.items
       .map((it) => {
         return `
@@ -390,110 +561,47 @@ const UI = {
         `;
       })
       .join("");
-
-    return `
-      <div class="task-card" id="card-${task.id}">
-        <div class="task-header">
-          <div class="task-title-group">
-            <div class="task-number-badge">${task.number}</div>
-            <div class="task-instructions">${task.title}</div>
-          </div>
-          <div class="task-points-badge">${task.points} points</div>
-        </div>
-
-        <div class="task-example-banner">
-          <strong>Example:</strong> ${task.example}
-        </div>
-
-        <div class="personality-list">
-          ${itemsHtml}
-        </div>
-      </div>
-    `;
+    return `<div class="personality-list">${itemsHtml}</div>`;
   },
 
   /**
-   * Grammar Section: Task 4 (Past Simple) & Task 5 (Past Simple vs Past Continuous)
+   * Renders Grammar Gap items (single or double verb gaps)
    */
-  renderGrammarSection(section) {
-    const container = document.getElementById("section-panel-grammar");
-    if (!container) return;
+  renderGrammarGapTask(task) {
+    let html = `<div class="grammar-items-list">`;
+    for (const it of task.items) {
+      let line = `<div class="grammar-item-row"><span class="gap-label">${it.label || ""}</span> `;
+      if (it.before) line += `<span>${it.before}</span> `;
+      line += `
+        <span class="gap-inline-wrapper">
+          <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
+        </span>
+        ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
+      `;
+      if (it.after) line += ` <span>${it.after}</span> `;
 
-    let html = "";
-    for (const task of section.tasks) {
-      if (task.id === "task_4") {
-        html += this.renderTask4(task);
-      } else if (task.id === "task_5") {
-        html += this.renderTask5(task);
-      }
-    }
-    container.innerHTML = html;
-    this.bindTaskInputs(container);
-  },
-
-  /**
-   * Task 4: Past Simple Dialogue
-   */
-  renderTask4(task) {
-    let linesHtml = "";
-    for (const line of task.dialogue) {
-      const isA = line.speaker === "Jack" || line.speaker === "Fiona";
-      const speakerClass = isA ? "speaker-A" : "speaker-B";
-
-      if (line.text) {
-        linesHtml += `
-          <div class="dialogue-line">
-            <div class="speaker-badge ${speakerClass}">${line.speaker}:</div>
-            <div class="dialogue-content">${line.text}</div>
-          </div>
+      if (it.gapId2) {
+        line += `
+          <span class="gap-inline-wrapper">
+            <span class="gap-label">${it.label2 || ""}</span>
+            <input type="text" class="gap-input test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
+          </span>
+          ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
         `;
-      } else if (line.parts) {
-        let partsContent = "";
-        for (const pt of line.parts) {
-          if (pt.before) partsContent += `${pt.before} `;
-          partsContent += `
-            <span class="gap-inline-wrapper">
-              <span class="gap-label">${pt.label}</span>
-              <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
-            </span>
-            <span class="verb-prompt">(${pt.verb})</span>
-          `;
-          if (pt.after) partsContent += ` ${pt.after} `;
-        }
-        linesHtml += `
-          <div class="dialogue-line">
-            <div class="speaker-badge ${speakerClass}">${line.speaker}:</div>
-            <div class="dialogue-content">${partsContent}</div>
-          </div>
-        `;
+        if (it.after2) line += ` <span>${it.after2}</span> `;
       }
+
+      line += `</div>`;
+      html += line;
     }
-
-    return `
-      <div class="task-card" id="card-${task.id}">
-        <div class="task-header">
-          <div class="task-title-group">
-            <div class="task-number-badge">${task.number}</div>
-            <div class="task-instructions">${task.title}</div>
-          </div>
-          <div class="task-points-badge">${task.points} points</div>
-        </div>
-
-        <div class="task-example-banner">
-          <strong>Example:</strong> ${task.example}
-        </div>
-
-        <div class="dialogue-thread">
-          ${linesHtml}
-        </div>
-      </div>
-    `;
+    html += `</div>`;
+    return html;
   },
 
   /**
-   * Task 5: Past Simple vs. Past Continuous
+   * Renders Grammar Mix (Unit 1 Task 5)
    */
-  renderTask5(task) {
+  renderGrammarMixTask(task) {
     const itemsHtml = task.items
       .map((it) => {
         let content = `<span style="font-weight:700; margin-right:0.35rem;">${it.itemNum}</span> `;
@@ -511,7 +619,7 @@ const UI = {
                   ${optionsHtml}
                 </select>
               </span>
-              <span class="verb-prompt">(${pt.verb})</span>
+              <span class="grammar-verb-prompt">(${pt.verb})</span>
             `;
           } else {
             content += `
@@ -519,7 +627,7 @@ const UI = {
                 <span class="gap-label">${pt.label}</span>
                 <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="was/were doing or did">
               </span>
-              <span class="verb-prompt">(${pt.verb})</span>
+              <span class="grammar-verb-prompt">(${pt.verb})</span>
             `;
           }
           if (pt.after) content += ` ${pt.after} `;
@@ -527,46 +635,29 @@ const UI = {
         return `<div class="grammar-item-row">${content}</div>`;
       })
       .join("");
-
-    return `
-      <div class="task-card" id="card-${task.id}">
-        <div class="task-header">
-          <div class="task-title-group">
-            <div class="task-number-badge">${task.number}</div>
-            <div class="task-instructions">${task.title}</div>
-          </div>
-          <div class="task-points-badge">${task.points} points</div>
-        </div>
-
-        <div class="task-example-banner">
-          <strong>Example:</strong> ${task.example}
-        </div>
-
-        <div class="grammar-items-list">
-          ${itemsHtml}
-        </div>
-      </div>
-    `;
+    return `<div class="grammar-items-list">${itemsHtml}</div>`;
   },
 
   /**
-   * Communication Section: Task 6
+   * Renders Dialogue with speaker badges and word bank
    */
-  renderCommunicationSection(section) {
-    const container = document.getElementById("section-panel-communication");
-    if (!container) return;
-
-    const task = section.tasks[0];
-    const wordBankHtml = task.wordBank
-      .map((w) => {
-        return `<button type="button" class="word-chip" data-word="${w}" data-task="${task.id}">${w}</button>`;
-      })
-      .join("");
+  renderDialogueTask(task) {
+    let html = "";
+    if (task.wordBank && task.wordBank.length > 0) {
+      const chips = task.wordBank
+        .map(w => `<button type="button" class="word-chip" data-word="${w}" data-task="${task.id}">${w}</button>`)
+        .join("");
+      html += `
+        <div class="word-bank-container" data-task="${task.id}">
+          <div class="word-bank-header"><span>📦 Word Bank (Click a phrase to insert):</span></div>
+          <div class="word-bank-chips">${chips}</div>
+        </div>
+      `;
+    }
 
     let dialogueHtml = "";
     for (const line of task.dialogue) {
-      const isA = line.speaker === "Anne" || line.speaker === "Kevin";
-      const speakerClass = isA ? "speaker-A" : "speaker-B";
+      const speakerClass = (line.speaker === "Anne" || line.speaker === "Lee" || line.speaker === "Jack" || line.speaker === "Tom") ? "speaker-A" : "speaker-B";
 
       if (line.text) {
         dialogueHtml += `
@@ -582,9 +673,10 @@ const UI = {
           partsContent += `
             <span class="gap-inline-wrapper">
               <span class="gap-label">${pt.label}</span>
-              <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="choose phrase">
+              <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type phrase">
             </span>
           `;
+          if (pt.verb) partsContent += ` <span class="grammar-verb-prompt">(${pt.verb})</span> `;
           if (pt.after) partsContent += ` ${pt.after} `;
         }
         dialogueHtml += `
@@ -596,40 +688,66 @@ const UI = {
       }
     }
 
-    container.innerHTML = `
-      <div class="task-card" id="card-${task.id}">
-        <div class="task-header">
-          <div class="task-title-group">
-            <div class="task-number-badge">${task.number}</div>
-            <div class="task-instructions">${task.title}</div>
-          </div>
-          <div class="task-points-badge">${task.points} points</div>
-        </div>
-
-        <div class="task-example-banner">
-          <strong>Example:</strong> ${task.example}
-        </div>
-
-        <div class="word-bank-container" data-task="${task.id}">
-          <div class="word-bank-header">
-            <span>📦 Word Bank (Click a phrase to insert):</span>
-          </div>
-          <div class="word-bank-chips">
-            ${wordBankHtml}
-          </div>
-        </div>
-
-        <div class="dialogue-thread">
-          ${dialogueHtml}
-        </div>
-      </div>
-    `;
-
-    this.bindTaskInputs(container);
+    html += `<div class="dialogue-thread">${dialogueHtml}</div>`;
+    return html;
   },
 
   /**
-   * Binds input event listeners, word bank chips, and auto-save.
+   * Renders Word Bank chips and Story / Sentences with gaps
+   */
+  renderWordBankOrGapTask(task) {
+    let html = "";
+    if (task.wordBank && task.wordBank.length > 0) {
+      const chips = task.wordBank
+        .map(w => `<button type="button" class="word-chip" data-word="${w}" data-task="${task.id}">${w}</button>`)
+        .join("");
+      html += `
+        <div class="word-bank-container" data-task="${task.id}">
+          <div class="word-bank-header"><span>📦 Word Bank (Click a word to fill the active blank):</span></div>
+          <div class="word-bank-chips">${chips}</div>
+        </div>
+      `;
+    }
+
+    if (task.sentences && task.sentences.length > 0) {
+      let sentencesHtml = "";
+      for (const s of task.sentences) {
+        sentencesHtml += this.renderSentenceWithGaps(s, task.id);
+      }
+      html += `<div class="story-text-flow">${sentencesHtml}</div>`;
+    }
+
+    return html;
+  },
+
+  /**
+   * Helper to render a sentence item with 1 or 2 gaps
+   */
+  renderSentenceWithGaps(s, taskId) {
+    let line = `<p style="margin-bottom:0.75rem;">${s.textBefore || ""} `;
+    if (s.gapId) {
+      line += `
+        <span class="gap-inline-wrapper">
+          <span class="gap-label">${s.label}</span>
+          <input type="text" class="gap-input test-gap" id="input-${s.gapId}" data-qid="${s.gapId}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type or click word">
+        </span>
+      `;
+    }
+    line += `${s.textAfter || ""} `;
+    if (s.gapId2) {
+      line += `
+        <span class="gap-inline-wrapper">
+          <span class="gap-label">${s.label2}</span>
+          <input type="text" class="gap-input test-gap" id="input-${s.gapId2}" data-qid="${s.gapId2}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type or click word">
+        </span>
+      `;
+    }
+    line += `${s.textAfter2 || ""}</p>`;
+    return line;
+  },
+
+  /**
+   * Binds input event listeners, word bank chips, choice pills, and sentence order chips.
    */
   bindTaskInputs(container) {
     const inputs = container.querySelectorAll(".test-gap");
@@ -660,6 +778,43 @@ const UI = {
         this.insertWordIntoGap(taskId, word);
       });
     });
+
+    // Circle Choice Pill Clicks
+    const pills = container.querySelectorAll(".choice-pill-btn");
+    pills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        const qid = pill.getAttribute("data-qid");
+        const val = pill.getAttribute("data-value");
+        const group = pill.closest(".choice-pills-group");
+        if (group) {
+          group.querySelectorAll(".choice-pill-btn").forEach(b => b.classList.remove("selected"));
+          pill.classList.add("selected");
+        }
+        const inp = document.getElementById(`input-${qid}`);
+        if (inp) {
+          inp.value = val;
+          inp.dispatchEvent(new Event("input", { bubbles: true }));
+          inp.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+    });
+
+    // Sentence Order Token Chips Clicks
+    const orderChips = container.querySelectorAll(".sentence-order-chip");
+    orderChips.forEach((ochip) => {
+      ochip.addEventListener("click", () => {
+        const qid = ochip.getAttribute("data-qid");
+        const token = ochip.getAttribute("data-token");
+        const inp = document.getElementById(`input-${qid}`);
+        if (inp) {
+          const curVal = inp.value.trim();
+          inp.value = curVal ? `${curVal} ${token}` : token;
+          inp.dispatchEvent(new Event("input", { bubbles: true }));
+          inp.dispatchEvent(new Event("change", { bubbles: true }));
+          inp.focus();
+        }
+      });
+    });
   },
 
   /**
@@ -668,7 +823,6 @@ const UI = {
   insertWordIntoGap(taskId, word) {
     let targetInput = null;
 
-    // If focused input belongs to this task
     if (this.focusedInputId) {
       const el = document.getElementById(this.focusedInputId);
       if (el && el.getAttribute("data-task") === taskId) {
@@ -676,7 +830,6 @@ const UI = {
       }
     }
 
-    // Otherwise find first empty input in this task
     if (!targetInput) {
       const card = document.getElementById(`card-${taskId}`);
       if (card) {
@@ -709,14 +862,14 @@ const UI = {
   },
 
   /**
-   * Word Bank chip state (strikethrough disabled per user request)
+   * Word Bank chip state: NO strikethrough per user requirement
    */
   updateWordBankUsedState() {
-    // No words are strikethrough or crossed out per user requirement
+    // Chips must always stay clean and clickable with no strikethrough
   },
 
   /**
-   * Populates input fields from saved answers.
+   * Populates input fields and pills from saved answers.
    */
   populateSavedAnswers() {
     for (const [qid, val] of Object.entries(this.answers)) {
@@ -725,21 +878,35 @@ const UI = {
         inp.value = val;
         inp.classList.toggle("has-value", val.trim().length > 0);
       }
+
+      // If choice pill
+      if (val) {
+        const pillGroup = document.querySelector(`.choice-pills-group[data-qid="${qid}"]`);
+        if (pillGroup) {
+          pillGroup.querySelectorAll(".choice-pill-btn").forEach((btn) => {
+            btn.classList.toggle("selected", btn.getAttribute("data-value") === val);
+          });
+        }
+      }
     }
     this.updateWordBankUsedState();
   },
 
   /**
-   * Updates the progress bar and answered counters across sections.
+   * Updates the progress bar and answered counters across sections dynamically.
    */
   updateProgress() {
-    const variant = TEST_DATA[this.currentVariant];
+    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
     if (!variant) return;
 
     let totalQ = 0;
     let answeredQ = 0;
     const secCounts = { vocabulary: 0, grammar: 0, communication: 0 };
-    const secMax = { vocabulary: 16, grammar: 14, communication: 5 };
+    const secMax = {
+      vocabulary: variant.sections.vocabulary ? variant.sections.vocabulary.maxScore : 16,
+      grammar: variant.sections.grammar ? variant.sections.grammar.maxScore : 14,
+      communication: variant.sections.communication ? variant.sections.communication.maxScore : 5
+    };
 
     for (const [secKey, section] of Object.entries(variant.sections)) {
       for (const task of section.tasks) {
@@ -766,7 +933,7 @@ const UI = {
     for (const secKey of ["vocabulary", "grammar", "communication"]) {
       const badge = document.getElementById(`badge-count-${secKey}`);
       if (badge) {
-        badge.textContent = `${secCounts[secKey]} / ${secMax[secKey]}`;
+        badge.textContent = `${secCounts[secKey] || 0} / ${secMax[secKey] || 0}`;
       }
     }
   },
@@ -774,7 +941,6 @@ const UI = {
   /**
    * Debounced AutoSave to LocalStorage
    */
-  saveTimer: null,
   debouncedSaveSession() {
     const ind = document.getElementById("save-indicator");
     if (ind) {
@@ -794,6 +960,7 @@ const UI = {
 
   saveCurrentSession() {
     Storage.saveSession({
+      unit: this.currentUnit,
       student: this.student,
       answers: this.answers,
       currentSection: this.activeSection
@@ -804,7 +971,7 @@ const UI = {
    * Submit Confirmation Modal
    */
   showSubmitConfirmation() {
-    const variant = TEST_DATA[this.currentVariant];
+    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
     let totalQuestions = 0;
     let answeredQuestions = 0;
     const unansweredIds = [];
@@ -862,7 +1029,6 @@ const UI = {
   jumpToQuestion(qid) {
     const input = document.getElementById(`input-${qid}`);
     if (input) {
-      const taskCard = input.closest(".task-card");
       const sectionPanel = input.closest(".test-section-panel");
       if (sectionPanel) {
         const sec = sectionPanel.id.replace("section-panel-", "");
@@ -882,7 +1048,7 @@ const UI = {
    */
   async performFinalSubmission() {
     // 1. Grade the test
-    const evaluation = Validator.evaluateTest(this.currentVariant, this.answers);
+    const evaluation = Validator.evaluateTest(this.currentVariant, this.answers, this.currentUnit);
 
     // 2. Clear active in-progress session
     Storage.clearSession();
@@ -945,7 +1111,7 @@ const UI = {
             🖨️ Print / Save PDF
           </button>
           <button type="button" class="btn btn-primary btn-sm" id="btn-retake-test">
-            🔄 Retake or Switch Variant
+            🔄 Switch Unit / Retake
           </button>
         </div>
       </div>
@@ -953,7 +1119,7 @@ const UI = {
       <div style="margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
         <h3 style="font-size:1.3rem; font-weight:800;">Detailed Answer Review</h3>
         <span style="font-size:0.9rem; color:var(--text-muted);">
-          ${evaluation.mistakes.length === 0 ? "🎉 Zero mistakes!" : `${evaluation.mistakes.length} mistakes to review`}
+          ${evaluation.mistakes.length === 0 ? "🎉 Zero mistakes! Perfect score!" : `${evaluation.mistakes.length} mistakes to review`}
         </span>
       </div>
     `;
@@ -1000,10 +1166,8 @@ const UI = {
     const retakeBtn = document.getElementById("btn-retake-test");
     if (retakeBtn) {
       retakeBtn.addEventListener("click", () => {
-        if (confirm("Are you sure you want to exit to the start screen?")) {
-          this.switchScreen("start");
-          this.checkForResume();
-        }
+        this.switchScreen("start");
+        this.checkForResume();
       });
     }
 
@@ -1046,7 +1210,7 @@ const UI = {
       sendBtn.textContent = "Sending...";
       if (statusMsg) statusMsg.innerHTML = `<span style="color:var(--text-muted)">Sending question to teacher...</span>`;
 
-      const variant = TEST_DATA[this.currentVariant];
+      const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
       const res = await TeacherService.sendStudentQuestion({
         student: this.student || { firstName: "Student", lastName: "", studentClass: "" },
         variantTitle: variant ? variant.title : "English Test",
@@ -1085,10 +1249,8 @@ const UI = {
     if (tgChatIdInput) tgChatIdInput.value = config.telegramChatId || "";
     if (testResultBox) testResultBox.innerHTML = "";
 
-    // Render Archive table
     this.renderSubmissionsArchive();
 
-    // Test Sheets button
     document.getElementById("btn-test-sheets").onclick = async () => {
       testResultBox.innerHTML = "<em>Testing Google Sheets webhook...</em>";
       const res = await TeacherService.testSheetsWebhook(sheetsInput.value);
@@ -1097,7 +1259,6 @@ const UI = {
         : `<span style="color:#DC2626">❌ ${res.message}</span>`;
     };
 
-    // Test Telegram button
     document.getElementById("btn-test-telegram").onclick = async () => {
       testResultBox.innerHTML = "<em>Sending test message to Telegram...</em>";
       const res = await TeacherService.testTelegramBot(tgTokenInput.value, tgChatIdInput.value);
@@ -1106,7 +1267,6 @@ const UI = {
         : `<span style="color:#DC2626">❌ ${res.message}</span>`;
     };
 
-    // Save Settings button
     document.getElementById("btn-save-teacher-settings").onclick = () => {
       Storage.saveTeacherConfig({
         sheetsWebhookUrl: sheetsInput.value.trim(),
@@ -1144,7 +1304,6 @@ const UI = {
       })
       .join("");
 
-    // Clear archive button
     const clearBtn = document.getElementById("btn-clear-archive");
     if (clearBtn) {
       clearBtn.onclick = () => {
@@ -1166,9 +1325,6 @@ const UI = {
     if (el) el.classList.remove("open");
   },
 
-  /**
-   * Lightweight HTML5 Canvas Confetti animation
-   */
   launchConfetti() {
     const canvas = document.getElementById("confetti-canvas");
     if (!canvas) return;
@@ -1198,7 +1354,7 @@ const UI = {
       particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.4; // gravity
+        p.vy += 0.4;
         p.rotation += p.rSpeed;
 
         ctx.save();

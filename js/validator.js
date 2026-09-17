@@ -1,5 +1,5 @@
-/**
- * Language Test Unit 1 - Validator & Scoring Engine
+﻿/**
+ * Language Test Units 1-8 - Validator & Scoring Engine
  */
 
 const Validator = {
@@ -16,7 +16,7 @@ const Validator = {
       .replace(/\s+/g, " ")                         // Collapse whitespace
       .toLowerCase();
 
-    // Strip trailing punctuation like dot or exclamation if pupil typed it
+    // Strip trailing punctuation like dot, comma or exclamation/question mark
     clean = clean.replace(/[.!?]+$/, "").trim();
     return clean;
   },
@@ -38,7 +38,27 @@ const Validator = {
       ["are not", "aren't"],
       ["cannot", "can't"],
       ["can not", "can't"],
-      ["will not", "won't"]
+      ["will not", "won't"],
+      ["have not", "haven't"],
+      ["has not", "hasn't"],
+      ["could not", "couldn't"],
+      ["must not", "mustn't"],
+      ["i am", "i'm"],
+      ["we are", "we're"],
+      ["they are", "they're"],
+      ["you are", "you're"],
+      ["it is", "it's"],
+      ["he is", "he's"],
+      ["she is", "she's"],
+      ["i will", "i'll"],
+      ["we will", "we'll"],
+      ["they will", "they'll"],
+      ["he will", "he'll"],
+      ["she will", "she'll"],
+      ["it will", "it'll"],
+      ["i have", "i've"],
+      ["we have", "we've"],
+      ["they have", "they've"]
     ];
 
     contractionPairs.forEach(([full, short]) => {
@@ -75,12 +95,21 @@ const Validator = {
    * Evaluates all student answers for a given variant and computes scores.
    * @param {string} variantKey - 'variantA' or 'variantB'
    * @param {Object} userAnswers - Key-value map of question ID to user input
+   * @param {string} [unitKey] - Optional unit key like 'unit1', 'unit2', ...
    */
-  evaluateTest(variantKey, userAnswers = {}) {
-    const variant = TEST_DATA[variantKey];
-    if (!variant) throw new Error("Invalid variant: " + variantKey);
+  evaluateTest(variantKey, userAnswers = {}, unitKey = null) {
+    const activeUnit = unitKey || (window.TEST_DATA && window.TEST_DATA.currentUnit ? window.TEST_DATA.currentUnit : "unit1");
+    let variant;
+    if (window.TEST_DATA && window.TEST_DATA[activeUnit] && window.TEST_DATA[activeUnit][variantKey]) {
+      variant = window.TEST_DATA[activeUnit][variantKey];
+    } else if (window.TEST_DATA && window.TEST_DATA[variantKey]) {
+      variant = window.TEST_DATA[variantKey];
+    }
+
+    if (!variant) throw new Error("Invalid test variant: " + activeUnit + " / " + variantKey);
 
     const results = {
+      unitKey: activeUnit,
       variantKey,
       variantTitle: variant.title,
       totalMax: variant.totalPoints,
@@ -192,3 +221,5 @@ const Validator = {
     }
   }
 };
+
+window.Validator = Validator;

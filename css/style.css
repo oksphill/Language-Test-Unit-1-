@@ -629,13 +629,291 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
+/* ==========================================================================
+   Unit Selector Grid (Units 1 to 8)
+   ========================================================================== */
+.unit-selector-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unit-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.unit-card-radio {
+  cursor: pointer;
+  user-select: none;
+}
+
+.unit-card-radio input[type="radio"] {
+  display: none;
+}
+
+.unit-card-box {
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 0.65rem;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  position: relative;
+  height: 100%;
+}
+
+.unit-card-box:hover {
+  border-color: #A5B4FC;
+  background: #F5F7FF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.08);
+}
+
+.unit-card-radio input[type="radio"]:checked + .unit-card-box {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.18);
+}
+
+.unit-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.unit-card-num-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #EEF2FF;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.unit-card-radio input[type="radio"]:checked + .unit-card-box .unit-card-num-badge {
+  background: var(--primary);
+  color: #FFFFFF;
+}
+
+.unit-card-icon {
+  font-size: 1.15rem;
+}
+
+.unit-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+.unit-card-pts {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748B;
+  background: #F1F5F9;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+
+.unit-card-radio input[type="radio"]:checked + .unit-card-box .unit-card-pts {
+  background: #E0E7FF;
+  color: var(--primary);
+}
+
+/* Selected Unit Preview Info */
+.unit-preview-banner {
+  background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+  border: 1px solid #C7D2FE;
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.unit-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.unit-preview-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #312E81;
+}
+
+.unit-preview-topics {
+  font-size: 0.8rem;
+  color: #4338CA;
+}
+
+/* ==========================================================================
+   Choice Pills for "Circle the correct word"
+   ========================================================================== */
+.circle-choice-item {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #F1F5F9;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.circle-choice-item:last-child {
+  border-bottom: none;
+}
+
+.choice-pills-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #F1F5F9;
+  padding: 0.2rem 0.3rem;
+  border-radius: var(--radius-full);
+  border: 1px solid #E2E8F0;
+  vertical-align: middle;
+}
+
+.choice-pill-btn {
+  background: transparent;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.choice-pill-btn:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.choice-pill-btn.selected {
+  background: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+/* Prompt verb in brackets */
+.grammar-verb-prompt {
+  font-weight: 700;
+  color: #6366F1;
+  background: #EEF2FF;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin: 0 0.2rem;
+  white-space: nowrap;
+}
+
+/* Sentence Order Items (Unit 7) */
+.sentence-order-item {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+}
+
+.sentence-order-prompt {
+  font-size: 0.95rem;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.sentence-order-prompt .scrambled-words {
+  font-weight: 700;
+  color: #1E293B;
+  background: #FFFFFF;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px dashed #CBD5E1;
+  letter-spacing: 0.3px;
+}
+
+.sentence-order-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.sentence-order-chip {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sentence-order-chip:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sentence-order-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 0.95rem;
+  padding: 0.65rem 0.9rem;
+}
+
+/* Change Unit / Restart button in review & header */
+.btn-change-unit {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+}
+
 /* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .unit-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .name-grid {
     grid-template-columns: 1fr;
   }
   .variant-cards-grid {
     grid-template-columns: 1fr;
+  }
+  .unit-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   .section-tabs {
     grid-template-columns: 1fr;

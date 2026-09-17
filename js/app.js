@@ -1,5 +1,5 @@
 /**
- * Language Test Unit 1 - Main Application Bootstrapper
+ * Language Tests Units 1 to 8 - Main Application Bootstrapper
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,5 +31,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  console.log("English Language Test Unit 1 initialized successfully.");
+  console.log("English Language Tests Units 1-8 initialized successfully.");
 });

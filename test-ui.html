@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UI and Interaction Test Suite</title>
+</head>
+<body>
+  <div id="test-summary">Testing...</div>
+  <ul id="ui-test-results"></ul>
+
+  <!-- Hidden fixture with elements expected by UI -->
+  <div id="fixture" style="display: none;">
+    <canvas id="confetti-canvas"></canvas>
+    <div id="app-logo-badge">1</div>
+    <h1 id="app-header-title">Language Test • Unit 1</h1>
+    <div id="app-header-subtitle">Clothes and Appearance</div>
+    <button id="btn-header-change-unit"></button>
+    <div id="header-student-tag"><span id="header-student-name"></span></div>
+    <div id="save-indicator"></div>
+    <button id="btn-teacher-settings"></button>
+    <div id="active-variant-badge"></div>
+    <div id="floating-help-btn"></div>
+    <div id="btn-submit-test"></div>
+    <div id="btn-prev-section"></div>
+    <div id="btn-next-section"></div>
+    <div id="badge-count-vocabulary"></div>
+    <div id="badge-count-grammar"></div>
+    <div id="badge-count-communication"></div>
+    <div id="test-progress-fill"></div>
+    <div id="test-progress-counter"></div>
+
+    <div class="screen" id="screen-start">
+      <div id="resume-session-prompt"></div>
+      <form id="start-test-form">
+        <input type="text" id="student-name" value="Test Student">
+        <span id="selected-unit-badge"></span>
+        <div id="unit-selector-grid">
+          <input type="radio" name="test-unit" id="unit-radio-unit1" value="unit1" checked>
+          <input type="radio" name="test-unit" id="unit-radio-unit2" value="unit2">
+          <input type="radio" name="test-unit" id="unit-radio-unit3" value="unit3">
+          <input type="radio" name="test-unit" id="unit-radio-unit4" value="unit4">
+          <input type="radio" name="test-unit" id="unit-radio-unit5" value="unit5">
+          <input type="radio" name="test-unit" id="unit-radio-unit6" value="unit6">
+          <input type="radio" name="test-unit" id="unit-radio-unit7" value="unit7">
+          <input type="radio" name="test-unit" id="unit-radio-unit8" value="unit8">
+        </div>
+        <span id="preview-unit-name"></span>
+        <span id="preview-unit-topics"></span>
+        <span id="variant-a-desc"></span>
+        <span id="variant-b-desc"></span>
+        <input type="radio" name="test-variant" value="variantA" checked>
+        <input type="radio" name="test-variant" value="variantB">
+      </form>
+    </div>
+
+    <div class="screen" id="screen-test">
+      <div class="test-section-panel" id="section-panel-vocabulary"></div>
+      <div class="test-section-panel" id="section-panel-grammar"></div>
+      <div class="test-section-panel" id="section-panel-communication"></div>
+    </div>
+
+    <div class="screen" id="screen-review">
+      <div id="review-content-container"></div>
+    </div>
+
+    <div id="modal-submit-confirmation">
+      <div id="submit-confirm-count"></div>
+      <div id="submit-confirm-warning"></div>
+      <button id="btn-jump-unanswered"></button>
+      <button id="btn-confirm-final-submit"></button>
+    </div>
+
+    <div id="modal-ask-teacher">
+      <input id="ask-teacher-student-name">
+      <input id="ask-teacher-task-info">
+      <textarea id="ask-teacher-question-text"></textarea>
+      <div id="ask-teacher-status"></div>
+      <button id="btn-send-question"></button>
+    </div>
+
+    <div id="modal-teacher-settings">
+      <input id="settings-sheets-url">
+      <input id="settings-telegram-token">
+      <input id="settings-telegram-chatid">
+      <div id="settings-test-results"></div>
+      <tbody id="archive-table-body"></tbody>
+      <button id="btn-test-sheets"></button>
+      <button id="btn-test-telegram"></button>
+      <button id="btn-save-teacher-settings"></button>
+      <button id="btn-clear-archive"></button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data/unit1.js"></script>
+  <script src="js/data/unit2.js"></script>
+  <script src="js/data/unit3.js"></script>
+  <script src="js/data/unit4.js"></script>
+  <script src="js/data/unit5.js"></script>
+  <script src="js/data/unit6.js"></script>
+  <script src="js/data/unit7.js"></script>
+  <script src="js/data/unit8.js"></script>
+  <script src="js/test-data.js"></script>
+  <script src="js/validator.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/teacher-service.js"></script>
+  <script src="js/illustrations.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    const results = [];
+    function assert(name, condition, details = "") {
+      if (condition) {
+        results.push({ name, pass: true });
+      } else {
+        results.push({ name, pass: false, details });
+        console.error("FAIL:", name, details);
+      }
+    }
+
+    try {
+      // 1. UI Initialization
+      UI.init();
+      assert("UI.init executes cleanly", UI.activeScreen === "start");
+
+      // 2. Test selecting each unit from 1 to 8
+      for (let u = 1; u <= 8; u++) {
+        const uKey = "unit" + u;
+        UI.onSelectUnit(uKey);
+        assert(`onSelectUnit(${uKey}) updates currentUnit`, UI.currentUnit === uKey);
+        const preview = document.getElementById("preview-unit-name").textContent;
+        assert(`onSelectUnit(${uKey}) updates preview banner`, preview.includes(`Unit ${u}`));
+      }
+
+      // 3. Test starting a test for Unit 2 Variant A
+      UI.currentUnit = "unit2";
+      UI.currentVariant = "variantA";
+      UI.student = { fullName: "Alice Brown", firstName: "Alice", lastName: "Brown", studentClass: "5B", variant: "variantA", unit: "unit2" };
+      UI.renderTestUI();
+      UI.switchScreen("test");
+
+      assert("Screen switched to test", UI.activeScreen === "test");
+      assert("Header logo shows Unit 2", document.getElementById("app-logo-badge").textContent === "2");
+      assert("Header title shows Unit 2", document.getElementById("app-header-title").textContent.includes("Unit 2"));
+
+      // Check Section 1 (Vocabulary) rendered
+      const secVocab = document.getElementById("section-panel-vocabulary");
+      assert("Unit 2 Vocab panel has task cards", secVocab.querySelectorAll(".task-card").length === 3);
+
+      // Check Task 1 (Word Bank) chips rendered
+      const chips = secVocab.querySelectorAll(".word-chip");
+      assert("Unit 2 Task 1 has word chips", chips.length >= 8);
+
+      // Check Section 2 (Grammar) rendered
+      const secGrammar = document.getElementById("section-panel-grammar");
+      assert("Unit 2 Grammar panel has 2 tasks", secGrammar.querySelectorAll(".task-card").length === 2);
+
+      // Check Circle-Choice Task (Task 5)
+      const pills = secGrammar.querySelectorAll(".choice-pill-btn");
+      assert("Unit 2 Task 5 has choice pills", pills.length >= 12);
+
+      // Test clicking a choice pill
+      const mustPill = secGrammar.querySelector('.choice-pill-btn[data-qid="A_5_1"][data-value="must"]');
+      assert("Choice pill 'must' exists", !!mustPill);
+      mustPill.click();
+      const hiddenInput = document.getElementById("input-A_5_1");
+      assert("Clicking choice pill sets input value", hiddenInput && hiddenInput.value === "must");
+      assert("Clicking choice pill marks it as selected", mustPill.classList.contains("selected"));
+      assert("Answers object contains question", UI.answers["A_5_1"] === "must");
+
+      // Test inserting word from Word Bank into gap
+      const dentistChip = secVocab.querySelector('.word-chip[data-word="dentist"]');
+      assert("Word chip 'dentist' exists", !!dentistChip);
+      dentistChip.click();
+      const firstGap = document.getElementById("input-A_1_1");
+      assert("Clicking word chip fills first empty gap", firstGap && firstGap.value === "dentist");
+      assert("Answers object updated with dentist", UI.answers["A_1_1"] === "dentist");
+
+      // 4. Test Unit 7 Sentence Order Unscramble
+      UI.currentUnit = "unit7";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+
+      const sec7Grammar = document.getElementById("section-panel-grammar");
+      const sentenceOrderChips = sec7Grammar.querySelectorAll(".sentence-order-chip");
+      assert("Unit 7 Task 4 has sentence order chips", sentenceOrderChips.length >= 15);
+
+      // Click a sentence order chip
+      const firstOrderChip = sentenceOrderChips[0];
+      const tok = firstOrderChip.getAttribute("data-token");
+      const qid = firstOrderChip.getAttribute("data-qid");
+      firstOrderChip.click();
+      const orderInp = document.getElementById(`input-${qid}`);
+      assert("Clicking order chip appends token to input", orderInp && orderInp.value.includes(tok));
+
+      // 5. Test Evaluation and Results rendering
+      const sampleAnswers = {};
+      const u7TestData = TEST_DATA.getTest("unit7", "variantA");
+      // Populate correct answers
+      for (const sec of Object.values(u7TestData.sections)) {
+        for (const task of sec.tasks) {
+          for (const [qKey, ansObj] of Object.entries(task.answers)) {
+            sampleAnswers[qKey] = ansObj.expected[0];
+          }
+        }
+      }
+      const evalRes = Validator.evaluateTest("variantA", sampleAnswers, "unit7");
+      assert("Unit 7 evaluation totalScore is 35/35", evalRes.totalScore === 35);
+      assert("Unit 7 zero mistakes", evalRes.mistakes.length === 0);
+
+      UI.renderResultsScreen(evalRes);
+      const reviewContainer = document.getElementById("review-content-container");
+      assert("Review container rendered hero card", !!reviewContainer.querySelector(".results-hero-card"));
+      assert("Review container rendered 35 review items", reviewContainer.querySelectorAll(".review-card").length === 35);
+
+    } catch (e) {
+      assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);
+    }
+
+    const passCount = results.filter(r => r.pass).length;
+    const failCount = results.filter(r => !r.pass).length;
+    const summary = `UI_RESULTS: ${passCount} PASSED, ${failCount} FAILED`;
+
+    const summaryEl = document.getElementById("test-summary");
+    summaryEl.innerText = summary;
+
+    document.getElementById("ui-test-results").innerHTML = results.map(r => `
+      <li style="color:${r.pass ? 'green' : 'red'}">${r.pass ? '✓' : '✗'} ${r.name} ${r.details || ''}</li>
+    `).join("");
+  </script>
+</body>
+</html>
