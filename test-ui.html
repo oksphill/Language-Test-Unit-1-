@@ -224,6 +224,33 @@
       const gregoryImg = u1Vocab.querySelector("#card-task_2 .test-illustration-img");
       assert("Unit 1 Task 2 renders Gregory Cook image", gregoryImg && gregoryImg.getAttribute("src").includes("gregory_cook"));
 
+      // 7. Test Disappearing Word Bank Chips
+      UI.answers = {};
+      UI.renderTestUI();
+      const task1Card = document.getElementById("card-task_1");
+      const braceletsChip = task1Card.querySelector('.word-chip[data-word="bracelets"]');
+      const ringsChip = task1Card.querySelector('.word-chip[data-word="rings"]');
+
+      assert("Before matching, bracelets chip is visible", !braceletsChip.classList.contains("is-used"));
+      assert("Before matching, rings chip is visible", !ringsChip.classList.contains("is-used"));
+
+      // Click bracelets chip to fill first gap
+      braceletsChip.click();
+      assert("After clicking, bracelets chip disappears (has is-used)", braceletsChip.classList.contains("is-used"));
+      assert("Gap 1 filled with bracelets", document.getElementById("input-A_1_1").value === "bracelets");
+
+      // Click rings chip to fill second gap
+      ringsChip.click();
+      assert("After clicking, rings chip disappears (has is-used)", ringsChip.classList.contains("is-used"));
+      assert("Gap 2 filled with rings", document.getElementById("input-A_1_2").value === "rings");
+
+      // Clear gap 1
+      const gap1 = document.getElementById("input-A_1_1");
+      gap1.value = "";
+      gap1.dispatchEvent(new Event("input", { bubbles: true }));
+      assert("After clearing gap 1, bracelets chip reappears (!is-used)", !braceletsChip.classList.contains("is-used"));
+      assert("rings chip is still hidden", ringsChip.classList.contains("is-used"));
+
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);
     }

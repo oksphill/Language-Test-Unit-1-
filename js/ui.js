@@ -653,6 +653,7 @@ const UI = {
         <div class="word-bank-container" data-task="${task.id}">
           <div class="word-bank-header"><span>📦 Word Bank (Click a phrase to insert):</span></div>
           <div class="word-bank-chips">${chips}</div>
+          <div class="word-bank-all-placed-msg">✅ All phrases from the box have been placed!</div>
         </div>
       `;
     }
@@ -707,6 +708,7 @@ const UI = {
         <div class="word-bank-container" data-task="${task.id}">
           <div class="word-bank-header"><span>📦 Word Bank (Click a word to fill the active blank):</span></div>
           <div class="word-bank-chips">${chips}</div>
+          <div class="word-bank-all-placed-msg">✅ All words from the box have been placed!</div>
         </div>
       `;
     }
@@ -855,19 +857,56 @@ const UI = {
       const card = targetInput.closest(".task-card");
       if (card) {
         const allInp = Array.from(card.querySelectorAll(".test-gap"));
-        const curIdx = allInp.indexOf(targetInput);
-        if (curIdx >= 0 && curIdx < allInp.length - 1) {
-          allInp[curIdx + 1].focus();
+        const emptiesAfter = allInp.filter((inp) => !inp.value.trim());
+        if (emptiesAfter.length > 0) {
+          emptiesAfter[0].focus();
         }
       }
     }
   },
 
   /**
-   * Word Bank chip state: NO strikethrough per user requirement
+   * Word Bank chip state:
+   * When a word is matched with a gap, it disappears from the Word Bank.
+   * If a word is cleared or replaced in the gap, it returns to the Word Bank.
    */
   updateWordBankUsedState() {
-    // Chips must always stay clean and clickable with no strikethrough
+    document.querySelectorAll(".task-card").forEach((card) => {
+      const bankContainer = card.querySelector(".word-bank-container");
+      if (!bankContainer) return;
+
+      const chips = Array.from(bankContainer.querySelectorAll(".word-chip"));
+      if (chips.length === 0) return;
+
+      // Collect all words currently entered into gap inputs within this task card
+      const inputs = Array.from(card.querySelectorAll(".test-gap"));
+      const usedWords = inputs
+        .map((inp) => (typeof Validator !== "undefined" ? Validator.normalize(inp.value) : inp.value.trim().toLowerCase()))
+        .filter(Boolean);
+
+      // Track remaining words to consume 1 chip per filled word
+      const remainingPool = [...usedWords];
+
+      let hiddenCount = 0;
+      chips.forEach((chip) => {
+        const rawWord = chip.getAttribute("data-word") || "";
+        const normWord = typeof Validator !== "undefined" ? Validator.normalize(rawWord) : rawWord.trim().toLowerCase();
+
+        const matchIdx = remainingPool.findIndex((w) => w === normWord);
+        if (matchIdx !== -1) {
+          // Word is matched to a gap: HIDE IT
+          chip.classList.add("is-used");
+          remainingPool.splice(matchIdx, 1);
+          hiddenCount++;
+        } else {
+          // Word is NOT used in any gap: SHOW IT
+          chip.classList.remove("is-used");
+        }
+      });
+
+      // Show/hide all-placed notification
+      bankContainer.classList.toggle("all-used", hiddenCount === chips.length && chips.length > 0);
+    });
   },
 
   /**

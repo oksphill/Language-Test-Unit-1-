@@ -10,7 +10,11 @@ const Illustrations = {
   getMrsCookSvg() {
     return `
       <div class="illustration-container" role="img" aria-label="Illustration for Task 1: Mrs Cook and her accessories">
-        <img src="assets/images/mrs_cook.png" alt="Mrs Cook and accessories in boutique" class="test-illustration-img" loading="eager">
+        <img src="assets/images/mrs_cook.jpg" alt="Mrs Cook and accessories in boutique" class="test-illustration-img" loading="eager">
+        <div class="illustration-caption">
+          <span class="caption-badge">Mrs Cook (Variant A)</span>
+          <span class="caption-sub">✨ Accessories & Style</span>
+        </div>
       </div>
     `;
   },
