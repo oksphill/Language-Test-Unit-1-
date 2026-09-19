@@ -411,10 +411,12 @@ const UI = {
       `;
     }
 
-    // Illustration (Unit 1 only)
-    if (task.hasIllustration && task.imageKey && typeof Illustrations !== "undefined") {
+    // Illustration (Unit 1 and visual tasks)
+    if (task.imageKey && typeof Illustrations !== "undefined") {
       const illSvg = Illustrations.renderIllustration(task.imageKey);
-      html += `<div class="illustration-wrapper">${illSvg}</div>`;
+      if (illSvg) {
+        html += `<div class="illustration-wrapper">${illSvg}</div>`;
+      }
     }
 
     // Task Body by Type

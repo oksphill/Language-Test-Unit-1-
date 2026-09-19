@@ -214,6 +214,16 @@
       assert("Review container rendered hero card", !!reviewContainer.querySelector(".results-hero-card"));
       assert("Review container rendered 35 review items", reviewContainer.querySelectorAll(".review-card").length === 35);
 
+      // 6. Test Unit 1 Illustrations (Mrs Cook & Gregory Cook)
+      UI.currentUnit = "unit1";
+      UI.currentVariant = "variantA";
+      UI.renderTestUI();
+      const u1Vocab = document.getElementById("section-panel-vocabulary");
+      const mrsCookImg = u1Vocab.querySelector("#card-task_1 .test-illustration-img");
+      assert("Unit 1 Task 1 renders Mrs Cook image", mrsCookImg && mrsCookImg.getAttribute("src").includes("mrs_cook"));
+      const gregoryImg = u1Vocab.querySelector("#card-task_2 .test-illustration-img");
+      assert("Unit 1 Task 2 renders Gregory Cook image", gregoryImg && gregoryImg.getAttribute("src").includes("gregory_cook"));
+
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);
     }

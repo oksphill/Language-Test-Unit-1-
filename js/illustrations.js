@@ -10,11 +10,7 @@ const Illustrations = {
   getMrsCookSvg() {
     return `
       <div class="illustration-container" role="img" aria-label="Illustration for Task 1: Mrs Cook and her accessories">
-        <img src="assets/images/mrs_cook.jpg" alt="Mrs Cook and accessories in boutique" class="test-illustration-img" loading="eager">
-        <div class="illustration-caption">
-          <span class="caption-badge">Mrs Cook (Variant A)</span>
-          <span class="caption-sub">✨ Accessories & Style</span>
-        </div>
+        <img src="assets/images/mrs_cook.png" alt="Mrs Cook and accessories in boutique" class="test-illustration-img" loading="eager">
       </div>
     `;
   },
@@ -40,11 +36,7 @@ const Illustrations = {
   getGregoryCookSvg() {
     return `
       <div class="illustration-container" role="img" aria-label="Illustration for Task 2: Gregory Cook at work vs casual">
-        <img src="assets/images/gregory_cook.jpg" alt="Gregory Cook - Work clothes vs Casual style" class="test-illustration-img" loading="eager">
-        <div class="illustration-caption">
-          <span class="caption-badge">Gregory Cook (Variant A)</span>
-          <span class="caption-sub">👔 Smart at work vs. 🎧 Casual at home</span>
-        </div>
+        <img src="assets/images/gregory_cook.png" alt="Gregory Cook - Work clothes vs Casual style" class="test-illustration-img" loading="eager">
       </div>
     `;
   },

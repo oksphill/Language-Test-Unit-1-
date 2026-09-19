@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Language Test Unit 1 - Clothes and Appearance
  * Pearson Education Limited 2019 Photocopiable Test Sheets
  */
@@ -26,6 +26,7 @@ window.UNIT_1_DATA = {
             points: 5,
             type: "word-bank",
             imageKey: "mrs_cook",
+            hasIllustration: true,
             wordBank: ["bracelets", "earrings", "floral", "handbag", "rings", "tie"],
             example: "Mrs Cook loves nice accessories. She is wearing gold ⁰earrings in her ears.",
             usedInExample: ["earrings"],
@@ -88,6 +89,7 @@ window.UNIT_1_DATA = {
             points: 6,
             type: "letter-hint",
             imageKey: "gregory_cook",
+            hasIllustration: true,
             example: "Gregory Cook wears ⁰smart clothes at work: ",
             items: [
               {
@@ -557,6 +559,7 @@ window.UNIT_1_DATA = {
             points: 5,
             type: "word-bank",
             imageKey: "mrs_smith",
+            hasIllustration: true,
             wordBank: ["bracelets", "earrings", "handbag", "rings", "scarf", "spotted"],
             example: "Mrs Smith loves nice accessories. She is wearing gold ⁰earrings in her ears and a floral ",
             usedInExample: ["earrings"],
@@ -619,6 +622,7 @@ window.UNIT_1_DATA = {
             points: 6,
             type: "letter-hint",
             imageKey: "lee",
+            hasIllustration: true,
             example: "Lee always wears ⁰smart clothes at work: ",
             items: [
               {
