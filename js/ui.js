@@ -109,43 +109,78 @@ const UI = {
     const info = unitsList.find((u) => u.id === unitKey) || {
       id: unitKey,
       number: unitKey.replace("unit", ""),
-      title: `Unit ${unitKey.replace("unit", "")}`,
-      description: "35 pts Photocopiable Language Test"
+      title: unitKey === "mid_year" ? "Mid-Year Test" : (unitKey === "end_of_year" ? "End-of-Year Test" : `Unit ${unitKey.replace("unit", "")}`),
+      points: (unitKey === "mid_year" || unitKey === "end_of_year") ? 50 : 35,
+      desc: "Comprehensive English Language Assessment"
     };
+
+    // Dynamic start screen subtitle based on test content
+    const heroSubtitle = document.getElementById("start-hero-subtitle");
+    if (heroSubtitle) {
+      if (unitKey === "mid_year") {
+        heroSubtitle.textContent = "Complete all 9 tasks to practice your Units 1–4 vocabulary, grammar, audio listening (Track 10), reading, and everyday communication skills.";
+      } else if (unitKey === "end_of_year") {
+        heroSubtitle.textContent = "Complete all 9 tasks to practice your Units 1–8 vocabulary, grammar, audio listening (Track 11), reading, and matching skills.";
+      } else if (unitKey === "unit1") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on clothes, past tenses, and everyday communication skills.";
+      } else if (unitKey === "unit2") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on jobs, present tenses, and workplace dialogues.";
+      } else if (unitKey === "unit3") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your sports vocabulary, Present Perfect, and sharing experiences.";
+      } else if (unitKey === "unit4") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on books and films, relative clauses, and movie reviews.";
+      } else if (unitKey === "unit5") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your music styles, past modals (could/had to), and making suggestions.";
+      } else if (unitKey === "unit6") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your nature & animals vocabulary, conditional sentences, and giving advice.";
+      } else if (unitKey === "unit7") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your technology inventions, passive voice, and step-by-step instructions.";
+      } else if (unitKey === "unit8") {
+        heroSubtitle.textContent = "Complete all 6 tasks to practice your feelings & relationships, reported speech, and emotional reactions.";
+      } else {
+        heroSubtitle.textContent = `Complete all tasks to practice ${info.desc || "your English language skills"}.`;
+      }
+    }
 
     const badge = document.getElementById("selected-unit-badge");
     if (badge) {
-      badge.textContent = `Unit ${info.number} • ${info.title}`;
+      if (unitKey === "mid_year") badge.textContent = "Mid-Year Test (Units 1–4) • 50 pts";
+      else if (unitKey === "end_of_year") badge.textContent = "End-of-Year Test (Units 1–8) • 50 pts";
+      else badge.textContent = `Unit ${info.number} • ${info.title}`;
     }
 
     const previewName = document.getElementById("preview-unit-name");
     if (previewName) {
-      previewName.textContent = `Unit ${info.number}: ${info.title}`;
+      if (unitKey === "mid_year") previewName.textContent = "Mid-Year Test: Units 1–4";
+      else if (unitKey === "end_of_year") previewName.textContent = "End-of-Year Test: Units 1–8";
+      else previewName.textContent = `Unit ${info.number}: ${info.title}`;
     }
 
     const previewTopics = document.getElementById("preview-unit-topics");
     if (previewTopics) {
-      previewTopics.textContent = `${info.description} • 35 pts total`;
+      previewTopics.textContent = `${info.desc || info.description || ""} • ${info.points || 35} pts total`;
     }
 
     const varADesc = document.getElementById("variant-a-desc");
     if (varADesc) {
-      varADesc.textContent = `Photocopiable Unit ${info.number} Test A (35 pts)`;
+      varADesc.textContent = `Photocopiable ${info.title} Variant A (${info.points || 35} pts)`;
     }
 
     const varBDesc = document.getElementById("variant-b-desc");
     if (varBDesc) {
-      varBDesc.textContent = `Photocopiable Unit ${info.number} Test B (35 pts)`;
+      varBDesc.textContent = `Photocopiable ${info.title} Variant B (${info.points || 35} pts)`;
     }
 
     const headerLogoBadge = document.getElementById("app-logo-badge");
     if (headerLogoBadge && this.activeScreen === "start") {
-      headerLogoBadge.textContent = info.number;
+      headerLogoBadge.textContent = unitKey === "mid_year" ? "1-4" : (unitKey === "end_of_year" ? "1-8" : info.number);
     }
 
     const headerTitle = document.getElementById("app-header-title");
     if (headerTitle && this.activeScreen === "start") {
-      headerTitle.textContent = `Language Test • Unit ${info.number}`;
+      if (unitKey === "mid_year") headerTitle.textContent = "Language Test • Mid-Year (Units 1–4)";
+      else if (unitKey === "end_of_year") headerTitle.textContent = "Language Test • End-of-Year (Units 1–8)";
+      else headerTitle.textContent = `Language Test • Unit ${info.number}`;
     }
 
     const headerSubtitle = document.getElementById("app-header-subtitle");
@@ -288,7 +323,20 @@ const UI = {
   },
 
   /**
-   * Switches section between 'vocabulary', 'grammar', 'communication'
+   * Retrieves active section keys for current test variant
+   */
+  getSectionKeys() {
+    const variant = (typeof TEST_DATA !== "undefined" && TEST_DATA.getTest)
+      ? TEST_DATA.getTest(this.currentUnit, this.currentVariant)
+      : null;
+    if (variant && variant.sections) {
+      return Object.keys(variant.sections);
+    }
+    return ["vocabulary", "grammar", "communication"];
+  },
+
+  /**
+   * Switches section dynamically
    */
   switchSection(sectionKey) {
     this.activeSection = sectionKey;
@@ -296,34 +344,34 @@ const UI = {
       btn.classList.toggle("active", btn.getAttribute("data-section") === sectionKey);
     });
 
+    const secKeys = this.getSectionKeys();
     document.querySelectorAll(".test-section-panel").forEach((panel) => {
       panel.style.display = panel.id === `section-panel-${sectionKey}` ? "block" : "none";
     });
 
     // Update Next/Prev navigation buttons
-    const sections = ["vocabulary", "grammar", "communication"];
-    const idx = sections.indexOf(sectionKey);
+    const idx = secKeys.indexOf(sectionKey);
     const prevBtn = document.getElementById("btn-prev-section");
     const nextBtn = document.getElementById("btn-next-section");
     const submitBtn = document.getElementById("btn-submit-test");
 
-    if (prevBtn) prevBtn.style.visibility = idx === 0 ? "hidden" : "visible";
+    if (prevBtn) prevBtn.style.visibility = idx <= 0 ? "hidden" : "visible";
     if (nextBtn) {
-      nextBtn.style.display = idx === sections.length - 1 ? "none" : "inline-flex";
+      nextBtn.style.display = idx === secKeys.length - 1 ? "none" : "inline-flex";
     }
     if (submitBtn) {
-      submitBtn.style.display = idx === sections.length - 1 ? "inline-flex" : "none";
+      submitBtn.style.display = idx === secKeys.length - 1 ? "inline-flex" : "none";
     }
 
     window.scrollTo({ top: 120, behavior: "smooth" });
   },
 
   navigateSection(direction) {
-    const sections = ["vocabulary", "grammar", "communication"];
-    const idx = sections.indexOf(this.activeSection);
+    const secKeys = this.getSectionKeys();
+    const idx = secKeys.indexOf(this.activeSection);
     const newIdx = idx + direction;
-    if (newIdx >= 0 && newIdx < sections.length) {
-      this.switchSection(sections[newIdx]);
+    if (newIdx >= 0 && newIdx < secKeys.length) {
+      this.switchSection(secKeys[newIdx]);
     }
   },
 
@@ -341,10 +389,16 @@ const UI = {
     // Header logo badge and title
     const unitNum = this.currentUnit.replace("unit", "");
     const logoBadge = document.getElementById("app-logo-badge");
-    if (logoBadge) logoBadge.textContent = unitNum;
+    if (logoBadge) {
+      logoBadge.textContent = this.currentUnit === "mid_year" ? "1-4" : (this.currentUnit === "end_of_year" ? "1-8" : unitNum);
+    }
 
     const headerTitle = document.getElementById("app-header-title");
-    if (headerTitle) headerTitle.textContent = `Language Test • Unit ${unitNum}`;
+    if (headerTitle) {
+      if (this.currentUnit === "mid_year") headerTitle.textContent = "Language Test • Mid-Year (Units 1–4)";
+      else if (this.currentUnit === "end_of_year") headerTitle.textContent = "Language Test • End-of-Year (Units 1–8)";
+      else headerTitle.textContent = `Language Test • Unit ${unitNum}`;
+    }
 
     const headerSubtitle = document.getElementById("app-header-subtitle");
     if (headerSubtitle) {
@@ -352,17 +406,58 @@ const UI = {
       headerSubtitle.textContent = unitInfo ? unitInfo.title : variant.title;
     }
 
-    // Render Section 1: Vocabulary
-    this.renderSection("vocabulary", variant.sections.vocabulary);
+    // Dynamic Section Tabs Navigation
+    const secKeys = this.getSectionKeys();
+    const tabsContainer = document.querySelector(".section-tabs");
+    if (tabsContainer) {
+      let tabsHtml = "";
+      secKeys.forEach((sKey, sIdx) => {
+        const sec = variant.sections[sKey];
+        if (!sec) return;
+        const iconMap = {
+          vocabulary: "📚",
+          grammar: "✏️",
+          listening: "🎧",
+          reading: "📖",
+          communication: "💬"
+        };
+        const icon = iconMap[sKey] || "📝";
+        const activeCls = sKey === this.activeSection ? " active" : "";
+        tabsHtml += `
+          <button type="button" class="section-tab-btn${activeCls}" data-section="${sKey}">
+            <span>${sIdx + 1}. ${sec.title} (${sec.maxScore} pts) ${icon}</span>
+            <span class="section-tab-badge" id="badge-count-${sKey}">0 / ${sec.maxScore}</span>
+          </button>
+        `;
+      });
+      tabsContainer.innerHTML = tabsHtml;
 
-    // Render Section 2: Grammar
-    this.renderSection("grammar", variant.sections.grammar);
+      // Re-bind click events for newly rendered tabs
+      tabsContainer.querySelectorAll(".section-tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.switchSection(btn.getAttribute("data-section"));
+        });
+      });
+    }
 
-    // Render Section 3: Communication
-    this.renderSection("communication", variant.sections.communication);
+    // Ensure active section exists in this test
+    if (!secKeys.includes(this.activeSection)) {
+      this.activeSection = secKeys[0] || "vocabulary";
+    }
+
+    // Render each section panel
+    for (const sKey of secKeys) {
+      this.renderSection(sKey, variant.sections[sKey]);
+    }
+
+    // Switch to active section and set visibility
+    this.switchSection(this.activeSection);
 
     // Restore saved answers into inputs
     this.populateSavedAnswers();
+
+    // Initialize interactive audio players
+    this.initAudioPlayers();
   },
 
   /**
@@ -430,6 +525,24 @@ const UI = {
    * Task Body Dispatcher
    */
   renderTaskBody(task) {
+    // 0. Audio Listening Tasks (with embedded player)
+    if (task.audioTrack || task.type === "listening-gap") {
+      if (task.type === "circle-choice") {
+        return this.renderAudioPlayer(task) + this.renderCircleChoiceTask(task);
+      }
+      return this.renderListeningGapTask(task);
+    }
+
+    // 0.1 Reading Tasks (Passage + T/F/DS or Open Questions)
+    if (task.type === "reading-tf-ds" || task.type === "reading-qa" || task.passage) {
+      return this.renderReadingTask(task);
+    }
+
+    // 0.2 Matching Dialogue Tasks (Options a–i + conversations)
+    if (task.type === "matching-dialogue") {
+      return this.renderMatchingDialogueTask(task);
+    }
+
     // 1. Circle Choice (or Relative Pronouns with choices)
     if (task.type === "circle-choice" || task.type === "relative-pronouns-gap") {
       return this.renderCircleChoiceTask(task);
@@ -471,6 +584,264 @@ const UI = {
 
     // 8. Word Bank / Collocations Choice / Word Gap (Default to text flow with gaps)
     return this.renderWordBankOrGapTask(task);
+  },
+
+  /**
+   * Audio Player Component Markup
+   */
+  renderAudioPlayer(task) {
+    return `
+      <div class="audio-player-card" data-track="${task.audioTrack || ''}">
+        <div class="audio-player-top">
+          <div class="audio-player-badge">🎧 Audio Listening</div>
+          <div class="audio-player-meta">
+            <span class="audio-player-title">${task.audioTitle || "Listening Audio Track"}</span>
+            <span class="audio-player-desc">${task.audioDesc || "Click play to listen to the recording"}</span>
+          </div>
+        </div>
+        <audio class="audio-native" src="${task.audioTrack}" preload="metadata"></audio>
+        <div class="audio-controls-row">
+          <button type="button" class="audio-btn btn-audio-play" title="Play or pause audio">
+            <span class="play-label">▶️ Play</span>
+          </button>
+          <button type="button" class="audio-btn btn-audio-skip-back" title="Rewind 5 seconds">⏪ -5s</button>
+          <button type="button" class="audio-btn btn-audio-skip-fwd" title="Forward 5 seconds">+5s ⏩</button>
+          <div class="audio-timeline">
+            <span class="audio-time-cur">0:00</span>
+            <input type="range" class="audio-seek-bar" min="0" max="100" value="0" step="0.1" aria-label="Audio scrubber">
+            <span class="audio-time-dur">0:00</span>
+          </div>
+          <button type="button" class="audio-btn btn-audio-speed" title="Adjust playback speed">1.0x</button>
+        </div>
+      </div>
+    `;
+  },
+
+  /**
+   * Initializes event listeners for all embedded audio players
+   */
+  initAudioPlayers() {
+    document.querySelectorAll(".audio-player-card").forEach((card) => {
+      const audio = card.querySelector(".audio-native");
+      if (!audio || card.dataset.audioInitialized) return;
+      card.dataset.audioInitialized = "true";
+
+      const playBtn = card.querySelector(".btn-audio-play");
+      const playLabel = card.querySelector(".play-label");
+      const skipBack = card.querySelector(".btn-audio-skip-back");
+      const skipFwd = card.querySelector(".btn-audio-skip-fwd");
+      const curTime = card.querySelector(".audio-time-cur");
+      const durTime = card.querySelector(".audio-time-dur");
+      const seekBar = card.querySelector(".audio-seek-bar");
+      const speedBtn = card.querySelector(".btn-audio-speed");
+
+      const formatTime = (sec) => {
+        if (isNaN(sec) || sec < 0) return "0:00";
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${m}:${s < 10 ? "0" : ""}${s}`;
+      };
+
+      // Metadata loaded
+      audio.addEventListener("loadedmetadata", () => {
+        if (durTime) durTime.textContent = formatTime(audio.duration);
+      });
+
+      // Play / Pause toggle
+      if (playBtn) {
+        playBtn.addEventListener("click", () => {
+          if (audio.paused) {
+            document.querySelectorAll(".audio-native").forEach((other) => {
+              if (other !== audio && !other.paused) {
+                other.pause();
+                const otherCard = other.closest(".audio-player-card");
+                if (otherCard) {
+                  const lbl = otherCard.querySelector(".play-label");
+                  if (lbl) lbl.textContent = "▶️ Play";
+                }
+              }
+            });
+            audio.play();
+            if (playLabel) playLabel.textContent = "⏸️ Pause";
+          } else {
+            audio.pause();
+            if (playLabel) playLabel.textContent = "▶️ Play";
+          }
+        });
+      }
+
+      // Time update
+      audio.addEventListener("timeupdate", () => {
+        if (curTime) curTime.textContent = formatTime(audio.currentTime);
+        if (seekBar && audio.duration) {
+          seekBar.value = (audio.currentTime / audio.duration) * 100;
+        }
+      });
+
+      // Audio ended
+      audio.addEventListener("ended", () => {
+        if (playLabel) playLabel.textContent = "▶️ Play again";
+        if (seekBar) seekBar.value = 0;
+      });
+
+      // Seek / scrub
+      if (seekBar) {
+        seekBar.addEventListener("input", () => {
+          if (audio.duration) {
+            audio.currentTime = (seekBar.value / 100) * audio.duration;
+          }
+        });
+      }
+
+      // Skip back 5s
+      if (skipBack) {
+        skipBack.addEventListener("click", () => {
+          audio.currentTime = Math.max(0, audio.currentTime - 5);
+        });
+      }
+
+      // Skip forward 5s
+      if (skipFwd) {
+        skipFwd.addEventListener("click", () => {
+          const maxDur = audio.duration || 0;
+          audio.currentTime = Math.min(maxDur, audio.currentTime + 5);
+        });
+      }
+
+      // Playback speed cycle: 1.0x -> 0.85x -> 1.2x -> 1.0x
+      if (speedBtn) {
+        const speeds = [1.0, 0.85, 1.2];
+        let sIdx = 0;
+        speedBtn.addEventListener("click", () => {
+          sIdx = (sIdx + 1) % speeds.length;
+          const spd = speeds[sIdx];
+          audio.playbackRate = spd;
+          speedBtn.textContent = spd === 1 ? "1.0x" : `${spd}x`;
+        });
+      }
+    });
+  },
+
+  /**
+   * Renders Listening gap tasks with audio player
+   */
+  renderListeningGapTask(task) {
+    let html = "";
+    if (task.audioTrack) {
+      html += this.renderAudioPlayer(task);
+    }
+    if (task.items && task.items.length > 0) {
+      let rowsHtml = "";
+      for (const it of task.items) {
+        rowsHtml += `
+          <div class="grammar-item-row">
+            <span class="gap-label">${it.label}</span>
+            ${it.before ? `<span>${it.before}</span> ` : ""}
+            <span class="gap-inline-wrapper">
+              <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type word or number">
+            </span>
+            ${it.after ? ` <span>${it.after}</span>` : ""}
+          </div>
+        `;
+      }
+      html += `<div class="grammar-items-list">${rowsHtml}</div>`;
+    }
+    return html;
+  },
+
+  /**
+   * Renders Reading tasks (passage with T/F/DS or open questions)
+   */
+  renderReadingTask(task) {
+    let html = "";
+    if (task.passage) {
+      const paragraphs = task.passage
+        .split("\n\n")
+        .map((p) => `<p>${p.trim()}</p>`)
+        .join("");
+      html += `
+        <div class="reading-passage-box">
+          ${task.passageTitle ? `<div class="reading-passage-title">📖 ${task.passageTitle}</div>` : ""}
+          <div class="reading-passage-text">${paragraphs}</div>
+        </div>
+      `;
+    }
+
+    if (task.type === "reading-tf-ds" && task.items) {
+      let rowsHtml = "";
+      for (const it of task.items) {
+        html += `
+          <div class="reading-tf-row">
+            <div class="reading-tf-statement">
+              <span class="gap-label">${it.label}</span>
+              <span>${it.statement}</span>
+            </div>
+            <div class="choice-pills-group" data-qid="${it.id}">
+              ${it.options.map((opt) => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
+              <input type="hidden" class="test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" value="">
+            </div>
+          </div>
+        `;
+      }
+    } else if (task.type === "reading-qa" && task.items) {
+      let rowsHtml = "";
+      for (const it of task.items) {
+        rowsHtml += `
+          <div class="reading-qa-item">
+            <div class="reading-qa-question">
+              <span class="gap-label">${it.label}</span>
+              <span>${it.question}</span>
+            </div>
+            <input type="text" class="form-control test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="${it.placeholder || 'Type your answer here...'}">
+          </div>
+        `;
+      }
+      html += `<div class="reading-qa-list">${rowsHtml}</div>`;
+    }
+
+    return html;
+  },
+
+  /**
+   * Renders Matching Dialogue tasks (options bank a-i + dialogue lines)
+   */
+  renderMatchingDialogueTask(task) {
+    let html = "";
+    if (task.optionsList && task.optionsList.length > 0) {
+      const chips = task.optionsList
+        .map((opt) => `<div class="matching-opt-chip"><strong>${opt.key}</strong> ${opt.text}</div>`)
+        .join("");
+      html += `
+        <div class="matching-options-bank">
+          <div class="matching-options-header">💡 Match each conversation (1–8) to an answer (a–i):</div>
+          <div class="matching-options-grid">${chips}</div>
+        </div>
+      `;
+    }
+
+    let rowsHtml = "";
+    for (const it of task.items) {
+      const optSelects = task.optionsList
+        ? task.optionsList.map((o) => `<option value="${o.key}">${o.key}. ${o.text}</option>`).join("")
+        : "";
+
+      rowsHtml += `
+        <div class="matching-item-row">
+          <div class="matching-prompt">
+            <span class="gap-label">${it.label}</span>
+            <span>${it.prompt}</span>
+          </div>
+          <div>
+            <select class="form-control test-gap matching-select" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}">
+              <option value="">▼ Choose answer (a–i)...</option>
+              ${optSelects}
+            </select>
+          </div>
+        </div>
+      `;
+    }
+    html += `<div class="matching-items-list">${rowsHtml}</div>`;
+    return html;
   },
 
   /**
@@ -604,10 +975,13 @@ const UI = {
    * Renders Grammar Mix (Unit 1 Task 5)
    */
   renderGrammarMixTask(task) {
+    if (!task.items || !task.items[0] || !task.items[0].parts) {
+      return this.renderGrammarGapTask(task);
+    }
     const itemsHtml = task.items
       .map((it) => {
-        let content = `<span style="font-weight:700; margin-right:0.35rem;">${it.itemNum}</span> `;
-        for (const pt of it.parts) {
+        let content = `<span style="font-weight:700; margin-right:0.35rem;">${it.itemNum || it.label || ""}</span> `;
+        for (const pt of (it.parts || [])) {
           if (pt.before) content += `${pt.before} `;
           if (pt.options && pt.options.length > 0) {
             const optionsHtml = pt.options

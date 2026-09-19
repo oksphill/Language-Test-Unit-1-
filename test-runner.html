@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -25,10 +25,12 @@
   <script src="js/data/unit2.js"></script>
   <script src="js/data/unit3.js"></script>
   <script src="js/data/unit4.js"></script>
+  <script src="js/data/mid_year.js"></script>
   <script src="js/data/unit5.js"></script>
   <script src="js/data/unit6.js"></script>
   <script src="js/data/unit7.js"></script>
   <script src="js/data/unit8.js"></script>
+  <script src="js/data/end_of_year.js"></script>
   <script src="js/test-data.js"></script>
   <script src="js/illustrations.js"></script>
   <script src="js/validator.js"></script>
@@ -51,7 +53,7 @@
       // 1. Data Aggregator Tests
       assert("TEST_DATA exists", typeof TEST_DATA === "object");
       const unitList = TEST_DATA.getUnitsList();
-      assert("Units list contains 8 units", unitList.length === 8);
+      assert("Units list contains 10 units", unitList.length === 10);
 
       // 2. Comprehensive Test Across All 8 Units (16 Variants)
       for (let u = 1; u <= 8; u++) {
@@ -91,6 +93,51 @@
         assert(`[${uKey} Variant B] Total Score is 35/35`, evalB.totalScore === 35, `Got: ${evalB.totalScore}`);
         assert(`[${uKey} Variant B] Percentage is 100%`, evalB.percentage === 100);
         assert(`[${uKey} Variant B] Zero mistakes`, evalB.mistakes.length === 0, `Mistakes: ${evalB.mistakes.map(m=>m.id).join(',')}`);
+      }
+
+      // 2b. Mid-Year and End-of-Year Tests (50 points each, 5 sections)
+      for (const examKey of ["mid_year", "end_of_year"]) {
+        const examData = TEST_DATA[examKey];
+        assert(`[${examKey}] defined`, !!examData);
+        assert(`[${examKey}] has title`, typeof examData.title === "string" && examData.title.length > 0);
+        assert(`[${examKey}] has variantA`, !!examData.variantA);
+        assert(`[${examKey}] has variantB`, !!examData.variantB);
+        assert(`[${examKey}] Variant A total points is 50`, examData.variantA.totalPoints === 50);
+        assert(`[${examKey}] Variant B total points is 50`, examData.variantB.totalPoints === 50);
+
+        // Check 5 sections exist
+        const aSecs = Object.keys(examData.variantA.sections);
+        assert(`[${examKey} Variant A] has 5 sections`, aSecs.length === 5 && aSecs.includes("listening") && aSecs.includes("reading"));
+        const bSecs = Object.keys(examData.variantB.sections);
+        assert(`[${examKey} Variant B] has 5 sections`, bSecs.length === 5 && bSecs.includes("listening") && bSecs.includes("reading"));
+
+        // Perfect score eval Variant A
+        const perfectA = {};
+        for (const sec of Object.values(examData.variantA.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectA[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalA = Validator.evaluateTest("variantA", perfectA, examKey);
+        assert(`[${examKey} Variant A] Total Score is 50/50`, evalA.totalScore === 50, `Got: ${evalA.totalScore}`);
+        assert(`[${examKey} Variant A] Percentage is 100%`, evalA.percentage === 100);
+        assert(`[${examKey} Variant A] Zero mistakes`, evalA.mistakes.length === 0, `Mistakes: ${evalA.mistakes.map(m=>m.id).join(',')}`);
+
+        // Perfect score eval Variant B
+        const perfectB = {};
+        for (const sec of Object.values(examData.variantB.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectB[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalB = Validator.evaluateTest("variantB", perfectB, examKey);
+        assert(`[${examKey} Variant B] Total Score is 50/50`, evalB.totalScore === 50, `Got: ${evalB.totalScore}`);
+        assert(`[${examKey} Variant B] Percentage is 100%`, evalB.percentage === 100);
+        assert(`[${examKey} Variant B] Zero mistakes`, evalB.mistakes.length === 0, `Mistakes: ${evalB.mistakes.map(m=>m.id).join(',')}`);
       }
 
       // 3. Normalization & Contraction Equivalence Tests

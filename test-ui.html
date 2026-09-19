@@ -25,24 +25,30 @@
     <div id="btn-next-section"></div>
     <div id="badge-count-vocabulary"></div>
     <div id="badge-count-grammar"></div>
+    <div id="badge-count-listening"></div>
+    <div id="badge-count-reading"></div>
     <div id="badge-count-communication"></div>
     <div id="test-progress-fill"></div>
     <div id="test-progress-counter"></div>
+    <div class="section-tabs"></div>
 
     <div class="screen" id="screen-start">
       <div id="resume-session-prompt"></div>
+      <p id="start-hero-subtitle"></p>
       <form id="start-test-form">
-        <input type="text" id="student-name" value="Test Student">
+        <input type="text" id="student-name" value="Test Student" placeholder="e.g. Sarah Jenkins">
         <span id="selected-unit-badge"></span>
         <div id="unit-selector-grid">
           <input type="radio" name="test-unit" id="unit-radio-unit1" value="unit1" checked>
           <input type="radio" name="test-unit" id="unit-radio-unit2" value="unit2">
           <input type="radio" name="test-unit" id="unit-radio-unit3" value="unit3">
           <input type="radio" name="test-unit" id="unit-radio-unit4" value="unit4">
+          <input type="radio" name="test-unit" id="unit-radio-mid_year" value="mid_year">
           <input type="radio" name="test-unit" id="unit-radio-unit5" value="unit5">
           <input type="radio" name="test-unit" id="unit-radio-unit6" value="unit6">
           <input type="radio" name="test-unit" id="unit-radio-unit7" value="unit7">
           <input type="radio" name="test-unit" id="unit-radio-unit8" value="unit8">
+          <input type="radio" name="test-unit" id="unit-radio-end_of_year" value="end_of_year">
         </div>
         <span id="preview-unit-name"></span>
         <span id="preview-unit-topics"></span>
@@ -56,6 +62,8 @@
     <div class="screen" id="screen-test">
       <div class="test-section-panel" id="section-panel-vocabulary"></div>
       <div class="test-section-panel" id="section-panel-grammar"></div>
+      <div class="test-section-panel" id="section-panel-listening"></div>
+      <div class="test-section-panel" id="section-panel-reading"></div>
       <div class="test-section-panel" id="section-panel-communication"></div>
     </div>
 
@@ -96,10 +104,12 @@
   <script src="js/data/unit2.js"></script>
   <script src="js/data/unit3.js"></script>
   <script src="js/data/unit4.js"></script>
+  <script src="js/data/mid_year.js"></script>
   <script src="js/data/unit5.js"></script>
   <script src="js/data/unit6.js"></script>
   <script src="js/data/unit7.js"></script>
   <script src="js/data/unit8.js"></script>
+  <script src="js/data/end_of_year.js"></script>
   <script src="js/test-data.js"></script>
   <script src="js/validator.js"></script>
   <script src="js/storage.js"></script>
@@ -250,6 +260,77 @@
       gap1.dispatchEvent(new Event("input", { bubbles: true }));
       assert("After clearing gap 1, bracelets chip reappears (!is-used)", !braceletsChip.classList.contains("is-used"));
       assert("rings chip is still hidden", ringsChip.classList.contains("is-used"));
+
+      // 8. Test Dynamic Subtitle and International Student Placeholder
+      const nameInput = document.getElementById("student-name");
+      assert("Student name input has international placeholder", nameInput && nameInput.placeholder === "e.g. Sarah Jenkins");
+
+      UI.onSelectUnit("unit1");
+      const subUnit1 = document.getElementById("start-hero-subtitle").textContent;
+      assert("Unit 1 subtitle mentions clothes/appearance or 6 tasks", subUnit1.includes("clothes") || subUnit1.includes("6 tasks") || subUnit1.length > 0);
+
+      UI.onSelectUnit("mid_year");
+      const subMid = document.getElementById("start-hero-subtitle").textContent;
+      assert("Mid-Year subtitle reflects Units 1-4 and listening", subMid.includes("Units 1–4") && subMid.includes("listening"));
+      assert("Mid-Year badge updated", document.getElementById("selected-unit-badge").textContent.includes("Mid-Year"));
+
+      UI.onSelectUnit("end_of_year");
+      const subEnd = document.getElementById("start-hero-subtitle").textContent;
+      assert("End-of-Year subtitle reflects Units 1-8 and listening", subEnd.includes("Units 1–8") && subEnd.includes("listening"));
+      assert("End-of-Year badge updated", document.getElementById("selected-unit-badge").textContent.includes("End-of-Year"));
+
+      // 9. Test Mid-Year Test UI Rendering and Audio Player
+      UI.currentUnit = "mid_year";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+
+      const tabsBar = document.querySelector(".section-tabs");
+      const tabBtns = tabsBar ? tabsBar.querySelectorAll(".section-tab-btn") : [];
+      assert("Mid-Year renders 5 section tabs", tabBtns.length === 5);
+
+      const midListeningPanel = document.getElementById("section-panel-listening");
+      const midAudioPlayer = midListeningPanel ? midListeningPanel.querySelector(".audio-player-card") : null;
+      assert("Mid-Year Listening panel has audio player card", !!midAudioPlayer);
+
+      const midAudioEl = midAudioPlayer ? midAudioPlayer.querySelector("audio") : null;
+      assert("Mid-Year audio element source is track_10_mid_year.mp3", midAudioEl && midAudioEl.getAttribute("src").includes("track_10_mid_year.mp3"));
+
+      const playBtn = midAudioPlayer ? midAudioPlayer.querySelector(".btn-audio-play") : null;
+      assert("Audio player has play button", !!playBtn);
+
+      const speedBtn = midAudioPlayer ? midAudioPlayer.querySelector(".btn-audio-speed") : null;
+      assert("Audio player has speed button", !!speedBtn && speedBtn.textContent.includes("1.0x"));
+      if (speedBtn) {
+        speedBtn.click();
+        assert("Clicking speed button cycles to 0.85x", speedBtn.textContent.includes("0.85x"));
+        speedBtn.click();
+        assert("Clicking speed button cycles to 1.2x", speedBtn.textContent.includes("1.2x"));
+        speedBtn.click();
+        assert("Clicking speed button cycles back to 1.0x", speedBtn.textContent.includes("1.0x"));
+      }
+
+      const midReadingPanel = document.getElementById("section-panel-reading");
+      const readingPassage = midReadingPanel ? midReadingPanel.querySelector(".reading-passage-box") : null;
+      assert("Mid-Year Reading panel renders reading passage", !!readingPassage);
+
+      const midCommPanel = document.getElementById("section-panel-communication");
+      const dialogueGaps = midCommPanel ? midCommPanel.querySelectorAll(".dialogue-gap-input, .test-gap") : [];
+      assert("Mid-Year Communication panel renders dialogue gaps", dialogueGaps.length >= 8);
+
+      // 10. Test End-of-Year Test UI Rendering and Audio Player
+      UI.currentUnit = "end_of_year";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+
+      const endListeningPanel = document.getElementById("section-panel-listening");
+      const endAudioEl = endListeningPanel ? endListeningPanel.querySelector("audio") : null;
+      assert("End-of-Year audio element source is track_11_end_of_year.mp3", endAudioEl && endAudioEl.getAttribute("src").includes("track_11_end_of_year.mp3"));
+
+      const endCommPanel = document.getElementById("section-panel-communication");
+      const endMatchingSelects = endCommPanel ? endCommPanel.querySelectorAll(".matching-select") : [];
+      assert("End-of-Year Communication renders matching selects", endMatchingSelects.length >= 4);
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);
