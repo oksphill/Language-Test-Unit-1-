@@ -40,7 +40,11 @@ const Illustrations = {
   getGregoryCookSvg() {
     return `
       <div class="illustration-container" role="img" aria-label="Illustration for Task 2: Gregory Cook at work vs casual">
-        <img src="assets/images/gregory_cook.png" alt="Gregory Cook - Work clothes vs Casual style" class="test-illustration-img" loading="eager">
+        <img src="assets/images/gregory_cook.jpg" alt="Gregory Cook - Work clothes vs Casual style" class="test-illustration-img" loading="eager">
+        <div class="illustration-caption">
+          <span class="caption-badge">Gregory Cook (Variant A)</span>
+          <span class="caption-sub">💼 Smart at work vs. 🏠 Casual at home</span>
+        </div>
       </div>
     `;
   },
