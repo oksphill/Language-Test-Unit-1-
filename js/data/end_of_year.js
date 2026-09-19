@@ -202,11 +202,11 @@ window.END_OF_YEAR_DATA = {
             type: "grammar-gap",
             example: "0 The bowl is made (make) of Italian glass.",
             items: [
-              { id: "EY_A_6_1", label: "1", before: "This picture", verb: "paint", after: "by Picasso in 1907." },
-              { id: "EY_A_6_2", label: "2", before: "", verb: "cocoa / grow", after: "in this country?" },
-              { id: "EY_A_6_3", label: "3", before: "I", verb: "not allow", after: "to stay out late. I must come home early." },
-              { id: "EY_A_6_4", label: "4", before: "The buildings", verb: "damage", after: "in the fire two years ago." },
-              { id: "EY_A_6_5", label: "5", before: "Anna", verb: "not invite", after: "to the party last month." }
+              { id: "EY_A_6_1", label: "1", before: "This picture", verb: "paint", options: ["was painted", "is painted", "painted"], after: "by Picasso in 1907." },
+              { id: "EY_A_6_2", label: "2", before: "", verb: "cocoa / grow", options: ["Is cocoa grown", "Was cocoa grown", "Does cocoa grow"], after: "in this country?" },
+              { id: "EY_A_6_3", label: "3", before: "I", verb: "not allow", options: ["am not allowed", "was not allowed", "don't allow"], after: "to stay out late. I must come home early." },
+              { id: "EY_A_6_4", label: "4", before: "The buildings", verb: "damage", options: ["were damaged", "are damaged", "damaged"], after: "in the fire two years ago." },
+              { id: "EY_A_6_5", label: "5", before: "Anna", verb: "not invite", options: ["was not invited", "is not invited", "didn't invite"], after: "to the party last month." }
             ],
             answers: {
               "EY_A_6_1": { expected: ["was painted"], explanation: "Past Simple passive: was painted." },
@@ -529,11 +529,11 @@ Today people all over the world love her books. 318,000 copies of Pride and Prej
             type: "grammar-gap",
             example: "0 The bowl is made (make) of Italian glass.",
             items: [
-              { id: "EY_B_6_1", label: "1", before: "These songs", verb: "compose", after: "by Mozart in 1770." },
-              { id: "EY_B_6_2", label: "2", before: "How many", verb: "cars / produce", after: "in this factory in a day?" },
-              { id: "EY_B_6_3", label: "3", before: "We", verb: "not allow", after: "to eat in the classroom." },
-              { id: "EY_B_6_4", label: "4", before: "The treasure", verb: "discover", after: "in Egypt more than a hundred years ago." },
-              { id: "EY_B_6_5", label: "5", before: "The animals", verb: "not feed", after: "yesterday, so they were hungry." }
+              { id: "EY_B_6_1", label: "1", before: "These songs", verb: "compose", options: ["were composed", "are composed", "composed"], after: "by Mozart in 1770." },
+              { id: "EY_B_6_2", label: "2", before: "How many", verb: "cars / produce", options: ["cars are produced", "cars were produced", "cars produce"], after: "in this factory in a day?" },
+              { id: "EY_B_6_3", label: "3", before: "We", verb: "not allow", options: ["are not allowed", "were not allowed", "don't allow"], after: "to eat in the classroom." },
+              { id: "EY_B_6_4", label: "4", before: "The treasure", verb: "discover", options: ["was discovered", "is discovered", "discovered"], after: "in Egypt more than a hundred years ago." },
+              { id: "EY_B_6_5", label: "5", before: "The animals", verb: "not feed", options: ["were not fed", "are not fed", "didn't feed"], after: "yesterday, so they were hungry." }
             ],
             answers: {
               "EY_B_6_1": { expected: ["were composed"], explanation: "Past Simple passive plural: were composed." },

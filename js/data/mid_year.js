@@ -194,6 +194,7 @@ window.MID_YEAR_DATA = {
                 label: "1",
                 before: "While Dora",
                 verb: "have",
+                options: ["was having", "had"],
                 after: "a snack in a café, she saw her favourite singer."
               },
               {
@@ -201,6 +202,7 @@ window.MID_YEAR_DATA = {
                 label: "2",
                 before: "I",
                 verb: "wash",
+                options: ["was washing", "washed"],
                 after: "my hair when my mum came back home."
               },
               {
@@ -208,6 +210,7 @@ window.MID_YEAR_DATA = {
                 label: "3",
                 before: "Where",
                 verb: "you / put",
+                options: ["did you put", "were you putting"],
                 after: "the keys? I can't find them."
               },
               {
@@ -215,6 +218,7 @@ window.MID_YEAR_DATA = {
                 label: "4",
                 before: "We were watching TV when we",
                 verb: "hear",
+                options: ["heard", "were hearing"],
                 after: "a strange noise outside."
               },
               {
@@ -222,6 +226,7 @@ window.MID_YEAR_DATA = {
                 label: "5",
                 before: "My aunt",
                 verb: "come",
+                options: ["came", "was coming"],
                 after: "to visit us yesterday."
               }
             ],
@@ -307,6 +312,7 @@ window.MID_YEAR_DATA = {
                 label: "1",
                 before: "My cousin David",
                 verb: "arrive",
+                options: ["arrived", "has arrived"],
                 after: "two days ago, so the house is full!"
               },
               {
@@ -314,6 +320,7 @@ window.MID_YEAR_DATA = {
                 label: "2",
                 before: "My sister and I",
                 verb: "already / make",
+                options: ["have already made", "already made"],
                 after: "a lot of friends. Mum and Dad are having fun, too."
               },
               {
@@ -321,6 +328,7 @@ window.MID_YEAR_DATA = {
                 label: "3",
                 before: "They play golf every day. I",
                 verb: "not try",
+                options: ["haven't tried", "didn't try"],
                 after: "playing it yet, but I'd like to."
               },
               {
@@ -328,6 +336,7 @@ window.MID_YEAR_DATA = {
                 label: "4",
                 before: "",
                 verb: "you / ever / play",
+                options: ["Have you ever played", "Did you ever play"],
                 after: "it? My big brother"
               },
               {
@@ -335,6 +344,7 @@ window.MID_YEAR_DATA = {
                 label: "5",
                 before: "",
                 verb: "leave",
+                options: ["left", "has left"],
                 after: "Spain yesterday because he's starting a new job on Monday."
               }
             ],
@@ -729,6 +739,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "1",
                 before: "Vicky",
                 verb: "make",
+                options: ["was making", "made"],
                 after: "some sandwiches when she heard the noise in the hall."
               },
               {
@@ -736,6 +747,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "2",
                 before: "The children were watching TV when their parents",
                 verb: "come",
+                options: ["came", "were coming"],
                 after: "home."
               },
               {
@@ -743,6 +755,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "3",
                 before: "Dad",
                 verb: "buy",
+                options: ["bought", "was buying"],
                 after: "a new car last week."
               },
               {
@@ -750,6 +763,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "4",
                 before: "While Joe",
                 verb: "walk",
+                options: ["was walking", "walked"],
                 after: "on the beach, he saw a famous actor."
               },
               {
@@ -757,6 +771,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "5",
                 before: "I",
                 verb: "not finish",
+                options: ["didn't finish", "wasn't finishing"],
                 after: "reading the book because it was boring."
               }
             ],
@@ -829,6 +844,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "1",
                 before: "My brother and I",
                 verb: "not make",
+                options: ["haven't made", "didn't make"],
                 after: "any friends yet. Luckily, our cousin Maria"
               },
               {
@@ -836,6 +852,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "2",
                 before: "",
                 verb: "send",
+                options: ["sent", "has sent"],
                 after: "me a text an hour ago. She's coming tomorrow. Mum and Dad"
               },
               {
@@ -843,6 +860,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "3",
                 before: "",
                 verb: "already / see",
+                options: ["have already seen", "already saw"],
                 after: "some nice places here. And yesterday they"
               },
               {
@@ -850,6 +868,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "4",
                 before: "",
                 verb: "take",
+                options: ["took", "have taken"],
                 after: "a bus to Tarragona. I prefer the beach, but I also want to go windsurfing."
               },
               {
@@ -857,6 +876,7 @@ The film, Max and Miss Jones, didn't win any prizes at film festivals, but lots 
                 label: "5",
                 before: "",
                 verb: "you / ever / do",
+                options: ["Have you ever done", "Did you ever do"],
                 after: "any water sports?"
               }
             ],

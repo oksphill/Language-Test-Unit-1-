@@ -318,6 +318,28 @@
       const dialogueGaps = midCommPanel ? midCommPanel.querySelectorAll(".dialogue-gap-input, .test-gap") : [];
       assert("Mid-Year Communication panel renders dialogue gaps", dialogueGaps.length >= 8);
 
+      // Verify Mid-Year Grammar Tasks 4 and 6 have choice pills
+      const midGrammarPanel = document.getElementById("section-panel-grammar");
+      const midTask4Pills = midGrammarPanel ? midGrammarPanel.querySelectorAll('#card-task_4 .choice-pill-btn') : [];
+      assert("Mid-Year Task 4 (Past Simple/Continuous) renders choice pills", midTask4Pills.length >= 10);
+      const wasHavingPill = midGrammarPanel ? midGrammarPanel.querySelector('.choice-pill-btn[data-qid="MY_A_4_1"][data-value="was having"]') : null;
+      assert("Pill 'was having' exists", !!wasHavingPill);
+      if (wasHavingPill) {
+        wasHavingPill.click();
+        assert("Clicking 'was having' sets input value", document.getElementById("input-MY_A_4_1").value === "was having");
+        assert("Answers object updated with was having", UI.answers["MY_A_4_1"] === "was having");
+      }
+
+      const midTask6Pills = midGrammarPanel ? midGrammarPanel.querySelectorAll('#card-task_6 .choice-pill-btn') : [];
+      assert("Mid-Year Task 6 (Present Perfect/Past Simple) renders choice pills", midTask6Pills.length >= 10);
+      const arrivedPill = midGrammarPanel ? midGrammarPanel.querySelector('.choice-pill-btn[data-qid="MY_A_6_1"][data-value="arrived"]') : null;
+      assert("Pill 'arrived' exists", !!arrivedPill);
+      if (arrivedPill) {
+        arrivedPill.click();
+        assert("Clicking 'arrived' sets input value", document.getElementById("input-MY_A_6_1").value === "arrived");
+        assert("Answers object updated with arrived", UI.answers["MY_A_6_1"] === "arrived");
+      }
+
       // 10. Test End-of-Year Test UI Rendering and Audio Player
       UI.currentUnit = "end_of_year";
       UI.currentVariant = "variantA";
@@ -331,6 +353,18 @@
       const endCommPanel = document.getElementById("section-panel-communication");
       const endMatchingSelects = endCommPanel ? endCommPanel.querySelectorAll(".matching-select") : [];
       assert("End-of-Year Communication renders matching selects", endMatchingSelects.length >= 4);
+
+      // Verify End-of-Year Grammar Task 6 has choice pills
+      const endGrammarPanel = document.getElementById("section-panel-grammar");
+      const endTask6Pills = endGrammarPanel ? endGrammarPanel.querySelectorAll('#card-task_6 .choice-pill-btn') : [];
+      assert("End-of-Year Task 6 (Passive forms) renders choice pills", endTask6Pills.length >= 15);
+      const wasPaintedPill = endGrammarPanel ? endGrammarPanel.querySelector('.choice-pill-btn[data-qid="EY_A_6_1"][data-value="was painted"]') : null;
+      assert("Pill 'was painted' exists", !!wasPaintedPill);
+      if (wasPaintedPill) {
+        wasPaintedPill.click();
+        assert("Clicking 'was painted' sets input value", document.getElementById("input-EY_A_6_1").value === "was painted");
+        assert("Answers object updated with was painted", UI.answers["EY_A_6_1"] === "was painted");
+      }
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);

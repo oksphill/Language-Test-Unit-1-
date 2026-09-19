@@ -945,22 +945,42 @@ const UI = {
     for (const it of task.items) {
       let line = `<div class="grammar-item-row"><span class="gap-label">${it.label || ""}</span> `;
       if (it.before) line += `<span>${it.before}</span> `;
-      line += `
-        <span class="gap-inline-wrapper">
-          <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
-        </span>
-        ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
-      `;
+      if (it.options && it.options.length > 0) {
+        line += `
+          <span class="choice-pills-group" data-qid="${it.id}">
+            ${it.options.map(opt => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
+            <input type="hidden" class="test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" value="">
+          </span>
+          ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
+        `;
+      } else {
+        line += `
+          <span class="gap-inline-wrapper">
+            <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
+          </span>
+          ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
+        `;
+      }
       if (it.after) line += ` <span>${it.after}</span> `;
 
       if (it.gapId2) {
-        line += `
-          <span class="gap-inline-wrapper">
-            <span class="gap-label">${it.label2 || ""}</span>
-            <input type="text" class="gap-input test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
-          </span>
-          ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
-        `;
+        if (it.options2 && it.options2.length > 0) {
+          line += `
+            <span class="choice-pills-group" data-qid="${it.gapId2}">
+              ${it.options2.map(opt => `<button type="button" class="choice-pill-btn" data-qid="${it.gapId2}" data-value="${opt}">${opt}</button>`).join("")}
+              <input type="hidden" class="test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" value="">
+            </span>
+            ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
+          `;
+        } else {
+          line += `
+            <span class="gap-inline-wrapper">
+              <span class="gap-label">${it.label2 || ""}</span>
+              <input type="text" class="gap-input test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
+            </span>
+            ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
+          `;
+        }
         if (it.after2) line += ` <span>${it.after2}</span> `;
       }
 
@@ -1450,10 +1470,11 @@ const UI = {
         this.switchSection(sec);
       }
       setTimeout(() => {
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
-        input.focus();
-        input.classList.add("highlight-pulse");
-        setTimeout(() => input.classList.remove("highlight-pulse"), 1500);
+        const target = input.type === "hidden" ? (input.closest(".choice-pills-group") || input) : input;
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (input.type !== "hidden") input.focus();
+        target.classList.add("highlight-pulse");
+        setTimeout(() => target.classList.remove("highlight-pulse"), 1500);
       }, 200);
     }
   },
