@@ -2,25 +2,13 @@
  * ============================================================================
  * GOOGLE APPS SCRIPT — БАЗА ДАННЫХ И УВЕДОМЛЕНИЯ ДЛЯ ТЕСТОВ ПО АНГЛИЙСКОМУ
  * ============================================================================
- * 
- * ИНСТРУКЦИЯ ПО УСТАНОВКЕ (занимает 3 минуты):
- * 1. Откройте Google Диск (drive.google.com) и создайте новую Google Таблицу.
- *    Назовите её, например: "Результаты тестов по английскому".
- * 2. В меню таблицы нажмите: «Расширения» (Extensions) ➔ «Apps Script».
- * 3. Удалите весь текст в открывшемся окне и вставьте ВЕСЬ этот код целиком.
- * 4. В переменной TEACHER_EMAIL ниже (строка 18) укажите вашу почту,
- *    куда должны приходить письма (или оставьте пустой, тогда письмо пойдёт
- *    на почту владельца таблицы).
- * 5. Нажмите кнопку «Сохранить» (значок дискеты 💾).
- * 6. Нажмите синюю кнопку вверху справа: «Начать развертывание» (Deploy) ➔ «Новое развертывание» (New deployment).
- * 7. Нажмите на шестеренку ⚙️ «Выберите тип» ➔ выберите «Веб-приложение» (Web app).
- * 8. Заполните настройки:
- *    - Описание: "English Tests Webhook"
- *    - Выполнять от имени (Execute as): "Я" (Me)
- *    - У кого есть доступ (Who has access): "Все" (Anyone)   <-- ВАЖНО!
- * 9. Нажмите «Развернуть» (Deploy), разрешите доступ (Authorize access).
- * 10. Скопируйте полученный «URL веб-приложения» (Web app URL, заканчивается на /exec).
- * 11. Вставьте этот URL в файл `js/config.js` в проекте в поле `sheetsWebhookUrl`.
+ * Сохраняет только нужные данные:
+ * 1. Дата и время сдачи
+ * 2. ФИО студента
+ * 3. Тест / Вариант
+ * 4. Баллы (набрано / максимум и процент)
+ * 5. Количество ошибок
+ * 6. Детальный список ошибок (в каких заданиях ошибся и верный ответ)
  * ============================================================================
  */
 
@@ -41,45 +29,48 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-    // Если таблица пустая — создаем аккуратную шапку с оформлением
-    if (sheet.getLastRow() === 0) {
+    // Если таблица пустая или в ней старая шапка с лишней колонкой "Класс" — создаем чистую шапку
+    if (sheet.getLastRow() === 0 || sheet.getRange(1, 3).getValue() === "Класс") {
+      sheet.clear();
       sheet.appendRow([
         "Дата и время",
         "ФИО студента",
-        "Класс",
         "Тест / Вариант",
         "Баллы",
-        "Процент",
-        "Оценка",
-        "Секции (детали)",
-        "Ошибок",
+        "Количество ошибок",
         "Список ошибок"
       ]);
-      var headerRange = sheet.getRange(1, 1, 1, 10);
+      var headerRange = sheet.getRange(1, 1, 1, 6);
       headerRange.setFontWeight("bold");
       headerRange.setBackground("#4F46E5");
       headerRange.setFontColor("#FFFFFF");
+      headerRange.setHorizontalAlignment("center");
       sheet.setFrozenRows(1);
+      sheet.setColumnWidth(1, 140); // Дата
+      sheet.setColumnWidth(2, 220); // ФИО
+      sheet.setColumnWidth(3, 220); // Тест
+      sheet.setColumnWidth(4, 140); // Баллы
+      sheet.setColumnWidth(5, 140); // Ошибок
+      sheet.setColumnWidth(6, 450); // Список ошибок
     }
 
-    // Добавляем строку с результатами ученика
+    var scoreText = (data.totalScore || "0") + " (" + (data.percentage || "0%") + ")";
+
+    // Добавляем строку с результатами ученика: только баллы и ошибки
     sheet.appendRow([
       data.timestamp || new Date().toLocaleString("ru-RU"),
       data.studentName || "Не указано",
-      data.studentClass || "—",
       data.variant || "—",
-      data.totalScore || "0",
-      data.percentage || "0%",
-      data.grade || "—",
-      data.sections || "—",
-      data.mistakesCount || 0,
-      data.mistakesSummary || "Нет ошибок"
+      scoreText,
+      data.mistakesCount !== undefined ? data.mistakesCount : 0,
+      data.mistakesSummary || "Нет ошибок (100% результат)"
     ]);
 
-    // Автоматическая подгонка ширины колонок при первой записи
-    if (sheet.getLastRow() <= 2) {
-      sheet.autoResizeColumns(1, 8);
-    }
+    // Выравнивание для аккуратного вида
+    var lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow, 1).setHorizontalAlignment("center");
+    sheet.getRange(lastRow, 4).setHorizontalAlignment("center");
+    sheet.getRange(lastRow, 5).setHorizontalAlignment("center");
 
     // Отправляем уведомление на email учителя
     sendEmailNotification(data);
@@ -94,6 +85,34 @@ function doPost(e) {
 }
 
 /**
+ * Ручная настройка или очистка таблицы под 6 аккуратных колонок
+ */
+function resetTable() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  sheet.clear();
+  sheet.appendRow([
+    "Дата и время",
+    "ФИО студента",
+    "Тест / Вариант",
+    "Баллы",
+    "Количество ошибок",
+    "Список ошибок"
+  ]);
+  var headerRange = sheet.getRange(1, 1, 1, 6);
+  headerRange.setFontWeight("bold");
+  headerRange.setBackground("#4F46E5");
+  headerRange.setFontColor("#FFFFFF");
+  headerRange.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+  sheet.setColumnWidth(1, 140);
+  sheet.setColumnWidth(2, 220);
+  sheet.setColumnWidth(3, 220);
+  sheet.setColumnWidth(4, 140);
+  sheet.setColumnWidth(5, 140);
+  sheet.setColumnWidth(6, 450);
+}
+
+/**
  * Отправка красивого HTML-письма на почту учителю
  */
 function sendEmailNotification(data) {
@@ -104,19 +123,20 @@ function sendEmailNotification(data) {
     }
     if (!recipient) return;
 
-    var subject = "📝 Сдан тест: " + (data.studentName || "Ученик") + " — " + (data.variant || "English Test") + " [" + (data.totalScore || "") + " / " + (data.percentage || "") + "]";
+    var scoreDisplay = (data.totalScore || "0") + " (" + (data.percentage || "0%") + ")";
+    var subject = "📝 Сдан тест: " + (data.studentName || "Ученик") + " — " + (data.variant || "English Test") + " [" + scoreDisplay + "]";
 
     var mistakesBlock = "";
     if (data.mistakesCount > 0 && data.mistakesSummary) {
       mistakesBlock = `
-        <div style="margin-top: 16px; background-color: #FEF2F2; border-left: 4px solid #EF4444; padding: 12px 16px; border-radius: 6px;">
-          <h4 style="margin: 0 0 8px 0; color: #991B1B; font-size: 15px;">❌ Допущенные ошибки (${data.mistakesCount}):</h4>
+        <div style="margin-top: 16px; background-color: #FEF2F2; border-left: 4px solid #EF4444; padding: 14px 18px; border-radius: 8px;">
+          <h4 style="margin: 0 0 10px 0; color: #991B1B; font-size: 15px;">❌ Допущенные ошибки (${data.mistakesCount}):</h4>
           <pre style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; line-height: 1.6; color: #1F2937; white-space: pre-wrap;">${escapeHtml(data.mistakesSummary)}</pre>
         </div>
       `;
     } else {
       mistakesBlock = `
-        <div style="margin-top: 16px; background-color: #ECFDF5; border-left: 4px solid #10B981; padding: 12px 16px; border-radius: 6px; color: #065F46; font-size: 14px; font-weight: bold;">
+        <div style="margin-top: 16px; background-color: #ECFDF5; border-left: 4px solid #10B981; padding: 14px 18px; border-radius: 8px; color: #065F46; font-size: 14px; font-weight: bold;">
           🎉 Идеальный результат! 100% правильных ответов, ошибок нет!
         </div>
       `;
@@ -130,40 +150,46 @@ function sendEmailNotification(data) {
           
           <!-- Шапка -->
           <div style="background-color: #4F46E5; color: #FFFFFF; padding: 20px 24px; text-align: center;">
-            <h2 style="margin: 0; font-size: 20px; font-weight: 700;">Новый результат теста по английскому</h2>
-            <p style="margin: 6px 0 0 0; opacity: 0.9; font-size: 14px;">${data.variant || 'English Test'}</p>
+            <h2 style="margin: 0; font-size: 20px; font-weight: 700;">Результаты теста по английскому</h2>
+            <p style="margin: 6px 0 0 0; opacity: 0.9; font-size: 14px;">${escapeHtml(data.variant || 'English Test')}</p>
           </div>
 
-          <!-- Основные данные -->
+          <!-- Основные данные: только студент, тест, баллы и ошибки -->
           <div style="padding: 24px;">
             <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
               <tr>
-                <td style="padding: 8px 0; color: #64748B; width: 140px;">👤 Студент:</td>
-                <td style="padding: 8px 0; font-weight: 700; color: #0F172A; font-size: 16px;">${data.studentName}</td>
+                <td style="padding: 10px 0; color: #64748B; width: 140px;">👤 Студент:</td>
+                <td style="padding: 10px 0; font-weight: 700; color: #0F172A; font-size: 16px;">${escapeHtml(data.studentName)}</td>
               </tr>
               <tr>
-                <td style="padding: 8px 0; color: #64748B;">🏆 Итог:</td>
-                <td style="padding: 8px 0; font-weight: 800; color: #4F46E5; font-size: 18px;">
-                  ${data.totalScore} (${data.percentage}) — ${data.grade}
+                <td style="padding: 10px 0; color: #64748B;">📑 Тест:</td>
+                <td style="padding: 10px 0; font-weight: 600; color: #334155; font-size: 15px;">${escapeHtml(data.variant)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; color: #64748B;">🏆 Баллы:</td>
+                <td style="padding: 10px 0; font-weight: 800; color: #4F46E5; font-size: 18px;">
+                  ${escapeHtml(scoreDisplay)}
                 </td>
               </tr>
               <tr>
-                <td style="padding: 8px 0; color: #64748B;">📊 По разделам:</td>
-                <td style="padding: 8px 0; color: #334155; font-size: 14px;">${data.sections}</td>
+                <td style="padding: 10px 0; color: #64748B;">❌ Ошибок:</td>
+                <td style="padding: 10px 0; font-weight: 700; color: ${data.mistakesCount > 0 ? '#DC2626' : '#16A34A'}; font-size: 15px;">
+                  ${data.mistakesCount}
+                </td>
               </tr>
               <tr>
-                <td style="padding: 8px 0; color: #64748B;">⏰ Время сдачи:</td>
-                <td style="padding: 8px 0; color: #64748B; font-size: 13px;">${data.timestamp}</td>
+                <td style="padding: 10px 0; color: #64748B;">⏰ Время:</td>
+                <td style="padding: 10px 0; color: #64748B; font-size: 13px;">${escapeHtml(data.timestamp)}</td>
               </tr>
             </table>
 
             <!-- Блок ошибок -->
             ${mistakesBlock}
 
-            <!-- Кнопка перехода к Google Таблице -->
+            <!-- Кнопка перехода к таблице -->
             <div style="margin-top: 24px; text-align: center;">
               <a href="${sheetUrl}" style="display: inline-block; background-color: #4F46E5; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px;">
-                Открыть Google Таблицу 📊
+                📊 Открыть Google Таблицу
               </a>
             </div>
           </div>
@@ -186,16 +212,7 @@ function sendEmailNotification(data) {
 }
 
 /**
- * ============================================================================
- * КРОН-ЗАДАЧА: ЕЖЕДНЕВНАЯ СВОДКА (ОПЦИОНАЛЬНО)
- * ============================================================================
- * Чтобы включить ежедневную сводку (например, каждый вечер в 20:00):
- * 1. В редакторе Apps Script слева нажмите значок ⏰ «Триггеры» (Triggers).
- * 2. Нажмите «Добавить триггер» (Add Trigger).
- * 3. Выберите функцию: `sendDailyDigest`.
- * 4. Источник мероприятия: «По времени» (Time-driven).
- * 5. Тип триггера: «Дневной таймер» (Day timer) ➔ Выберите удобное время (например, с 20:00 до 21:00).
- * 6. Нажмите «Сохранить».
+ * Крон-задача: ежедневная сводка (по желанию)
  */
 function sendDailyDigest() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -210,15 +227,14 @@ function sendDailyDigest() {
     if (rowDate.indexOf(todayDateStr) !== -1) {
       todaySubmissions.push({
         name: rows[i][1],
-        test: rows[i][3],
-        score: rows[i][4],
-        percent: rows[i][5],
-        grade: rows[i][6]
+        test: rows[i][2],
+        score: rows[i][3],
+        mistakes: rows[i][4]
       });
     }
   }
 
-  if (todaySubmissions.length === 0) return; // Сегодня никто не сдавал
+  if (todaySubmissions.length === 0) return;
 
   var recipient = TEACHER_EMAIL;
   if (!recipient || recipient.trim() === "") {
@@ -229,10 +245,10 @@ function sendDailyDigest() {
   var listHtml = "";
   todaySubmissions.forEach(function(sub, idx) {
     listHtml += "<tr>" +
-      "<td style='padding:8px; border-bottom:1px solid #E2E8F0;'>" + (idx + 1) + ". <strong>" + sub.name + "</strong></td>" +
-      "<td style='padding:8px; border-bottom:1px solid #E2E8F0;'>" + sub.test + "</td>" +
-      "<td style='padding:8px; border-bottom:1px solid #E2E8F0; color:#4F46E5; font-weight:bold;'>" + sub.score + " (" + sub.percent + ")</td>" +
-      "<td style='padding:8px; border-bottom:1px solid #E2E8F0;'>" + sub.grade + "</td>" +
+      "<td style='padding:8px; border-bottom:1px solid #E2E8F0;'>" + (idx + 1) + ". <strong>" + escapeHtml(sub.name) + "</strong></td>" +
+      "<td style='padding:8px; border-bottom:1px solid #E2E8F0;'>" + escapeHtml(sub.test) + "</td>" +
+      "<td style='padding:8px; border-bottom:1px solid #E2E8F0; color:#4F46E5; font-weight:bold;'>" + escapeHtml(sub.score) + "</td>" +
+      "<td style='padding:8px; border-bottom:1px solid #E2E8F0; color:" + (sub.mistakes > 0 ? "#DC2626" : "#16A34A") + "; font-weight:bold;'>" + sub.mistakes + "</td>" +
     "</tr>";
   });
 
@@ -249,7 +265,7 @@ function sendDailyDigest() {
               <th style="padding: 8px;">Студент</th>
               <th style="padding: 8px;">Тест</th>
               <th style="padding: 8px;">Баллы</th>
-              <th style="padding: 8px;">Оценка</th>
+              <th style="padding: 8px;">Ошибок</th>
             </tr>
           </thead>
           <tbody>
@@ -258,7 +274,7 @@ function sendDailyDigest() {
         </table>
         <div style="margin-top: 24px; text-align: center;">
           <a href="${sheetUrl}" style="display: inline-block; background-color: #4F46E5; color: #FFFFFF; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 14px;">
-            Открыть полную таблицу
+            📊 Открыть Google Таблицу
           </a>
         </div>
       </div>
@@ -273,7 +289,7 @@ function sendDailyDigest() {
 }
 
 /**
- * Экранирование HTML спецсимволов
+ * Экранирование спецсимволов
  */
 function escapeHtml(text) {
   if (!text) return "";
