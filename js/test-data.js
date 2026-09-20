@@ -14,16 +14,18 @@ const TEST_DATA = {
       name: "Go Getter 3",
       level: "A2",
       title: "Go Getter 3 (Level A2)",
-      desc: "Pre-Intermediate • 8 Units • 30–31 pts each",
+      desc: "Pre-Intermediate • 8 Units + 2 Exams • 30–50 pts",
       units: {
         get unit1() { return window.GG3_UNIT_1_DATA; },
         get unit2() { return window.GG3_UNIT_2_DATA; },
         get unit3() { return window.GG3_UNIT_3_DATA; },
         get unit4() { return window.GG3_UNIT_4_DATA; },
+        get mid_year() { return window.GG3_MID_YEAR_DATA; },
         get unit5() { return window.GG3_UNIT_5_DATA; },
         get unit6() { return window.GG3_UNIT_6_DATA; },
         get unit7() { return window.GG3_UNIT_7_DATA; },
-        get unit8() { return window.GG3_UNIT_8_DATA; }
+        get unit8() { return window.GG3_UNIT_8_DATA; },
+        get end_of_year() { return window.GG3_END_OF_YEAR_DATA; }
       },
       getUnitsList() {
         return [
@@ -31,10 +33,12 @@ const TEST_DATA = {
           { id: "unit2", number: 2, title: "Shopping & Shops", icon: "🛒", points: 30, desc: "Shopping dialogue, Shops, Comparatives (-er / more / better), too / enough / as" },
           { id: "unit3", number: 3, title: "Holidays & Travel", icon: "🏕️", points: 30, desc: "Holiday activities, Past Simple regular & irregular, Did questions, requests" },
           { id: "unit4", number: 4, title: "Technology & Gadgets", icon: "📱", points: 30, desc: "Household appliances, Smartphones, Past Continuous, when, adverbs of manner" },
+          { id: "mid_year", number: "1-4", title: "Mid-Year Test", icon: "⭐", points: 50, desc: "Units 1–4 Review: Vocab, Grammar, Audio Listening (Track 10), Comm, Reading" },
           { id: "unit5", number: 5, title: "Health & The Body", icon: "🩺", points: 30, desc: "Flu symptoms, Injuries, Body parts, have to, should / shouldn't" },
           { id: "unit6", number: 6, title: "Food & Cooking", icon: "🍳", points: 30, desc: "Butter biscuits recipe, Kitchen utensils, Flavours, Present Perfect (ever / never)" },
           { id: "unit7", number: 7, title: "Houses & Homes", icon: "🏡", points: 30, desc: "Types of houses & rooms, Phrasal verbs, Present Continuous for future, must / can" },
-          { id: "unit8", number: 8, title: "Life Plans & Friends", icon: "🌟", points: 31, desc: "Life plans, Manners & gestures, Future with will, Complex questions, agree/disagree" }
+          { id: "unit8", number: 8, title: "Life Plans & Friends", icon: "🌟", points: 31, desc: "Life plans, Manners & gestures, Future with will, Complex questions, agree/disagree" },
+          { id: "end_of_year", number: "1-8", title: "End-of-Year Test", icon: "🏆", points: 50, desc: "Units 1–8 Full Review: Vocab, Grammar, Audio Listening (Track 11), Comm matching, Reading" }
         ];
       }
     },
@@ -107,8 +111,14 @@ const TEST_DATA = {
     const c = this.courses[this.currentCourse] || this.courses.gogetter3;
     return (c.units && c.units.unit8) || window.GG3_UNIT_8_DATA || window.UNIT_8_DATA;
   },
-  get mid_year() { return window.MID_YEAR_DATA; },
-  get end_of_year() { return window.END_OF_YEAR_DATA; },
+  get mid_year() {
+    const c = this.courses[this.currentCourse] || this.courses.gogetter4;
+    return (c.units && c.units.mid_year) || window.GG3_MID_YEAR_DATA || window.MID_YEAR_DATA;
+  },
+  get end_of_year() {
+    const c = this.courses[this.currentCourse] || this.courses.gogetter4;
+    return (c.units && c.units.end_of_year) || window.GG3_END_OF_YEAR_DATA || window.END_OF_YEAR_DATA;
+  },
 
   get variantA() {
     const u = this[this.currentUnit] || this.unit1;
@@ -137,7 +147,7 @@ const TEST_DATA = {
 
   getCoursesList() {
     return [
-      { id: "gogetter3", name: "Go Getter 3", level: "A2", icon: "📘", title: "Go Getter 3", badge: "Level A2", desc: "Pre-Intermediate • 8 Units (30 pts each)" },
+      { id: "gogetter3", name: "Go Getter 3", level: "A2", icon: "📘", title: "Go Getter 3", badge: "Level A2", desc: "Pre-Intermediate • 8 Units + 2 Exams (30–50 pts)" },
       { id: "gogetter4", name: "Go Getter 4", level: "A2+ / B1", icon: "📙", title: "Go Getter 4", badge: "Level A2+ / B1", desc: "Intermediate • 8 Units + 2 Exams (35–50 pts)" }
     ];
   }

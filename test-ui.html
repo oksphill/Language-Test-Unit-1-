@@ -36,6 +36,11 @@
       <div id="resume-session-prompt"></div>
       <p id="start-hero-subtitle"></p>
       <form id="start-test-form">
+        <div id="course-selector-container">
+          <span id="selected-course-badge"></span>
+          <input type="radio" name="test-course" id="course-radio-gogetter3" value="gogetter3" checked>
+          <input type="radio" name="test-course" id="course-radio-gogetter4" value="gogetter4">
+        </div>
         <input type="text" id="student-name" value="Test Student" placeholder="e.g. Sarah Jenkins">
         <span id="selected-unit-badge"></span>
         <div id="unit-selector-grid">
@@ -110,6 +115,19 @@
   <script src="js/data/unit7.js"></script>
   <script src="js/data/unit8.js"></script>
   <script src="js/data/end_of_year.js"></script>
+
+  <!-- Load Go Getter 3 Modules -->
+  <script src="js/data/gg3_unit1.js"></script>
+  <script src="js/data/gg3_unit2.js"></script>
+  <script src="js/data/gg3_unit3.js"></script>
+  <script src="js/data/gg3_unit4.js"></script>
+  <script src="js/data/gg3_mid_year.js"></script>
+  <script src="js/data/gg3_unit5.js"></script>
+  <script src="js/data/gg3_unit6.js"></script>
+  <script src="js/data/gg3_unit7.js"></script>
+  <script src="js/data/gg3_unit8.js"></script>
+  <script src="js/data/gg3_end_of_year.js"></script>
+
   <script src="js/test-data.js"></script>
   <script src="js/validator.js"></script>
   <script src="js/storage.js"></script>
@@ -133,6 +151,8 @@
       // 1. UI Initialization
       UI.init();
       assert("UI.init executes cleanly", UI.activeScreen === "start");
+      UI.onSelectCourse("gogetter4");
+      assert("Course selected as gogetter4 for GG4 test suites", UI.currentCourse === "gogetter4");
 
       // 2. Test selecting each unit from 1 to 8
       for (let u = 1; u <= 8; u++) {
@@ -187,23 +207,30 @@
       assert("Clicking word chip fills first empty gap", firstGap && firstGap.value === "dentist");
       assert("Answers object updated with dentist", UI.answers["A_1_1"] === "dentist");
 
-      // 4. Test Unit 7 Sentence Order Unscramble
+      // 4. Test Unit 7 Sentence Order / Full Sentence Tasks (Type-only, no chips, no placeholders)
       UI.currentUnit = "unit7";
       UI.currentVariant = "variantA";
       UI.answers = {};
       UI.renderTestUI();
 
       const sec7Grammar = document.getElementById("section-panel-grammar");
+      const orderInputs = sec7Grammar.querySelectorAll(".sentence-order-input");
+      assert("Unit 7 Task 4 has sentence order inputs", orderInputs.length >= 5);
       const sentenceOrderChips = sec7Grammar.querySelectorAll(".sentence-order-chip");
-      assert("Unit 7 Task 4 has sentence order chips", sentenceOrderChips.length >= 15);
+      assert("No sentence order chips are rendered (type-only)", sentenceOrderChips.length === 0);
+      assert("Sentence order inputs have no placeholder text", !orderInputs[0].placeholder);
 
-      // Click a sentence order chip
-      const firstOrderChip = sentenceOrderChips[0];
-      const tok = firstOrderChip.getAttribute("data-token");
-      const qid = firstOrderChip.getAttribute("data-qid");
-      firstOrderChip.click();
-      const orderInp = document.getElementById(`input-${qid}`);
-      assert("Clicking order chip appends token to input", orderInp && orderInp.value.includes(tok));
+      // Verify no test-gap inputs in current section have placeholders
+      const allSec7Gaps = sec7Grammar.querySelectorAll(".test-gap");
+      const gapsWithPlaceholder = Array.from(allSec7Gaps).filter(g => g.placeholder && g.placeholder.length > 0);
+      assert("Zero gap inputs have placeholder text in Grammar section", gapsWithPlaceholder.length === 0);
+
+      // Simulate typing answer directly into input
+      const firstOrderInp = orderInputs[0];
+      const qid = firstOrderInp.getAttribute("data-qid");
+      firstOrderInp.value = "The book was written in 1990.";
+      firstOrderInp.dispatchEvent(new Event("input", { bubbles: true }));
+      assert("Typing in sentence input updates answers object", UI.answers[qid] === "The book was written in 1990.");
 
       // 5. Test Evaluation and Results rendering
       const sampleAnswers = {};
@@ -373,6 +400,34 @@
       APP_CONFIG.sheetsWebhookUrl = "https://script.google.com/macros/s/TEST/exec";
       assert("TeacherService.getWebhookUrl returns configured APP_CONFIG url", TeacherService.getWebhookUrl() === "https://script.google.com/macros/s/TEST/exec");
       APP_CONFIG.sheetsWebhookUrl = "";
+
+      // 12. Test Course Switching and Go Getter 3 Data Integration
+      UI.onSelectCourse("gogetter3");
+      assert("Current course switched to gogetter3", UI.currentCourse === "gogetter3");
+      const gg3Units = TEST_DATA.getUnitsList("gogetter3");
+      assert("Go Getter 3 has 10 units (8 units + 2 exams)", gg3Units.length === 10);
+      assert("Go Getter 3 includes mid_year", gg3Units.some(u => u.id === "mid_year"));
+      assert("Go Getter 3 includes end_of_year", gg3Units.some(u => u.id === "end_of_year"));
+
+      // Test Go Getter 3 Mid-Year Test UI Rendering & Audio
+      UI.currentUnit = "mid_year";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+      const gg3MidAudio = document.getElementById("section-panel-listening").querySelector("audio");
+      assert("GG3 Mid-Year audio source is gg3_track_10_mid_year.mp3", gg3MidAudio && gg3MidAudio.getAttribute("src").includes("gg3_track_10_mid_year.mp3"));
+
+      // Test Go Getter 3 End-of-Year Test UI Rendering & Audio
+      UI.currentUnit = "end_of_year";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+      const gg3EndAudio = document.getElementById("section-panel-listening").querySelector("audio");
+      assert("GG3 End-of-Year audio source is gg3_track_11_end_of_year.mp3", gg3EndAudio && gg3EndAudio.getAttribute("src").includes("gg3_track_11_end_of_year.mp3"));
+
+      // Switch back to gogetter4
+      UI.onSelectCourse("gogetter4");
+      assert("Course switches back to gogetter4 cleanly", UI.currentCourse === "gogetter4");
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);

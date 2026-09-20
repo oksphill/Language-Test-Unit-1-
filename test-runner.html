@@ -37,10 +37,12 @@
   <script src="js/data/gg3_unit2.js"></script>
   <script src="js/data/gg3_unit3.js"></script>
   <script src="js/data/gg3_unit4.js"></script>
+  <script src="js/data/gg3_mid_year.js"></script>
   <script src="js/data/gg3_unit5.js"></script>
   <script src="js/data/gg3_unit6.js"></script>
   <script src="js/data/gg3_unit7.js"></script>
   <script src="js/data/gg3_unit8.js"></script>
+  <script src="js/data/gg3_end_of_year.js"></script>
 
   <script src="js/test-data.js"></script>
   <script src="js/illustrations.js"></script>
@@ -154,7 +156,7 @@
 
       // 2c. Go Getter 3 Tests across all 8 Units (16 Variants, 30-31 points each)
       const gg3Units = TEST_DATA.getUnitsList("gogetter3");
-      assert("Go Getter 3 list contains 8 units", gg3Units.length === 8);
+      assert("Go Getter 3 list contains 10 units (8 units + 2 exams)", gg3Units.length === 10);
       for (let u = 1; u <= 8; u++) {
         const uKey = "unit" + u;
         const expectedPts = u === 8 ? 31 : 30;
@@ -192,6 +194,50 @@
         assert(`[GG3 ${uKey} Variant B] Total Score is ${expectedPts}/${expectedPts}`, evalB.totalScore === expectedPts, `Got: ${evalB.totalScore}`);
         assert(`[GG3 ${uKey} Variant B] Percentage is 100%`, evalB.percentage === 100);
         assert(`[GG3 ${uKey} Variant B] Zero mistakes`, evalB.mistakes.length === 0, `Mistakes: ${evalB.mistakes.map(m=>m.id).join(',')}`);
+      }
+
+      // 2d. Go Getter 3 Mid-Year and End-of-Year Exams (50 points each, 5 sections)
+      for (const examKey of ["mid_year", "end_of_year"]) {
+        const testA = TEST_DATA.getTest(examKey, "variantA", "gogetter3");
+        const testB = TEST_DATA.getTest(examKey, "variantB", "gogetter3");
+        assert(`[GG3 ${examKey}] Variant A defined`, !!testA);
+        assert(`[GG3 ${examKey}] Variant B defined`, !!testB);
+        assert(`[GG3 ${examKey}] Variant A total points is 50`, testA.totalPoints === 50);
+        assert(`[GG3 ${examKey}] Variant B total points is 50`, testB.totalPoints === 50);
+
+        // Check 5 sections exist
+        const aSecs = Object.keys(testA.sections);
+        assert(`[GG3 ${examKey} Variant A] has 5 sections`, aSecs.length === 5 && aSecs.includes("listening") && aSecs.includes("reading"));
+        const bSecs = Object.keys(testB.sections);
+        assert(`[GG3 ${examKey} Variant B] has 5 sections`, bSecs.length === 5 && bSecs.includes("listening") && bSecs.includes("reading"));
+
+        // Perfect score Variant A
+        const perfectA = {};
+        for (const sec of Object.values(testA.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectA[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalA = Validator.evaluateTest("variantA", perfectA, examKey, "gogetter3");
+        assert(`[GG3 ${examKey} Variant A] Total Score is 50/50`, evalA.totalScore === 50, `Got: ${evalA.totalScore}`);
+        assert(`[GG3 ${examKey} Variant A] Percentage is 100%`, evalA.percentage === 100);
+        assert(`[GG3 ${examKey} Variant A] Zero mistakes`, evalA.mistakes.length === 0, `Mistakes: ${evalA.mistakes.map(m=>m.id).join(',')}`);
+
+        // Perfect score Variant B
+        const perfectB = {};
+        for (const sec of Object.values(testB.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectB[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalB = Validator.evaluateTest("variantB", perfectB, examKey, "gogetter3");
+        assert(`[GG3 ${examKey} Variant B] Total Score is 50/50`, evalB.totalScore === 50, `Got: ${evalB.totalScore}`);
+        assert(`[GG3 ${examKey} Variant B] Percentage is 100%`, evalB.percentage === 100);
+        assert(`[GG3 ${examKey} Variant B] Zero mistakes`, evalB.mistakes.length === 0, `Mistakes: ${evalB.mistakes.map(m=>m.id).join(',')}`);
       }
 
       // 3. Normalization & Contraction Equivalence Tests

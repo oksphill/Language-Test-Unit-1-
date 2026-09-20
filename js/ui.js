@@ -895,7 +895,7 @@ const UI = {
             <span class="gap-label">${it.label}</span>
             ${it.before ? `<span>${it.before}</span> ` : ""}
             <span class="gap-inline-wrapper">
-              <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type word or number">
+              <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
             </span>
             ${it.after ? ` <span>${it.after}</span>` : ""}
           </div>
@@ -949,7 +949,7 @@ const UI = {
               <span class="gap-label">${it.label}</span>
               <span>${it.question}</span>
             </div>
-            <input type="text" class="form-control test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="${it.placeholder || 'Type your answer here...'}">
+            <input type="text" class="form-control test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
           </div>
         `;
       }
@@ -1024,28 +1024,19 @@ const UI = {
   },
 
   /**
-   * Renders sentence-order unscramble tasks (Unit 7)
+   * Renders sentence-order / sentence-writing tasks (Type-only, clean inputs)
    */
   renderSentenceOrderTask(task) {
     let html = `<div class="sentence-order-list">`;
     for (const it of task.items) {
-      const tokens = it.prompt.split("/").map(t => t.trim()).filter(Boolean);
-      const tokenChips = tokens
-        .map(tok => `<button type="button" class="sentence-order-chip" data-qid="${it.id}" data-token="${tok}">${tok}</button>`)
-        .join("");
-
       html += `
         <div class="sentence-order-item">
           <div class="sentence-order-prompt">
             <span class="gap-label">${it.label}</span>
             <span class="scrambled-words">${it.prompt}</span>
           </div>
-          <div class="sentence-order-chips">
-            <span style="font-size: 0.8rem; color: #64748B; margin-right: 0.25rem; align-self: center;">💡 Tap to append:</span>
-            ${tokenChips}
-          </div>
           <div class="sentence-order-input-wrap">
-            <input type="text" class="form-control test-gap sentence-order-input" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Type the complete passive sentence here...">
+            <input type="text" class="form-control test-gap sentence-order-input" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
           </div>
         </div>
       `;
@@ -1066,7 +1057,7 @@ const UI = {
           <span class="gap-label">${it.label}</span>
           <span>${it.textBefore || it.before || ""}</span>
           ${hintDisplay ? `<span class="hint-capsule">${hintDisplay}</span>` : ""}
-          <input type="text" class="hint-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type word...">
+          <input type="text" class="hint-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
           <span>${it.textAfter || it.after || ""}</span>
         </div>
       `;
@@ -1085,7 +1076,7 @@ const UI = {
             <div class="personality-prompt">${it.sentence}</div>
             <div class="personality-input-wrap">
               <span class="personality-prefix">${it.prefix.toUpperCase()}</span>
-              <input type="text" class="form-control test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type adjective here...">
+              <input type="text" class="form-control test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
             </div>
           </div>
         `;
@@ -1113,7 +1104,7 @@ const UI = {
       } else {
         line += `
           <span class="gap-inline-wrapper">
-            <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
+            <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
           </span>
           ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
         `;
@@ -1133,7 +1124,7 @@ const UI = {
           line += `
             <span class="gap-inline-wrapper">
               <span class="gap-label">${it.label2 || ""}</span>
-              <input type="text" class="gap-input test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="verb form">
+              <input type="text" class="gap-input test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
             </span>
             ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
           `;
@@ -1178,7 +1169,7 @@ const UI = {
             content += `
               <span class="gap-inline-wrapper">
                 <span class="gap-label">${pt.label}</span>
-                <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="was/were doing or did">
+                <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
               </span>
               <span class="grammar-verb-prompt">(${pt.verb})</span>
             `;
@@ -1227,7 +1218,7 @@ const UI = {
           partsContent += `
             <span class="gap-inline-wrapper">
               <span class="gap-label">${pt.label}</span>
-              <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type phrase">
+              <input type="text" class="gap-input test-gap" id="input-${pt.gapId}" data-qid="${pt.gapId}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
             </span>
           `;
           if (pt.verb) partsContent += ` <span class="grammar-verb-prompt">(${pt.verb})</span> `;
@@ -1284,7 +1275,7 @@ const UI = {
       line += `
         <span class="gap-inline-wrapper">
           <span class="gap-label">${s.label}</span>
-          <input type="text" class="gap-input test-gap" id="input-${s.gapId}" data-qid="${s.gapId}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type or click word">
+          <input type="text" class="gap-input test-gap" id="input-${s.gapId}" data-qid="${s.gapId}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false">
         </span>
       `;
     }
@@ -1293,7 +1284,7 @@ const UI = {
       line += `
         <span class="gap-inline-wrapper">
           <span class="gap-label">${s.label2}</span>
-          <input type="text" class="gap-input test-gap" id="input-${s.gapId2}" data-qid="${s.gapId2}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="type or click word">
+          <input type="text" class="gap-input test-gap" id="input-${s.gapId2}" data-qid="${s.gapId2}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false">
         </span>
       `;
     }
