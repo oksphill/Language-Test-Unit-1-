@@ -1391,63 +1391,270 @@ body {
   white-space: nowrap;
 }
 
-/* Sentence Order Items (Unit 7) */
+/* ==========================================================================
+   Interactive Word Order Builder (Put words in the correct order)
+   ========================================================================== */
+
 .sentence-order-item {
-  margin-bottom: 1.25rem;
-  padding: 1rem;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: var(--radius-md);
-}
-
-.sentence-order-prompt {
-  font-size: 0.95rem;
-  margin-bottom: 0.65rem;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.sentence-order-prompt .scrambled-words {
-  font-weight: 700;
-  color: #1E293B;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.35rem;
   background: #FFFFFF;
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  border: 1px dashed #CBD5E1;
-  letter-spacing: 0.3px;
+  border: 2px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sentence-order-chips {
+.sentence-order-item:focus-within {
+  border-color: #93C5FD;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+}
+
+.sentence-order-header {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.65rem;
 }
 
-.sentence-order-chip {
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  border-radius: 6px;
-  padding: 0.3rem 0.65rem;
+.sentence-order-instruction {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.order-hint-text {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-main);
+  color: #475569;
+}
+
+.btn-order-reset {
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748B;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.18s ease;
+}
+
+.btn-order-reset:hover {
+  background: #FEE2E2;
+  border-color: #FCA5A5;
+  color: #DC2626;
+  transform: translateY(-1px);
+}
+
+/* Target Area: Sentence Construction Dropzone */
+.sentence-dropzone {
+  min-height: 56px;
+  background: #F8FAFC;
+  border: 2px dashed #CBD5E1;
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sentence-dropzone.has-chips {
+  background: #F0F7FF;
+  border-style: solid;
+  border-color: #93C5FD;
+}
+
+.sentence-dropzone.drag-over {
+  background: #DBEAFE;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.dropzone-placeholder {
+  color: #94A3B8;
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  user-select: none;
+  pointer-events: none;
+  padding: 0.25rem;
+}
+
+.sentence-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Available Words Pool (Bank) */
+.word-bank-pool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: #F8FAFC;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  min-height: 48px;
+  transition: background-color 0.2s;
+}
+
+.word-bank-pool.drag-over {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+}
+
+/* Word Chips / Tiles */
+.order-word-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: grab;
+  user-select: none;
+  touch-action: manipulation;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.order-word-chip:active {
+  cursor: grabbing;
+}
+
+/* Chip inside Bank */
+.order-word-chip.chip-in-bank {
+  background: #FFFFFF;
+  color: #1E293B;
+  border: 1.5px solid #CBD5E1;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+}
+
+.order-word-chip.chip-in-bank:hover {
+  background: #EFF6FF;
+  border-color: #3B82F6;
+  color: #1D4ED8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.12);
+}
+
+.order-word-chip.chip-used {
+  display: none !important;
+}
+
+/* Chip inside Constructed Sentence */
+.order-word-chip.chip-in-sentence {
+  background: #FFFFFF;
+  color: #1E293B;
+  border: 2px solid #2563EB;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.16);
+  padding: 0.45rem 0.75rem 0.45rem 0.95rem;
+}
+
+.order-word-chip.chip-in-sentence:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.22);
+  border-color: #1D4ED8;
+}
+
+.order-word-chip.dragging {
+  opacity: 0.45;
+  transform: scale(0.96);
+}
+
+.order-word-chip.drag-target {
+  border-left: 4px solid #F59E0B !important;
+  transform: translateX(4px);
+}
+
+/* Remove button on sentence chips */
+.chip-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  color: #64748B;
+  font-size: 0.85rem;
+  line-height: 1;
+  font-weight: 800;
+  margin-left: 0.25rem;
   transition: all 0.15s ease;
 }
 
-.sentence-order-chip:hover {
-  background: var(--primary-light);
-  border-color: var(--primary);
-  color: var(--primary);
+.order-word-chip.chip-in-sentence:hover .chip-remove-btn {
+  background: #FEE2E2;
+  color: #EF4444;
 }
 
-.sentence-order-input {
+/* Move left / Move right mini controls for touch devices */
+.chip-move-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.order-word-chip.chip-in-sentence:hover .chip-move-btn {
+  display: inline-flex;
+}
+
+.chip-move-btn:hover {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+/* Synced Result Text Input */
+.sentence-order-input-wrap {
+  margin-top: 0.75rem;
+}
+
+.synced-order-input {
   width: 100% !important;
   max-width: 100% !important;
   font-size: 0.95rem;
+  font-weight: 600;
   padding: 0.65rem 0.9rem;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  color: #0F172A;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.synced-order-input:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 /* Change Unit / Restart button in review & header */

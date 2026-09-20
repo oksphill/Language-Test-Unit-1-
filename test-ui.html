@@ -224,7 +224,7 @@
       assert("Clicking word chip fills first empty gap", firstGap && firstGap.value === "dentist");
       assert("Answers object updated with dentist", UI.answers["A_1_1"] === "dentist");
 
-      // 4. Test Unit 7 Sentence Order / Full Sentence Tasks (Type-only, no chips, no placeholders)
+      // 4. Test Unit 7 Sentence Order Interactive Tasks (Interactive word chips + zero placeholders)
       UI.currentUnit = "unit7";
       UI.currentVariant = "variantA";
       UI.answers = {};
@@ -233,8 +233,8 @@
       const sec7Grammar = document.getElementById("section-panel-grammar");
       const orderInputs = sec7Grammar.querySelectorAll(".sentence-order-input");
       assert("Unit 7 Task 4 has sentence order inputs", orderInputs.length >= 5);
-      const sentenceOrderChips = sec7Grammar.querySelectorAll(".sentence-order-chip");
-      assert("No sentence order chips are rendered (type-only)", sentenceOrderChips.length === 0);
+      const interactiveItems = sec7Grammar.querySelectorAll(".interactive-order-item");
+      assert("Unit 7 Task 4 renders interactive order items", interactiveItems.length >= 5);
       assert("Sentence order inputs have no placeholder text", !orderInputs[0].placeholder);
 
       // Verify no test-gap inputs in current section have placeholders
@@ -475,6 +475,116 @@
       // Switch back to gogetter4
       UI.onSelectCourse("gogetter4");
       assert("Course switches back to gogetter4 cleanly", UI.currentCourse === "gogetter4");
+
+      // 15. Test Interactive Sentence Order Word Builder (Duolingo-style word reordering)
+      UI.onSelectCourse("gogetter2");
+      UI.currentUnit = "unit1";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+
+      const gg2Grammar = document.getElementById("section-panel-grammar");
+      const gg2InteractiveItems = gg2Grammar.querySelectorAll(".interactive-order-item");
+      assert("GG2 Unit 1 Task 3 renders interactive-order-item elements", gg2InteractiveItems.length === 4);
+
+      const firstItem = gg2InteractiveItems[0];
+      const firstQid = firstItem.getAttribute("data-qid"); // A_3_1
+      assert("First interactive item has qid A_3_1", firstQid === "A_3_1");
+
+      const dropzone = firstItem.querySelector(".sentence-dropzone");
+      const wordBank = firstItem.querySelector(".word-bank-pool");
+      const chipsContainer = firstItem.querySelector(".sentence-chips-container");
+      const resetBtn = firstItem.querySelector(".btn-order-reset");
+      const syncedInput = firstItem.querySelector(".synced-order-input");
+
+      assert("Interactive item has sentence-dropzone", !!dropzone);
+      assert("Interactive item has word-bank-pool", !!wordBank);
+      assert("Interactive item has sentence-chips-container", !!chipsContainer);
+      assert("Interactive item has btn-order-reset", !!resetBtn);
+      assert("Interactive item has synced-order-input", !!syncedInput);
+      assert("Synced order input has empty placeholder (rule: zero placeholders)", !syncedInput.placeholder);
+
+      const bankChips = Array.from(wordBank.querySelectorAll(".order-word-chip"));
+      assert("Word bank has 7 word chips for prompt", bankChips.length === 7);
+
+      // Find individual word chips by data-word
+      const getBankChip = (w) => bankChips.find(c => c.getAttribute("data-word").toLowerCase() === w.toLowerCase());
+      const chipWe = getBankChip("we");
+      const chipAre = getBankChip("are");
+      const chipNever = getBankChip("never");
+      const chipLate = getBankChip("late");
+      const chipFor = getBankChip("for");
+      const chipMusic = getBankChip("Music");
+      const chipLessons = getBankChip("lessons");
+
+      assert("Found bank chips: we, are, never, late, for, Music, lessons", !!(chipWe && chipAre && chipNever && chipLate && chipFor && chipMusic && chipLessons));
+
+      // Click each chip in correct sequence
+      chipWe.click();
+      chipAre.click();
+      chipNever.click();
+      chipLate.click();
+      chipFor.click();
+      chipMusic.click();
+      chipLessons.click();
+
+      assert("All 7 chips moved into sentence container", chipsContainer.querySelectorAll(".chip-in-sentence").length === 7);
+      assert("All bank chips marked as chip-used", bankChips.every(c => c.classList.contains("chip-used")));
+      assert("Dropzone has-chips class added", dropzone.classList.contains("has-chips"));
+
+      // Check synced input value and UI.answers
+      assert("Synced input value is capitalized and formatted correctly", syncedInput.value === "We are never late for Music lessons");
+      assert("UI.answers[A_3_1] updated automatically", UI.answers["A_3_1"] === "We are never late for Music lessons");
+
+      // Test Validator checkAnswer on the constructed answer
+      const evalCheck = Validator.checkAnswer(syncedInput.value, ["We are never late for Music lessons."]);
+      assert("Constructed sentence passes Validator checkAnswer", evalCheck === true);
+
+      // Test micro-controls: shift chip left
+      const sentenceChips = chipsContainer.querySelectorAll(".chip-in-sentence");
+      const secondSentenceChip = sentenceChips[1]; // "are"
+      const moveLeftBtn = secondSentenceChip.querySelector(".chip-move-btn.move-left");
+      assert("Sentence chip has move-left button", !!moveLeftBtn);
+      moveLeftBtn.click();
+      assert("Moving 'are' left reorders input", syncedInput.value === "Are we never late for Music lessons");
+
+      // Shift back to right
+      const firstSentenceChipNow = chipsContainer.querySelectorAll(".chip-in-sentence")[0]; // "are"
+      const moveRightBtn = firstSentenceChipNow.querySelector(".chip-move-btn.move-right");
+      moveRightBtn.click();
+      assert("Moving 'are' right restores original order", syncedInput.value === "We are never late for Music lessons");
+
+      // Test clicking a sentence chip returns it to the bank
+      const lastSentenceChip = chipsContainer.querySelector('.chip-in-sentence[data-chip-id="' + chipLessons.getAttribute("data-chip-id") + '"]');
+      assert("Last sentence chip exists", !!lastSentenceChip);
+      lastSentenceChip.click();
+      assert("Clicking sentence chip removes it from sentence", chipsContainer.querySelectorAll(".chip-in-sentence").length === 6);
+      assert("Chip 'lessons' is available in bank again (not chip-used)", !chipLessons.classList.contains("chip-used"));
+      assert("Input updated after removing chip", syncedInput.value === "We are never late for Music");
+
+      // Put 'lessons' back
+      chipLessons.click();
+      assert("Chip 'lessons' appended back to sentence", syncedInput.value === "We are never late for Music lessons");
+
+      // Test Reset button
+      resetBtn.click();
+      assert("Clicking reset button empties sentence chips container", chipsContainer.querySelectorAll(".chip-in-sentence").length === 0);
+      assert("Clicking reset button restores all bank chips to available", bankChips.every(c => !c.classList.contains("chip-used")));
+      assert("Clicking reset button clears synced input value", syncedInput.value === "");
+      assert("Clicking reset button clears UI.answers", UI.answers["A_3_1"] === "");
+
+      // Test sentence order task in GG4 Unit 7 Task 4
+      UI.onSelectCourse("gogetter4");
+      UI.currentUnit = "unit7";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+
+      const u7Grammar = document.getElementById("section-panel-grammar");
+      const u7Interactive = u7Grammar.querySelectorAll(".interactive-order-item");
+      assert("GG4 Unit 7 Task 4 also renders interactive-order-item elements", u7Interactive.length === 6);
+      const u7FirstInput = u7Interactive[0].querySelector(".synced-order-input");
+      assert("GG4 Unit 7 Task 4 inputs have empty placeholder", !u7FirstInput.placeholder);
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);

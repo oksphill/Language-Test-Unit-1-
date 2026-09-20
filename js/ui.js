@@ -1050,22 +1050,75 @@ const UI = {
   },
 
   /**
-   * Renders sentence-order / sentence-writing tasks (Type-only, clean inputs)
+   * Renders sentence-order / sentence-writing tasks (Interactive draggable/tap word reordering)
    */
   renderSentenceOrderTask(task) {
     let html = `<div class="sentence-order-list">`;
     for (const it of task.items) {
-      html += `
-        <div class="sentence-order-item">
-          <div class="sentence-order-prompt">
-            <span class="gap-label">${it.label}</span>
-            <span class="scrambled-words">${it.prompt}</span>
+      const rawPrompt = it.prompt || "";
+      const isWordOrder = rawPrompt.includes("/") || rawPrompt.includes(" / ");
+      
+      if (isWordOrder) {
+        const tokens = rawPrompt.split(/\s*\/\s*/).map(s => s.trim()).filter(Boolean);
+        html += `
+          <div class="sentence-order-item interactive-order-item" data-qid="${it.id}" data-task="${task.id}">
+            <div class="sentence-order-header">
+              <span class="gap-label">${it.label}</span>
+              <div class="sentence-order-instruction">
+                <span class="order-hint-text">Передвигайте слова в правильном порядке:</span>
+              </div>
+              <button type="button" class="btn-order-reset" data-qid="${it.id}" title="Вернуть слова в исходное положение">
+                <span class="reset-icon">↺</span> Сбросить
+              </button>
+            </div>
+
+            <!-- Target: Sentence Construction Area (Dropzone) -->
+            <div class="sentence-dropzone" id="dropzone-${it.id}" data-qid="${it.id}" aria-label="Sentence area">
+              <div class="dropzone-placeholder" id="placeholder-${it.id}">
+                <span class="dropzone-icon">✋</span> Перетащите слова сюда или нажимайте на них
+              </div>
+              <div class="sentence-chips-container" id="chips-container-${it.id}"></div>
+            </div>
+
+            <!-- Source: Word Bank Pool -->
+            <div class="word-bank-pool" id="word-bank-${it.id}" data-qid="${it.id}">
+              ${tokens.map((tok, idx) => `
+                <div class="order-word-chip chip-in-bank" 
+                     id="chip-${it.id}-${idx}" 
+                     data-qid="${it.id}" 
+                     data-chip-id="chip-${it.id}-${idx}" 
+                     data-word="${tok.replace(/"/g, '&quot;')}" 
+                     draggable="true">
+                  ${tok}
+                </div>
+              `).join("")}
+            </div>
+
+            <!-- Synced text input for answers and fallback -->
+            <div class="sentence-order-input-wrap">
+              <input type="text" 
+                     class="form-control test-gap sentence-order-input synced-order-input" 
+                     id="input-${it.id}" 
+                     data-qid="${it.id}" 
+                     data-task="${task.id}" 
+                     placeholder="" 
+                     autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
           </div>
-          <div class="sentence-order-input-wrap">
-            <input type="text" class="form-control test-gap sentence-order-input" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
+        `;
+      } else {
+        html += `
+          <div class="sentence-order-item">
+            <div class="sentence-order-prompt">
+              <span class="gap-label">${it.label}</span>
+              <span class="scrambled-words">${it.prompt}</span>
+            </div>
+            <div class="sentence-order-input-wrap">
+              <input type="text" class="form-control test-gap sentence-order-input" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
     }
     html += `</div>`;
     return html;
@@ -1371,21 +1424,330 @@ const UI = {
       });
     });
 
-    // Sentence Order Token Chips Clicks
-    const orderChips = container.querySelectorAll(".sentence-order-chip");
-    orderChips.forEach((ochip) => {
-      ochip.addEventListener("click", () => {
-        const qid = ochip.getAttribute("data-qid");
-        const token = ochip.getAttribute("data-token");
-        const inp = document.getElementById(`input-${qid}`);
-        if (inp) {
-          const curVal = inp.value.trim();
-          inp.value = curVal ? `${curVal} ${token}` : token;
-          inp.dispatchEvent(new Event("input", { bubbles: true }));
-          inp.dispatchEvent(new Event("change", { bubbles: true }));
-          inp.focus();
+    // Initialize Interactive Word Order Movers (Drag & Drop + Click to Reorder)
+    this.initWordOrderInteractive(container);
+  },
+
+  /**
+   * Initializes Interactive Word Order Movers for sentence-order tasks.
+   * Supports:
+   * - Drag & Drop to arrange words from bank to sentence area
+   * - Drag & Drop within sentence area to reorder words
+   * - Click on bank words to instantly append to sentence
+   * - Click on sentence words (or "x") to return them to bank
+   * - Move left / Move right mini buttons on sentence chips for touch/mobile
+   * - Reset button to return all words to initial bank state
+   * - Real-time sync to the input field with proper punctuation and capitalization
+   */
+  initWordOrderInteractive(container) {
+    const items = container.querySelectorAll(".interactive-order-item");
+    if (!items || items.length === 0) return;
+
+    this.wordOrderStates = this.wordOrderStates || {};
+
+    items.forEach((itemEl) => {
+      const qid = itemEl.getAttribute("data-qid");
+      const dropzone = itemEl.querySelector(".sentence-dropzone");
+      const chipsContainer = itemEl.querySelector(".sentence-chips-container");
+      const wordBank = itemEl.querySelector(".word-bank-pool");
+      const placeholder = itemEl.querySelector(".dropzone-placeholder");
+      const input = itemEl.querySelector(".synced-order-input");
+      const resetBtn = itemEl.querySelector(".btn-order-reset");
+
+      if (!dropzone || !chipsContainer || !wordBank || !input) return;
+
+      const bankChips = Array.from(wordBank.querySelectorAll(".order-word-chip"));
+      const tokenMap = {};
+      bankChips.forEach((c) => {
+        const cId = c.getAttribute("data-chip-id");
+        const word = c.getAttribute("data-word");
+        tokenMap[cId] = { id: cId, word: word, el: c };
+      });
+
+      // Maintain state for this item
+      const state = {
+        available: bankChips.map((c) => c.getAttribute("data-chip-id")),
+        ordered: []
+      };
+      this.wordOrderStates[qid] = state;
+
+      // Helper to render the chips according to current state
+      const renderState = () => {
+        // 1. Update bank chips visibility
+        bankChips.forEach((chip) => {
+          const cId = chip.getAttribute("data-chip-id");
+          const isUsed = state.ordered.includes(cId);
+          chip.classList.toggle("chip-used", isUsed);
+        });
+
+        // 2. Render ordered chips in the sentence construction area
+        chipsContainer.innerHTML = "";
+        state.ordered.forEach((cId, idx) => {
+          const info = tokenMap[cId];
+          if (!info) return;
+
+          const chipEl = document.createElement("div");
+          chipEl.className = "order-word-chip chip-in-sentence";
+          chipEl.setAttribute("draggable", "true");
+          chipEl.setAttribute("data-chip-id", cId);
+          chipEl.setAttribute("data-index", idx);
+
+          chipEl.innerHTML = `
+            ${idx > 0 ? `<span class="chip-move-btn move-left" data-dir="-1" title="Сдвинуть влево">‹</span>` : ""}
+            <span class="chip-word-text">${info.word}</span>
+            ${idx < state.ordered.length - 1 ? `<span class="chip-move-btn move-right" data-dir="1" title="Сдвинуть вправо">›</span>` : ""}
+            <span class="chip-remove-btn" title="Убрать слово">×</span>
+          `;
+
+          // Move left / right click handlers
+          chipEl.querySelectorAll(".chip-move-btn").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const dir = parseInt(btn.getAttribute("data-dir"), 10);
+              const curIdx = state.ordered.indexOf(cId);
+              const newIdx = curIdx + dir;
+              if (newIdx >= 0 && newIdx < state.ordered.length) {
+                state.ordered.splice(curIdx, 1);
+                state.ordered.splice(newIdx, 0, cId);
+                renderState();
+                syncInput();
+              }
+            });
+          });
+
+          // Click chip to remove back to bank
+          chipEl.addEventListener("click", (e) => {
+            if (e.target.closest(".chip-move-btn")) return;
+            e.stopPropagation();
+            removeChipFromSentence(cId);
+          });
+
+          // Drag to reorder within sentence
+          chipEl.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", JSON.stringify({ type: "reorder", chipId: cId, qid }));
+            e.dataTransfer.effectAllowed = "move";
+            chipEl.classList.add("dragging");
+            e.stopPropagation();
+          });
+
+          chipEl.addEventListener("dragend", () => {
+            chipEl.classList.remove("dragging");
+            clearDragOverStates();
+          });
+
+          chipEl.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = "move";
+            chipEl.classList.add("drag-target");
+          });
+
+          chipEl.addEventListener("dragleave", () => {
+            chipEl.classList.remove("drag-target");
+          });
+
+          chipEl.addEventListener("drop", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            chipEl.classList.remove("drag-target");
+            try {
+              const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+              if (data.qid !== qid) return;
+              if (data.type === "reorder") {
+                const fromIdx = state.ordered.indexOf(data.chipId);
+                const toIdx = idx;
+                if (fromIdx !== -1 && fromIdx !== toIdx) {
+                  state.ordered.splice(fromIdx, 1);
+                  state.ordered.splice(toIdx, 0, data.chipId);
+                  renderState();
+                  syncInput();
+                }
+              } else if (data.type === "bank") {
+                const fromIdx = state.available.indexOf(data.chipId);
+                if (fromIdx !== -1) {
+                  state.available.splice(fromIdx, 1);
+                  state.ordered.splice(idx, 0, data.chipId);
+                  renderState();
+                  syncInput();
+                }
+              }
+            } catch (err) {}
+          });
+
+          chipsContainer.appendChild(chipEl);
+        });
+
+        // 3. Show/hide placeholder
+        if (placeholder) {
+          placeholder.style.display = state.ordered.length === 0 ? "flex" : "none";
+        }
+        dropzone.classList.toggle("has-chips", state.ordered.length > 0);
+      };
+
+      const clearDragOverStates = () => {
+        dropzone.classList.remove("drag-over");
+        wordBank.classList.remove("drag-over");
+        itemEl.querySelectorAll(".order-word-chip").forEach((c) => c.classList.remove("drag-target", "dragging"));
+      };
+
+      const addChipToSentence = (cId, targetIndex = -1) => {
+        const aIdx = state.available.indexOf(cId);
+        if (aIdx !== -1) {
+          state.available.splice(aIdx, 1);
+          if (targetIndex >= 0 && targetIndex <= state.ordered.length) {
+            state.ordered.splice(targetIndex, 0, cId);
+          } else {
+            state.ordered.push(cId);
+          }
+          renderState();
+          syncInput();
+        }
+      };
+
+      const removeChipFromSentence = (cId) => {
+        const oIdx = state.ordered.indexOf(cId);
+        if (oIdx !== -1) {
+          state.ordered.splice(oIdx, 1);
+          if (!state.available.includes(cId)) {
+            state.available.push(cId);
+          }
+          renderState();
+          syncInput();
+        }
+      };
+
+      const syncInput = () => {
+        if (state.ordered.length === 0) {
+          input.value = "";
+        } else {
+          const words = state.ordered.map((cId) => (tokenMap[cId] ? tokenMap[cId].word : ""));
+          let sentence = words.join(" ");
+          // Fix spacing before punctuation like ? . ! ,
+          sentence = sentence.replace(/\s+([?.!,:;])/g, "$1");
+          // Capitalize first letter
+          if (sentence.length > 0) {
+            sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+          }
+          input.value = sentence;
+        }
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      };
+
+      // Bank chips click and dragstart
+      bankChips.forEach((bChip) => {
+        const cId = bChip.getAttribute("data-chip-id");
+        bChip.addEventListener("click", () => {
+          if (!state.ordered.includes(cId)) {
+            addChipToSentence(cId);
+          }
+        });
+
+        bChip.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", JSON.stringify({ type: "bank", chipId: cId, qid }));
+          e.dataTransfer.effectAllowed = "copyMove";
+          bChip.classList.add("dragging");
+        });
+
+        bChip.addEventListener("dragend", () => {
+          bChip.classList.remove("dragging");
+          clearDragOverStates();
+        });
+      });
+
+      // Sentence dropzone events
+      dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("drag-over");
+      });
+
+      dropzone.addEventListener("dragleave", (e) => {
+        if (!dropzone.contains(e.relatedTarget)) {
+          dropzone.classList.remove("drag-over");
         }
       });
+
+      dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        clearDragOverStates();
+        try {
+          const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+          if (data.qid !== qid) return;
+          if (data.type === "bank") {
+            addChipToSentence(data.chipId);
+          } else if (data.type === "reorder") {
+            // Drop onto empty end of dropzone
+            const fromIdx = state.ordered.indexOf(data.chipId);
+            if (fromIdx !== -1) {
+              state.ordered.splice(fromIdx, 1);
+              state.ordered.push(data.chipId);
+              renderState();
+              syncInput();
+            }
+          }
+        } catch (err) {}
+      });
+
+      // Word bank dropzone (drag from sentence back to bank)
+      wordBank.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        wordBank.classList.add("drag-over");
+      });
+
+      wordBank.addEventListener("dragleave", (e) => {
+        if (!wordBank.contains(e.relatedTarget)) {
+          wordBank.classList.remove("drag-over");
+        }
+      });
+
+      wordBank.addEventListener("drop", (e) => {
+        e.preventDefault();
+        clearDragOverStates();
+        try {
+          const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+          if (data.qid !== qid) return;
+          if (data.type === "reorder") {
+            removeChipFromSentence(data.chipId);
+          }
+        } catch (err) {}
+      });
+
+      // Reset button
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          state.ordered = [];
+          state.available = bankChips.map((c) => c.getAttribute("data-chip-id"));
+          renderState();
+          syncInput();
+        });
+      }
+
+      // Populate if input already has text (e.g. from restored session)
+      if (input.value && input.value.trim()) {
+        const val = input.value.trim().toLowerCase().replace(/[.!?]+$/, "");
+        const valWords = val.split(/\s+/).filter(Boolean);
+        const matchedChips = [];
+        const remainingAvail = [...state.available];
+
+        valWords.forEach((w) => {
+          const foundId = remainingAvail.find((cId) => {
+            const chipWord = tokenMap[cId].word.toLowerCase().replace(/[.!?]+$/, "");
+            return chipWord === w || chipWord.includes(w) || w.includes(chipWord);
+          });
+          if (foundId) {
+            matchedChips.push(foundId);
+            remainingAvail.splice(remainingAvail.indexOf(foundId), 1);
+          }
+        });
+
+        if (matchedChips.length > 0) {
+          state.ordered = matchedChips;
+          state.available = remainingAvail;
+        }
+      }
+
+      // Initial render
+      renderState();
     });
   },
 
