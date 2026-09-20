@@ -1573,9 +1573,6 @@ const UI = {
               <span>${statusIcon}</span>
               <span style="color:var(--text-muted); font-size:0.85rem;">Task ${qRes.taskNumber} (Item ${qid})</span>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm ask-teacher-mini-btn" data-qid="${qid}" data-task="Task ${qRes.taskNumber} (Question ${qid})">
-              🙋 Ask Teacher
-            </button>
           </div>
 
           <div class="review-diff-row">

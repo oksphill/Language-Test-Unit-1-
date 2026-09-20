@@ -314,14 +314,6 @@
   </main>
 
   <!-- ====================================================================
-       FLOATING HELP BUTTON
-       ==================================================================== -->
-  <button type="button" class="floating-help-btn" id="floating-help-btn" style="display: none;" title="Ask your teacher a question about this test">
-    <span>🙋</span>
-    <span>Ask Teacher</span>
-  </button>
-
-  <!-- ====================================================================
        MODAL: SUBMIT CONFIRMATION
        ==================================================================== -->
   <div class="modal-backdrop" id="modal-submit-confirmation">
@@ -343,37 +335,6 @@
           Check Blank Question
         </button>
         <button type="button" class="btn btn-success" id="btn-confirm-final-submit">Yes, Submit Now!</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====================================================================
-       MODAL: ASK TEACHER
-       ==================================================================== -->
-  <div class="modal-backdrop" id="modal-ask-teacher">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>🙋 Ask Your Teacher</h3>
-        <button type="button" class="modal-close-btn">&times;</button>
-      </div>
-      <div>
-        <div class="form-group">
-          <label for="ask-teacher-student-name">Student</label>
-          <input type="text" id="ask-teacher-student-name" class="form-control" readonly style="background: #F1F5F9;">
-        </div>
-        <div class="form-group">
-          <label for="ask-teacher-task-info">Task / Question</label>
-          <input type="text" id="ask-teacher-task-info" class="form-control" placeholder="e.g. Task 4, Question 2">
-        </div>
-        <div class="form-group">
-          <label for="ask-teacher-question-text">What question do you have? <span class="req">*</span></label>
-          <textarea id="ask-teacher-question-text" class="form-control" rows="4" placeholder="Explain what is unclear or what help you need..."></textarea>
-        </div>
-        <div id="ask-teacher-status"></div>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary btn-modal-cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="btn-send-question">Send Question</button>
       </div>
     </div>
   </div>
