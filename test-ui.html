@@ -45,7 +45,7 @@
         </div>
         <input type="text" id="student-name" value="Test Student" placeholder="e.g. Sarah Jenkins">
         <div id="teacher-step-card">
-          <input type="text" id="teacher-name" placeholder="e.g. Mrs. Smith (Optional)">
+          <input type="text" id="teacher-name">
           <span id="teacher-valid-indicator"></span>
         </div>
         <span id="selected-unit-badge"></span>
@@ -598,6 +598,7 @@
       const teacherIndicator = document.getElementById("teacher-valid-indicator");
 
       assert("Teacher name input exists in DOM", !!teacherInput);
+      assert("Teacher name input has no placeholder", !teacherInput.placeholder);
       assert("Teacher card element exists in DOM", !!teacherCard);
 
       // Test 1: Empty teacher is allowed and optional (does not block start)
