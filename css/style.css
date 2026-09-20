@@ -671,120 +671,51 @@ body {
 .course-card-box {
   border: 2px solid #E2E8F0;
   border-radius: 16px;
-  padding: 0.75rem 0.95rem;
-  background: #FFFFFF;
+  padding: 1rem 1.15rem;
+  background: #F8FAFC;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.95rem;
+  flex-direction: column;
+  gap: 0.25rem;
   position: relative;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
 }
 
 .course-card-box:hover {
-  border-color: #93C5FD;
-  background: #F8FAFC;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.09);
-}
-
-.course-card-radio input[type="radio"]:checked + .course-card-box {
-  border-color: #2563EB;
-  background: #EFF6FF;
-  transform: translateY(-2px);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18), 0 8px 20px rgba(37, 99, 235, 0.12);
-}
-
-/* Simple, crisp book cover thumbnail */
-.course-cover-container {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.course-cover-thumb {
-  width: 68px;
-  height: 92px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
-  background: #F1F5F9;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.course-card-box:hover .course-cover-thumb {
-  transform: scale(1.04);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.16);
-}
-
-.course-info-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 0.18rem;
-  flex: 1;
-  min-width: 0;
 }
 
 .course-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.4rem;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.35rem;
+}
+
+.course-card-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.course-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .course-card-badge {
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
-  padding: 0.18rem 0.5rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  background: #DBEAFE;
-  color: #1D4ED8;
   display: inline-block;
 }
 
-.course-card-badge-pink {
-  background: #FCE7F3;
-  color: #BE185D;
-}
-
-.course-card-badge-blue {
-  background: #E0F2FE;
-  color: #0369A1;
-}
-
-.course-card-badge-orange {
-  background: #FFEDD5;
-  color: #C2410C;
-}
-
-.course-card-badge-purple {
-  background: #F3E8FF;
-  color: #7E22CE;
-}
-
-.course-coming-tag {
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.12rem 0.45rem;
-  border-radius: 9999px;
-  background: #F1F5F9;
-  color: #64748B;
-  border: 1px solid #CBD5E1;
-}
-
 .course-card-title {
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  color: #0F172A;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .course-card-level {
@@ -793,9 +724,129 @@ body {
 }
 
 .course-card-desc {
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   color: #64748B;
-  line-height: 1.3;
+  margin-top: 0.15rem;
+}
+
+/* 1. Go Getter 1 (Pink Theme) */
+.course-card-pink {
+  background: #FFF5F8;
+  border-color: #FBCFE8;
+}
+.course-card-pink .course-card-badge {
+  background: #FCE7F3;
+  color: #BE185D;
+}
+.course-card-pink .course-card-title {
+  color: #9D174D;
+}
+.course-card-pink .course-card-level {
+  color: #BE185D;
+}
+.course-card-pink:hover {
+  background: #FDF2F8;
+  border-color: #F472B6;
+  box-shadow: 0 6px 16px rgba(219, 39, 119, 0.1);
+}
+.course-card-radio input[type="radio"]:checked + .course-card-pink {
+  background: #FDF2F8;
+  border-color: #DB2777;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.22), 0 8px 20px rgba(219, 39, 119, 0.15);
+}
+
+/* 2. Go Getter 2 (Blue Theme) */
+.course-card-blue {
+  background: #F0F9FF;
+  border-color: #BAE6FD;
+}
+.course-card-blue .course-card-badge {
+  background: #E0F2FE;
+  color: #0369A1;
+}
+.course-card-blue .course-card-title {
+  color: #0C4A6E;
+}
+.course-card-blue .course-card-level {
+  color: #0284C7;
+}
+.course-card-blue:hover {
+  background: #E0F2FE;
+  border-color: #38BDF8;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.1);
+}
+.course-card-radio input[type="radio"]:checked + .course-card-blue {
+  background: #E0F2FE;
+  border-color: #0284C7;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.22), 0 8px 20px rgba(2, 132, 199, 0.15);
+}
+
+/* 3. Go Getter 3 (Orange Theme) */
+.course-card-orange {
+  background: #FFF7ED;
+  border-color: #FED7AA;
+}
+.course-card-orange .course-card-badge {
+  background: #FFEDD5;
+  color: #C2410C;
+}
+.course-card-orange .course-card-title {
+  color: #7C2D12;
+}
+.course-card-orange .course-card-level {
+  color: #EA580C;
+}
+.course-card-orange:hover {
+  background: #FFEDD5;
+  border-color: #FB923C;
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.1);
+}
+.course-card-radio input[type="radio"]:checked + .course-card-orange {
+  background: #FFEDD5;
+  border-color: #EA580C;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.22), 0 8px 20px rgba(234, 88, 12, 0.15);
+}
+
+/* 4. Go Getter 4 (Purple Theme) */
+.course-card-purple {
+  background: #FAF5FF;
+  border-color: #E9D5FF;
+}
+.course-card-purple .course-card-badge {
+  background: #F3E8FF;
+  color: #7E22CE;
+}
+.course-card-purple .course-card-title {
+  color: #581C87;
+}
+.course-card-purple .course-card-level {
+  color: #7C3AED;
+}
+.course-card-purple:hover {
+  background: #F3E8FF;
+  border-color: #C084FC;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.1);
+}
+.course-card-radio input[type="radio"]:checked + .course-card-purple {
+  background: #F3E8FF;
+  border-color: #7C3AED;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22), 0 8px 20px rgba(124, 58, 237, 0.15);
+}
+
+.course-coming-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  background: #FCE7F3;
+  color: #BE185D;
+  border: 1px solid #FBCFE8;
 }
 
 /* ==========================================================================
