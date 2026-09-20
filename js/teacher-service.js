@@ -61,6 +61,7 @@ const TeacherService = {
       timestamp: new Date().toLocaleString("ru-RU"),
       studentName: studentFullName,
       studentClass: student.studentClass || "—",
+      teacher: (student.teacher && student.teacher.trim()) ? student.teacher.trim() : "—",
       variant: evaluation.variantTitle || "English Test",
       totalScore: `${evaluation.totalScore} / ${evaluation.totalMax}`,
       percentage: `${evaluation.percentage}%`,
@@ -203,6 +204,7 @@ const TeacherService = {
   formatTelegramSubmission(payload, evaluation) {
     let msg = `📝 *New Test Submission Received!*\n\n` +
       `👤 *Student:* ${payload.studentName}\n` +
+      (payload.teacher && payload.teacher !== "—" ? `👩‍🏫 *Teacher:* ${payload.teacher}\n` : "") +
       `🏫 *Class:* ${payload.studentClass}\n` +
       `📑 *Test:* ${payload.variant}\n` +
       `🏆 *Total Score:* *${payload.totalScore}* (${payload.percentage}) — ${payload.grade}\n\n` +

@@ -76,6 +76,28 @@ const UI = {
       updateNameValidation();
     }
 
+    // Teacher Name Input - dynamic validation & micro-interactions (Optional)
+    const teacherNameInput = document.getElementById("teacher-name");
+    if (teacherNameInput) {
+      const updateTeacherValidation = () => {
+        const val = teacherNameInput.value.trim();
+        const validIndicator = document.getElementById("teacher-valid-indicator");
+        const teacherCard = document.getElementById("teacher-step-card");
+
+        if (val.length >= 2) {
+          if (validIndicator) validIndicator.classList.add("active");
+          if (teacherCard) teacherCard.classList.add("teacher-filled");
+        } else {
+          if (validIndicator) validIndicator.classList.remove("active");
+          if (teacherCard) teacherCard.classList.remove("teacher-filled");
+        }
+      };
+
+      teacherNameInput.addEventListener("input", updateTeacherValidation);
+      teacherNameInput.addEventListener("change", updateTeacherValidation);
+      updateTeacherValidation();
+    }
+
     // Section Tab Switching
     document.querySelectorAll(".section-tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -390,6 +412,16 @@ const UI = {
    */
   resumeSession(saved) {
     this.student = saved.student;
+    if (saved.student) {
+      const teacherInput = document.getElementById("teacher-name");
+      if (teacherInput && saved.student.teacher) {
+        teacherInput.value = saved.student.teacher;
+        const validIndicator = document.getElementById("teacher-valid-indicator");
+        const teacherCard = document.getElementById("teacher-step-card");
+        if (validIndicator) validIndicator.classList.add("active");
+        if (teacherCard) teacherCard.classList.add("teacher-filled");
+      }
+    }
     this.currentCourse = saved.course || (saved.student && saved.student.course) || "gogetter3";
     if (typeof TEST_DATA !== "undefined") {
       TEST_DATA.currentCourse = this.currentCourse;
@@ -425,6 +457,8 @@ const UI = {
   handleStartTest() {
     const nameEl = document.getElementById("student-name");
     const fullName = nameEl ? nameEl.value.trim() : "";
+    const teacherEl = document.getElementById("teacher-name");
+    const teacher = teacherEl ? teacherEl.value.trim() : "";
     const courseRadio = document.querySelector('input[name="test-course"]:checked');
     const course = courseRadio ? courseRadio.value : this.currentCourse || "gogetter3";
     const unitRadio = document.querySelector('input[name="test-unit"]:checked');
@@ -456,7 +490,7 @@ const UI = {
     }
     this.currentUnit = unit;
     this.currentVariant = variant;
-    this.student = { fullName, firstName, lastName, studentClass: "", variant, unit, course };
+    this.student = { fullName, firstName, lastName, teacher, studentClass: "", variant, unit, course };
     this.answers = {};
     this.activeSection = "vocabulary";
 
@@ -2065,7 +2099,7 @@ const UI = {
         <h2>${grade.title}</h2>
         <p style="color:var(--text-muted); max-width:540px; margin:0 auto 1rem;">${grade.message}</p>
         <div class="student-meta">
-          👤 <strong>${this.student.fullName || `${this.student.firstName} ${this.student.lastName}`.trim()}</strong>${this.student.studentClass ? ` • 🏫 Class: ${this.student.studentClass}` : ''} • 📑 ${evaluation.variantTitle}
+          👤 <strong>${this.student.fullName || `${this.student.firstName} ${this.student.lastName}`.trim()}</strong>${this.student.studentClass ? ` • 🏫 Class: ${this.student.studentClass}` : ''}${this.student.teacher ? ` • 👩‍🏫 Teacher: ${this.student.teacher}` : ''} • 📑 ${evaluation.variantTitle}
         </div>
 
         <div class="section-scores-grid">

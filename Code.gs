@@ -5,16 +5,23 @@
  * Тихо сохраняет все результаты в Google Таблицу БЕЗ писем и уведомлений:
  * 1. Дата и время сдачи
  * 2. ФИО студента
- * 3. Тест / Вариант
- * 4. Баллы (набрано / максимум и процент)
- * 5. Количество ошибок
- * 6. Список ошибок (детали каждого неверного ответа)
+ * 3. Учитель (по желанию, колонка и отдельная вкладка «Учитель»)
+ * 4. Тест / Вариант
+ * 5. Баллы (набрано / максимум и процент)
+ * 6. Количество ошибок
+ * 7. Список ошибок (детали каждого неверного ответа)
+ *
+ * ВКЛАДКИ ТАБЛИЦЫ:
+ * - Основной лист («Все результаты» / активный лист) — содержит все работы.
+ * - Вкладка «Учитель» — автоматически собирает все тесты с указанным учителем.
  * ============================================================================
  */
 
 function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({ status: "ok", message: "English Test Webhook is active!" }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "ok",
+    message: "English Test Webhook is active with Teacher tab support!"
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
@@ -25,49 +32,66 @@ function doPost(e) {
     }
 
     var data = JSON.parse(e.postData.contents);
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var mainSheet = ss.getActiveSheet();
 
-    if (sheet.getLastRow() === 0 || sheet.getRange(1, 3).getValue() === "Класс") {
-      sheet.clear();
-      sheet.appendRow([
-        "Дата и время",
-        "ФИО студента",
-        "Тест / Вариант",
-        "Баллы",
-        "Количество ошибок",
-        "Список ошибок"
-      ]);
-      var headerRange = sheet.getRange(1, 1, 1, 6);
-      headerRange.setFontWeight("bold");
-      headerRange.setBackground("#4F46E5");
-      headerRange.setFontColor("#FFFFFF");
-      headerRange.setHorizontalAlignment("center");
-      sheet.setFrozenRows(1);
-      sheet.setColumnWidth(1, 140);
-      sheet.setColumnWidth(2, 220);
-      sheet.setColumnWidth(3, 220);
-      sheet.setColumnWidth(4, 140);
-      sheet.setColumnWidth(5, 140);
-      sheet.setColumnWidth(6, 450);
-    }
+    // 1. Инициализация / проверка основной таблицы («Все результаты»)
+    setupMainSheetHeader(mainSheet);
 
+    var timestamp = data.timestamp || new Date().toLocaleString("ru-RU");
+    var studentName = data.studentName || "Не указано";
+    var teacher = (data.teacher && data.teacher.trim() && data.teacher.trim() !== "—")
+      ? data.teacher.trim()
+      : "—";
+    var variant = data.variant || "—";
     var scoreText = (data.totalScore || "0") + " (" + (data.percentage || "0%") + ")";
+    var mistakesCount = data.mistakesCount !== undefined ? data.mistakesCount : 0;
+    var mistakesSummary = data.mistakesSummary || "No mistakes (100% score)";
 
-    sheet.appendRow([
-      data.timestamp || new Date().toLocaleString("ru-RU"),
-      data.studentName || "Не указано",
-      data.variant || "—",
+    // Добавляем строку в основную таблицу
+    mainSheet.appendRow([
+      timestamp,
+      studentName,
+      teacher,
+      variant,
       scoreText,
-      data.mistakesCount !== undefined ? data.mistakesCount : 0,
-      data.mistakesSummary || "No mistakes (100% score)"
+      mistakesCount,
+      mistakesSummary
     ]);
 
-    var lastRow = sheet.getLastRow();
-    sheet.getRange(lastRow, 1).setHorizontalAlignment("center");
-    sheet.getRange(lastRow, 4).setHorizontalAlignment("center");
-    sheet.getRange(lastRow, 5).setHorizontalAlignment("center");
+    var mainLastRow = mainSheet.getLastRow();
+    mainSheet.getRange(mainLastRow, 1).setHorizontalAlignment("center");
+    mainSheet.getRange(mainLastRow, 3).setHorizontalAlignment("center");
+    mainSheet.getRange(mainLastRow, 5).setHorizontalAlignment("center");
+    mainSheet.getRange(mainLastRow, 6).setHorizontalAlignment("center");
 
-    // Уведомления отключены: все результаты сохраняются бесшумно в таблицу
+    // 2. Отдельная вкладка «Учитель»
+    var teacherSheet = ss.getSheetByName("Учитель");
+    if (!teacherSheet) {
+      teacherSheet = ss.insertSheet("Учитель");
+      setupTeacherSheetHeader(teacherSheet);
+    } else if (teacherSheet.getLastRow() === 0) {
+      setupTeacherSheetHeader(teacherSheet);
+    }
+
+    // Если учитель указан учеником — дублируем результат во вкладку «Учитель»
+    if (teacher !== "—") {
+      teacherSheet.appendRow([
+        timestamp,
+        teacher,
+        studentName,
+        variant,
+        scoreText,
+        mistakesCount,
+        mistakesSummary
+      ]);
+
+      var tLastRow = teacherSheet.getLastRow();
+      teacherSheet.getRange(tLastRow, 1).setHorizontalAlignment("center");
+      teacherSheet.getRange(tLastRow, 2).setHorizontalAlignment("center");
+      teacherSheet.getRange(tLastRow, 5).setHorizontalAlignment("center");
+      teacherSheet.getRange(tLastRow, 6).setHorizontalAlignment("center");
+    }
 
     return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -78,27 +102,80 @@ function doPost(e) {
   }
 }
 
-function resetTable() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+function setupMainSheetHeader(sheet) {
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "Дата и время",
+      "ФИО студента",
+      "Учитель",
+      "Тест / Вариант",
+      "Баллы",
+      "Количество ошибок",
+      "Список ошибок"
+    ]);
+    var headerRange = sheet.getRange(1, 1, 1, 7);
+    headerRange.setFontWeight("bold");
+    headerRange.setBackground("#4F46E5");
+    headerRange.setFontColor("#FFFFFF");
+    headerRange.setHorizontalAlignment("center");
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 140);
+    sheet.setColumnWidth(2, 220);
+    sheet.setColumnWidth(3, 180);
+    sheet.setColumnWidth(4, 220);
+    sheet.setColumnWidth(5, 140);
+    sheet.setColumnWidth(6, 140);
+    sheet.setColumnWidth(7, 450);
+    return;
+  }
+
+  if (sheet.getRange(1, 3).getValue() === "Тест / Вариант") {
+    sheet.insertColumnBefore(3);
+    var newColCell = sheet.getRange(1, 3);
+    newColCell.setValue("Учитель");
+    newColCell.setFontWeight("bold");
+    newColCell.setBackground("#4F46E5");
+    newColCell.setFontColor("#FFFFFF");
+    newColCell.setHorizontalAlignment("center");
+    sheet.setColumnWidth(3, 180);
+  }
+}
+
+function setupTeacherSheetHeader(sheet) {
   sheet.clear();
   sheet.appendRow([
     "Дата и время",
+    "Учитель",
     "ФИО студента",
     "Тест / Вариант",
     "Баллы",
     "Количество ошибок",
     "Список ошибок"
   ]);
-  var headerRange = sheet.getRange(1, 1, 1, 6);
+  var headerRange = sheet.getRange(1, 1, 1, 7);
   headerRange.setFontWeight("bold");
-  headerRange.setBackground("#4F46E5");
+  headerRange.setBackground("#059669");
   headerRange.setFontColor("#FFFFFF");
   headerRange.setHorizontalAlignment("center");
   sheet.setFrozenRows(1);
   sheet.setColumnWidth(1, 140);
-  sheet.setColumnWidth(2, 220);
+  sheet.setColumnWidth(2, 180);
   sheet.setColumnWidth(3, 220);
-  sheet.setColumnWidth(4, 140);
+  sheet.setColumnWidth(4, 220);
   sheet.setColumnWidth(5, 140);
-  sheet.setColumnWidth(6, 450);
+  sheet.setColumnWidth(6, 140);
+  sheet.setColumnWidth(7, 450);
+}
+
+function resetTable() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var mainSheet = ss.getActiveSheet();
+  mainSheet.clear();
+  setupMainSheetHeader(mainSheet);
+
+  var teacherSheet = ss.getSheetByName("Учитель");
+  if (!teacherSheet) {
+    teacherSheet = ss.insertSheet("Учитель");
+  }
+  setupTeacherSheetHeader(teacherSheet);
 }

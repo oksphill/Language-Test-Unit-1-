@@ -95,6 +95,36 @@
             </div>
           </div>
 
+          <!-- OPTIONAL TEACHER CARD -->
+          <div class="teacher-step-card" id="teacher-step-card">
+            <div class="step-header">
+              <span class="step-badge step-badge-green">OPTIONAL</span>
+              <div class="step-header-text">
+                <label for="teacher-name" class="step-title">Your Teacher (Optional)</label>
+                <span class="step-subtitle">Specify your teacher or leave blank if self-studying</span>
+              </div>
+            </div>
+
+            <div class="name-input-wrapper" id="teacher-input-wrapper">
+              <div class="name-avatar-badge teacher-avatar-badge" id="teacher-avatar-badge" aria-hidden="true">👩‍🏫</div>
+              <input 
+                type="text" 
+                id="teacher-name" 
+                class="name-input-field" 
+                placeholder="e.g. Mrs. Smith or Mr. Davis" 
+                autocomplete="off"
+              >
+              <div class="name-valid-indicator" id="teacher-valid-indicator" title="Teacher specified!">
+                <span>✓</span>
+              </div>
+            </div>
+            
+            <div class="name-hint-row">
+              <span class="name-hint-icon">💡</span>
+              <span class="name-hint-text">Optional — if left blank, you can still take the test and submit it</span>
+            </div>
+          </div>
+
           <!-- STEP 2: COURSE & LEVEL SELECTOR -->
           <div class="course-step-card" id="course-step-card">
             <div class="step-header">
