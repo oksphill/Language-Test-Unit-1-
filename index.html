@@ -55,28 +55,59 @@
          ==================================================================== -->
     <section class="screen active" id="screen-start">
       <div class="start-hero">
+        <div class="hero-top-badge">
+          <span class="badge-pulse-dot"></span>
+          <span>Interactive English Assessment</span>
+        </div>
         <h2>Welcome to Your English Test! 📝</h2>
-        <p id="start-hero-subtitle">Complete all 6 tasks to practice your vocabulary, past tenses, and everyday communication skills.</p>
+        <p id="start-hero-subtitle">Complete all tasks to practice your vocabulary, grammar, and communication skills.</p>
       </div>
 
       <!-- Resume Session Prompt (Dynamically shown if unfinished test exists) -->
-      <div id="resume-session-prompt" style="display: none; max-width: 580px; margin: 0 auto 1.5rem;"></div>
+      <div id="resume-session-prompt" style="display: none; max-width: 620px; margin: 0 auto 1.5rem;"></div>
 
       <div class="start-card">
         <form id="start-test-form">
-          <!-- Student Name Input -->
-          <div class="form-group">
-            <label for="student-name">Student Name <span class="req">*</span></label>
-            <input type="text" id="student-name" class="form-control" placeholder="e.g. Sarah Jenkins" required autocomplete="name">
+          <!-- STEP 1: STUDENT NAME CARD -->
+          <div class="name-step-card" id="student-name-card">
+            <div class="step-header">
+              <span class="step-badge">STEP 1</span>
+              <div class="step-header-text">
+                <label for="student-name" class="step-title">Enter Your Full Name <span class="req">*</span></label>
+                <span class="step-subtitle">Type your name so your teacher knows who completed this test</span>
+              </div>
+            </div>
+
+            <div class="name-input-wrapper" id="name-input-wrapper">
+              <div class="name-avatar-badge" id="name-avatar-badge" aria-hidden="true">👤</div>
+              <input 
+                type="text" 
+                id="student-name" 
+                class="name-input-field" 
+                placeholder="e.g. Sarah Jenkins" 
+                required 
+                autocomplete="name"
+              >
+              <div class="name-valid-indicator" id="name-valid-indicator" title="Name entered!">
+                <span>✓</span>
+              </div>
+            </div>
+            
+            <div class="name-hint-row">
+              <span class="name-hint-icon">💡</span>
+              <span class="name-hint-text">First and last name (English or Russian)</span>
+            </div>
           </div>
 
-
-          <!-- Unit Selector (Units 1 to 8 + Mid-Year + End-of-Year) -->
-          <div class="form-group">
-            <span class="unit-selector-label">
-              <span>Select Unit (1 – 8) or Exam:</span>
-              <span id="selected-unit-badge" style="font-weight: 700; color: var(--primary);">Unit 1 • Clothes & Appearance</span>
-            </span>
+          <!-- STEP 2: UNIT SELECTOR -->
+          <div class="units-step-card">
+            <div class="step-header">
+              <span class="step-badge step-badge-purple">STEP 2</span>
+              <div class="step-header-text">
+                <span class="step-title">Select Unit (1 – 8) or Exam:</span>
+                <span id="selected-unit-badge" class="selected-unit-text">Unit 1 • Clothes & Appearance</span>
+              </div>
+            </div>
             <div class="unit-cards-grid" id="unit-selector-grid">
               <label class="unit-card-radio">
                 <input type="radio" name="test-unit" value="unit1" checked>
@@ -198,7 +229,6 @@
                 </div>
               </label>
             </div>
-          </div>
 
           <!-- Selected Unit Preview Banner -->
           <div class="unit-preview-banner" id="unit-preview-banner">
@@ -229,6 +259,7 @@
               </label>
             </div>
           </div>
+          </div> <!-- /units-step-card -->
 
           <!-- Quick Instructions -->
           <div class="instructions-box">
@@ -237,12 +268,13 @@
               <li>Read each question and the examples carefully.</li>
               <li>You can type your answers or click words from the word banks.</li>
               <li>Your answers are saved automatically as you type.</li>
-              <li>Need help? Click <strong>"Ask Teacher"</strong> at any time.</li>
+              <li>Review your score and mistake breakdown immediately after finishing!</li>
             </ul>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-            Start Test 🚀
+          <button type="submit" class="btn btn-primary btn-lg btn-start-animated" id="btn-start-test-main">
+            <span class="btn-start-text">Start Test Now</span>
+            <span class="btn-start-rocket">🚀</span>
           </button>
         </form>
       </div>

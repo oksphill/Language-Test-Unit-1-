@@ -29,6 +29,32 @@ const UI = {
       });
     }
 
+    // Student Name Input - dynamic validation & micro-interactions
+    const studentNameInput = document.getElementById("student-name");
+    if (studentNameInput) {
+      const updateNameValidation = () => {
+        const val = studentNameInput.value.trim();
+        const validIndicator = document.getElementById("name-valid-indicator");
+        const avatarBadge = document.getElementById("name-avatar-badge");
+        const nameCard = document.getElementById("student-name-card");
+
+        if (val.length >= 2) {
+          if (validIndicator) validIndicator.classList.add("active");
+          if (avatarBadge) avatarBadge.textContent = "🎓";
+          if (nameCard) nameCard.classList.add("name-filled");
+        } else {
+          if (validIndicator) validIndicator.classList.remove("active");
+          if (avatarBadge) avatarBadge.textContent = "👤";
+          if (nameCard) nameCard.classList.remove("name-filled");
+        }
+      };
+
+      studentNameInput.addEventListener("input", updateNameValidation);
+      studentNameInput.addEventListener("change", updateNameValidation);
+      // Run once on load in case of browser autofill
+      updateNameValidation();
+    }
+
     // Section Tab Switching
     document.querySelectorAll(".section-tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -263,6 +289,15 @@ const UI = {
     const variant = variantRadio ? variantRadio.value : "variantA";
 
     if (!fullName) {
+      const nameCard = document.getElementById("student-name-card");
+      if (nameCard) {
+        nameCard.classList.remove("shake-attention");
+        void nameCard.offsetWidth; // Force DOM reflow to re-trigger animation
+        nameCard.classList.add("shake-attention");
+      }
+      if (nameEl) {
+        nameEl.focus();
+      }
       alert("Please enter your name.");
       return;
     }
