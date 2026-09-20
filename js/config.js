@@ -11,5 +11,5 @@ const APP_CONFIG = {
   sheetsWebhookUrl: "https://script.google.com/macros/s/AKfycbwgEW927naXpaJhrA7CZ7K9EVMsyhYmrXZCjc7okevisCvmKbALItnxDaDnCrX-OKehEA/exec",
 
   // 2. Таблица для школы (когда ссылка открыта с ?school=1):
-  schoolWebhookUrl: ""
+  schoolWebhookUrl: "https://script.google.com/macros/s/AKfycbxFgF7Y96BrWH9NuVSlWNQv1fqDhwYTu1nYNwPV8aLnEcdZO3PAWmD8vzTUxhVcET0/exec"
 };
