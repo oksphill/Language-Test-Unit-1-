@@ -1697,3 +1697,343 @@ body {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================================================
+   Magic Wand Cursor & Illumination Aura
+   ========================================================================== */
+
+#screen-start {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2236%22 height%3D%2236%22 viewBox%3D%220 0 36 36%22 fill%3D%22none%22%3E%3Cdefs%3E%3Cfilter id%3D%22glow%22 x%3D%22-50%25%22 y%3D%22-50%25%22 width%3D%22200%25%22 height%3D%22200%25%22%3E%3CfeGaussianBlur in%3D%22SourceGraphic%22 stdDeviation%3D%221.5%22 result%3D%22blur%22%2F%3E%3CfeMerge%3E%3CfeMergeNode in%3D%22blur%22%2F%3E%3CfeMergeNode in%3D%22SourceGraphic%22%2F%3E%3C%2FfeMerge%3E%3C%2Ffilter%3E%3ClinearGradient id%3D%22wandGrad%22 x1%3D%226%22 y1%3D%226%22 x2%3D%2230%22 y2%3D%2230%22 gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop offset%3D%220%25%22 stop-color%3D%22%23A855F7%22%2F%3E%3Cstop offset%3D%2240%25%22 stop-color%3D%22%236366F1%22%2F%3E%3Cstop offset%3D%2275%25%22 stop-color%3D%22%231E1B4B%22%2F%3E%3Cstop offset%3D%22100%25%22 stop-color%3D%22%230F172A%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient id%3D%22goldCollar%22 x1%3D%220%22 y1%3D%220%22 x2%3D%221%22 y2%3D%221%22%3E%3Cstop offset%3D%220%25%22 stop-color%3D%22%23FEF08A%22%2F%3E%3Cstop offset%3D%2250%25%22 stop-color%3D%22%23F59E0B%22%2F%3E%3Cstop offset%3D%22100%25%22 stop-color%3D%22%23B45309%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cline x1%3D%229%22 y1%3D%229%22 x2%3D%2231%22 y2%3D%2231%22 stroke%3D%22%23000000%22 stroke-width%3D%224.5%22 stroke-linecap%3D%22round%22 opacity%3D%220.3%22%2F%3E%3Cline x1%3D%228%22 y1%3D%228%22 x2%3D%2230%22 y2%3D%2230%22 stroke%3D%22url(%23wandGrad)%22 stroke-width%3D%223.5%22 stroke-linecap%3D%22round%22%2F%3E%3Cline x1%3D%2212%22 y1%3D%2212%22 x2%3D%2214.5%22 y2%3D%2214.5%22 stroke%3D%22url(%23goldCollar)%22 stroke-width%3D%223.5%22%2F%3E%3Ccircle cx%3D%2230%22 cy%3D%2230%22 r%3D%222.2%22 fill%3D%22url(%23goldCollar)%22%2F%3E%3Ccircle cx%3D%227.5%22 cy%3D%227.5%22 r%3D%222.5%22 fill%3D%22url(%23goldCollar)%22%2F%3E%3Ccircle cx%3D%224%22 cy%3D%224%22 r%3D%223.5%22 fill%3D%22%23FDE047%22 opacity%3D%220.55%22 filter%3D%22url(%23glow)%22%2F%3E%3Cpath d%3D%22M4 0 L5.2 2.8 L8 4 L5.2 5.2 L4 8 L2.8 5.2 L0 4 L2.8 2.8 Z%22 fill%3D%22%23FEF08A%22 stroke%3D%22%23F59E0B%22 stroke-width%3D%220.5%22 filter%3D%22url(%23glow)%22%2F%3E%3Ccircle cx%3D%224%22 cy%3D%224%22 r%3D%221.1%22 fill%3D%22%23FFFFFF%22%2F%3E%3Cpath d%3D%22M10 0 L10.6 1.4 L12 2 L10.6 2.6 L10 4 L9.4 2.6 L8 2 L9.4 1.4 Z%22 fill%3D%22%2367E8F9%22 opacity%3D%220.95%22%2F%3E%3Cpath d%3D%22M1 9 L1.6 10.4 L3 11 L1.6 11.6 L1 13 L0.4 11.6 L-1 11 L0.4 10.4 Z%22 fill%3D%22%23F472B6%22 opacity%3D%220.95%22%2F%3E%3C%2Fsvg%3E") 4 4, auto;
+}
+
+#screen-start a,
+#screen-start button,
+#screen-start .btn,
+#screen-start label,
+#screen-start .course-card-box,
+#screen-start .unit-card-box,
+#screen-start .variant-card-box,
+#screen-start .stepper-item {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2236%22 height%3D%2236%22 viewBox%3D%220 0 36 36%22 fill%3D%22none%22%3E%3Cdefs%3E%3Cfilter id%3D%22glowHov%22 x%3D%22-50%25%22 y%3D%22-50%25%22 width%3D%22200%25%22 height%3D%22200%25%22%3E%3CfeGaussianBlur in%3D%22SourceGraphic%22 stdDeviation%3D%222%22 result%3D%22blur%22%2F%3E%3CfeMerge%3E%3CfeMergeNode in%3D%22blur%22%2F%3E%3CfeMergeNode in%3D%22SourceGraphic%22%2F%3E%3C%2FfeMerge%3E%3C%2Ffilter%3E%3ClinearGradient id%3D%22wandGradHov%22 x1%3D%226%22 y1%3D%226%22 x2%3D%2230%22 y2%3D%2230%22 gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop offset%3D%220%25%22 stop-color%3D%22%23C084FC%22%2F%3E%3Cstop offset%3D%2235%25%22 stop-color%3D%22%23818CF8%22%2F%3E%3Cstop offset%3D%2270%25%22 stop-color%3D%22%23312E81%22%2F%3E%3Cstop offset%3D%22100%25%22 stop-color%3D%22%230F172A%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient id%3D%22goldCollarHov%22 x1%3D%220%22 y1%3D%220%22 x2%3D%221%22 y2%3D%221%22%3E%3Cstop offset%3D%220%25%22 stop-color%3D%22%23FEF9C3%22%2F%3E%3Cstop offset%3D%2250%25%22 stop-color%3D%22%23FBBF24%22%2F%3E%3Cstop offset%3D%22100%25%22 stop-color%3D%22%23D97706%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cline x1%3D%229%22 y1%3D%229%22 x2%3D%2231%22 y2%3D%2231%22 stroke%3D%22%23000000%22 stroke-width%3D%225%22 stroke-linecap%3D%22round%22 opacity%3D%220.35%22%2F%3E%3Cline x1%3D%228%22 y1%3D%228%22 x2%3D%2230%22 y2%3D%2230%22 stroke%3D%22url(%23wandGradHov)%22 stroke-width%3D%223.8%22 stroke-linecap%3D%22round%22%2F%3E%3Cline x1%3D%2212%22 y1%3D%2212%22 x2%3D%2214.5%22 y2%3D%2214.5%22 stroke%3D%22url(%23goldCollarHov)%22 stroke-width%3D%223.8%22%2F%3E%3Ccircle cx%3D%2230%22 cy%3D%2230%22 r%3D%222.5%22 fill%3D%22url(%23goldCollarHov)%22%2F%3E%3Ccircle cx%3D%227.5%22 cy%3D%227.5%22 r%3D%222.8%22 fill%3D%22url(%23goldCollarHov)%22%2F%3E%3Ccircle cx%3D%224%22 cy%3D%224%22 r%3D%225%22 fill%3D%22%23FDE047%22 opacity%3D%220.7%22 filter%3D%22url(%23glowHov)%22%2F%3E%3Cpath d%3D%22M4 -1 L5.5 2.5 L9 4 L5.5 5.5 L4 9 L2.5 5.5 L-1 4 L2.5 2.5 Z%22 fill%3D%22%23FFFFFF%22 stroke%3D%22%23F59E0B%22 stroke-width%3D%220.8%22 filter%3D%22url(%23glowHov)%22%2F%3E%3Ccircle cx%3D%224%22 cy%3D%224%22 r%3D%221.5%22 fill%3D%22%23FFFFFF%22%2F%3E%3Cpath d%3D%22M11 -1 L11.7 0.7 L13.5 1.5 L11.7 2.3 L11 4 L10.3 2.3 L8.5 1.5 L10.3 0.7 Z%22 fill%3D%22%2338BDF8%22 opacity%3D%220.95%22%2F%3E%3Cpath d%3D%22M0 10 L0.8 11.7 L2.5 12.5 L0.8 13.3 L0 15 L-0.8 13.3 L-2.5 12.5 L-0.8 11.7 Z%22 fill%3D%22%23F43F5E%22 opacity%3D%220.95%22%2F%3E%3C%2Fsvg%3E") 4 4, pointer;
+}
+
+#screen-start input[type="text"] {
+  cursor: text;
+}
+
+/* Follower Aura (Illumination / Подсветка) */
+.magic-wand-aura {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 170px;
+  height: 170px;
+  margin-top: -85px;
+  margin-left: -85px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.32) 0%, rgba(168, 85, 247, 0.18) 35%, rgba(59, 130, 246, 0.08) 60%, transparent 75%);
+  filter: blur(14px);
+  will-change: transform, opacity;
+}
+
+.magic-sparkles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.magic-sparkle-particle {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1rem;
+  line-height: 1;
+  user-select: none;
+  animation: sparkleFloat 0.8s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes sparkleFloat {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(var(--dx, 0px), var(--dy, -15px)) scale(1.2) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dx, 0px) * 1.5), calc(var(--dy, -25px) * 1.5)) scale(0.2) rotate(180deg);
+  }
+}
+
+/* ==========================================================================
+   Interactive Step Progress Tracker (Start Stepper)
+   ========================================================================== */
+
+.start-stepper-tracker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #F8FAFC, #F1F5F9);
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  user-select: none;
+  transition: all 0.25s ease;
+}
+
+.stepper-bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #E2E8F0;
+  color: #64748B;
+  font-weight: 800;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.stepper-bubble .stepper-check {
+  display: none;
+  font-size: 0.95rem;
+  color: #FFFFFF;
+}
+
+.stepper-labels {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepper-step-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  line-height: 1;
+}
+
+.stepper-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+  line-height: 1.3;
+}
+
+.stepper-connector {
+  flex: 1;
+  height: 2px;
+  background: #E2E8F0;
+  margin: 0 0.65rem;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+/* Active Stepper Item */
+.stepper-item.active .stepper-bubble {
+  background: linear-gradient(135deg, #4F46E5, #6366F1);
+  color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 3px 8px rgba(79, 70, 229, 0.3);
+  transform: scale(1.08);
+}
+
+.stepper-item.active .stepper-step-tag {
+  color: #4F46E5;
+}
+
+.stepper-item.active .stepper-title {
+  color: #1E1B4B;
+  font-weight: 800;
+}
+
+/* Completed Stepper Item */
+.stepper-item.completed .stepper-bubble {
+  background: #10B981;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.stepper-item.completed .stepper-num {
+  display: none;
+}
+
+.stepper-item.completed .stepper-check {
+  display: inline-block;
+}
+
+.stepper-connector.completed {
+  background: #10B981;
+}
+
+/* ==========================================================================
+   Interactive Step Guide Pointers ("что нажимать 1")
+   ========================================================================== */
+
+.step-guide-tag {
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+  width: fit-content;
+  transition: all 0.3s ease;
+}
+
+.step-guide-tag.active-guide {
+  display: inline-flex;
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  color: #92400E;
+  border: 1.5px solid #F59E0B;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.22), 0 4px 12px rgba(245, 158, 11, 0.18);
+  animation: guidePulse 2.2s infinite ease-in-out;
+}
+
+.step-guide-tag.completed-guide {
+  display: inline-flex;
+  background: #F0FDF4;
+  color: #166534;
+  border: 1.5px solid #86EFAC;
+  box-shadow: none;
+  animation: none;
+}
+
+.step-guide-tag.step-guide-start.active-guide {
+  display: inline-flex;
+  background: linear-gradient(135deg, #F5F3FF, #EDE9FE);
+  color: #5B21B6;
+  border: 1.5px solid #8B5CF6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2), 0 4px 12px rgba(139, 92, 246, 0.15);
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+  animation: guidePulseViolet 2.2s infinite ease-in-out;
+}
+
+.guide-bounce-hand {
+  font-size: 1.15rem;
+  display: inline-block;
+  animation: bounceGuideHand 1.2s infinite ease-in-out;
+}
+
+@keyframes bounceGuideHand {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+@keyframes guidePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25), 0 4px 12px rgba(245, 158, 11, 0.18);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.1), 0 6px 16px rgba(245, 158, 11, 0.25);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes guidePulseViolet {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 4px 12px rgba(139, 92, 246, 0.18);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(139, 92, 246, 0.1), 0 6px 16px rgba(139, 92, 246, 0.25);
+    transform: scale(1.02);
+  }
+}
+
+.guide-step-pill {
+  background: #B45309;
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 800;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-guide-tag.completed-guide .guide-step-pill {
+  background: #10B981;
+}
+
+.guide-tag-msg strong {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Card active glow highlight when it is the current step */
+.name-step-card.step-card-active {
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 12px 28px -5px rgba(99, 102, 241, 0.2) !important;
+}
+
+.name-input-field.input-guide-glow {
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.22) !important;
+}
+
+.course-step-card.step-card-active {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.22) !important;
+}
+
+.units-step-card.step-card-active {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.22) !important;
+}
+
+/* Ready to start button shimmer animation */
+.btn-start-animated.ready-shimmer {
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
+  background-size: 200% auto;
+  animation: shimmerMove 3s infinite linear, buttonReadyPulse 2s infinite ease-in-out;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.25), 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+@keyframes shimmerMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes buttonReadyPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@media (max-width: 640px) {
+  .start-stepper-tracker {
+    padding: 0.65rem 0.75rem;
+  }
+  .stepper-labels {
+    display: none;
+  }
+}

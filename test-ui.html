@@ -36,34 +36,67 @@
       <div id="resume-session-prompt"></div>
       <p id="start-hero-subtitle"></p>
       <form id="start-test-form">
-        <div id="course-selector-container">
-          <span id="selected-course-badge"></span>
-          <input type="radio" name="test-course" id="course-radio-gogetter1" value="gogetter1">
-          <input type="radio" name="test-course" id="course-radio-gogetter2" value="gogetter2">
-          <input type="radio" name="test-course" id="course-radio-gogetter3" value="gogetter3" checked>
-          <input type="radio" name="test-course" id="course-radio-gogetter4" value="gogetter4">
+        <div class="start-stepper-tracker" id="start-stepper-tracker">
+          <div class="stepper-item active" id="stepper-item-1" data-step="1"></div>
+          <div class="stepper-connector" id="stepper-conn-1"></div>
+          <div class="stepper-item" id="stepper-item-2" data-step="2"></div>
+          <div class="stepper-connector" id="stepper-conn-2"></div>
+          <div class="stepper-item" id="stepper-item-3" data-step="3"></div>
+          <div class="stepper-connector" id="stepper-conn-3"></div>
+          <div class="stepper-item" id="stepper-item-4" data-step="4"></div>
         </div>
-        <input type="text" id="student-name" value="Test Student" placeholder="e.g. Sarah Jenkins">
-        <span id="selected-unit-badge"></span>
-        <div id="unit-selector-grid">
-          <input type="radio" name="test-unit" id="unit-radio-unit1" value="unit1" checked>
-          <input type="radio" name="test-unit" id="unit-radio-unit2" value="unit2">
-          <input type="radio" name="test-unit" id="unit-radio-unit3" value="unit3">
-          <input type="radio" name="test-unit" id="unit-radio-unit4" value="unit4">
-          <input type="radio" name="test-unit" id="unit-radio-mid_year" value="mid_year">
-          <input type="radio" name="test-unit" id="unit-radio-unit5" value="unit5">
-          <input type="radio" name="test-unit" id="unit-radio-unit6" value="unit6">
-          <input type="radio" name="test-unit" id="unit-radio-unit7" value="unit7">
-          <input type="radio" name="test-unit" id="unit-radio-unit8" value="unit8">
-          <input type="radio" name="test-unit" id="unit-radio-end_of_year" value="end_of_year">
+
+        <div class="name-step-card" id="student-name-card">
+          <div class="step-guide-tag active-guide" id="step-guide-1">
+            <span class="guide-bounce-hand">👉</span>
+            <span class="guide-step-pill">1</span>
+            <span class="guide-tag-msg"><strong>START HERE:</strong> Enter your full name</span>
+          </div>
+          <input type="text" id="student-name" value="Test Student" placeholder="e.g. Sarah Jenkins">
+          <div class="name-valid-indicator" id="name-valid-indicator"></div>
+          <div class="name-avatar-badge" id="name-avatar-badge">👤</div>
         </div>
-        <span id="preview-unit-name"></span>
-        <span id="preview-unit-topics"></span>
-        <span id="variant-a-desc"></span>
-        <span id="variant-b-desc"></span>
-        <input type="radio" name="test-variant" value="variantA" checked>
-        <input type="radio" name="test-variant" value="variantB">
+
+        <div class="course-step-card" id="course-step-card">
+          <div class="step-guide-tag" id="step-guide-2"></div>
+          <div id="course-selector-container">
+            <span id="selected-course-badge"></span>
+            <input type="radio" name="test-course" id="course-radio-gogetter1" value="gogetter1">
+            <input type="radio" name="test-course" id="course-radio-gogetter2" value="gogetter2">
+            <input type="radio" name="test-course" id="course-radio-gogetter3" value="gogetter3" checked>
+            <input type="radio" name="test-course" id="course-radio-gogetter4" value="gogetter4">
+          </div>
+        </div>
+
+        <div class="units-step-card" id="units-step-card">
+          <div class="step-guide-tag" id="step-guide-3"></div>
+          <span id="selected-unit-badge"></span>
+          <div id="unit-selector-grid">
+            <input type="radio" name="test-unit" id="unit-radio-unit1" value="unit1" checked>
+            <input type="radio" name="test-unit" id="unit-radio-unit2" value="unit2">
+            <input type="radio" name="test-unit" id="unit-radio-unit3" value="unit3">
+            <input type="radio" name="test-unit" id="unit-radio-unit4" value="unit4">
+            <input type="radio" name="test-unit" id="unit-radio-mid_year" value="mid_year">
+            <input type="radio" name="test-unit" id="unit-radio-unit5" value="unit5">
+            <input type="radio" name="test-unit" id="unit-radio-unit6" value="unit6">
+            <input type="radio" name="test-unit" id="unit-radio-unit7" value="unit7">
+            <input type="radio" name="test-unit" id="unit-radio-unit8" value="unit8">
+            <input type="radio" name="test-unit" id="unit-radio-end_of_year" value="end_of_year">
+          </div>
+          <span id="preview-unit-name"></span>
+          <span id="preview-unit-topics"></span>
+          <span id="variant-a-desc"></span>
+          <span id="variant-b-desc"></span>
+          <input type="radio" name="test-variant" value="variantA" checked>
+          <input type="radio" name="test-variant" value="variantB">
+        </div>
+
+        <div class="step-guide-tag step-guide-start" id="step-guide-4"></div>
+        <button type="submit" id="btn-start-test-main"></button>
       </form>
+
+      <div id="magic-cursor-aura" class="magic-wand-aura"></div>
+      <div id="magic-sparkles-container" class="magic-sparkles-container"></div>
     </div>
 
     <div class="screen" id="screen-test">
@@ -585,6 +618,52 @@
       assert("GG4 Unit 7 Task 4 also renders interactive-order-item elements", u7Interactive.length === 6);
       const u7FirstInput = u7Interactive[0].querySelector(".synced-order-input");
       assert("GG4 Unit 7 Task 4 inputs have empty placeholder", !u7FirstInput.placeholder);
+
+      // 16. Test Magic Wand Cursor & Interactive Step Guide ("что нажимать 1")
+      UI.switchScreen("start");
+      const startScreenEl = document.getElementById("screen-start");
+      assert("Start screen is active", startScreenEl && startScreenEl.classList.contains("active"));
+
+      // Check Magic Cursor elements exist
+      const magicAura = document.getElementById("magic-cursor-aura");
+      const magicSparkles = document.getElementById("magic-sparkles-container");
+      assert("Magic wand aura element exists", !!magicAura);
+      assert("Magic sparkles container exists", !!magicSparkles);
+
+      // Check Interactive Stepper Tracker exists
+      const stepperTracker = document.getElementById("start-stepper-tracker");
+      assert("Stepper tracker exists", !!stepperTracker);
+      const stepperItems = stepperTracker.querySelectorAll(".stepper-item");
+      assert("Stepper tracker has 4 steps (Name, Level, Unit, Start)", stepperItems.length === 4);
+
+      // Check Step Guide Tags exist on cards
+      const guideTag1 = document.getElementById("step-guide-1");
+      const guideTag2 = document.getElementById("step-guide-2");
+      const guideTag3 = document.getElementById("step-guide-3");
+      const guideTag4 = document.getElementById("step-guide-4");
+      assert("Step 1 guide tag exists", !!guideTag1);
+      assert("Step 2 guide tag exists", !!guideTag2);
+      assert("Step 3 guide tag exists", !!guideTag3);
+      assert("Step 4 guide tag exists", !!guideTag4);
+
+      // When name is empty, Step 1 must be active and indicate "START HERE"
+      const sNameInput = document.getElementById("student-name");
+      sNameInput.value = "";
+      sNameInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+      assert("When name empty, Step 1 guide tag is active", guideTag1.classList.contains("active-guide"));
+      assert("When name empty, Step 1 contains 'START HERE'", guideTag1.textContent.includes("START HERE"));
+      assert("When name empty, Stepper item 1 has active class", document.getElementById("stepper-item-1").classList.contains("active"));
+      assert("When name empty, Name card has step-card-active class", document.getElementById("student-name-card").classList.contains("step-card-active"));
+
+      // Enter student name -> Step 1 should complete and Step 4 / Ready activate
+      sNameInput.value = "Harry Potter";
+      sNameInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+      assert("When name entered, Stepper item 1 marked completed", document.getElementById("stepper-item-1").classList.contains("completed"));
+      assert("When name entered, Step 1 guide tag marked completed", guideTag1.classList.contains("completed-guide"));
+      assert("When name entered, Step 4 guide tag is active and ready", guideTag4.classList.contains("active-guide"));
+      assert("When name entered, Start button has ready-shimmer class", document.getElementById("btn-start-test-main").classList.contains("ready-shimmer"));
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);
