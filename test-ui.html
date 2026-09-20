@@ -113,6 +113,7 @@
   <script src="js/test-data.js"></script>
   <script src="js/validator.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/teacher-service.js"></script>
   <script src="js/illustrations.js"></script>
   <script src="js/ui.js"></script>
@@ -365,6 +366,13 @@
         assert("Clicking 'was painted' sets input value", document.getElementById("input-EY_A_6_1").value === "was painted");
         assert("Answers object updated with was painted", UI.answers["EY_A_6_1"] === "was painted");
       }
+
+      // 11. Test TeacherService and APP_CONFIG Webhook Integration
+      assert("APP_CONFIG object exists", typeof APP_CONFIG === "object");
+      assert("TeacherService has getWebhookUrl function", typeof TeacherService.getWebhookUrl === "function");
+      APP_CONFIG.sheetsWebhookUrl = "https://script.google.com/macros/s/TEST/exec";
+      assert("TeacherService.getWebhookUrl returns configured APP_CONFIG url", TeacherService.getWebhookUrl() === "https://script.google.com/macros/s/TEST/exec");
+      APP_CONFIG.sheetsWebhookUrl = "";
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);

@@ -5,26 +5,60 @@
 
 const TeacherService = {
   /**
+   * Returns configured Google Sheets Webhook URL from localStorage or APP_CONFIG
+   */
+  getWebhookUrl() {
+    try {
+      const config = Storage.getTeacherConfig();
+      if (config.sheetsWebhookUrl && config.sheetsWebhookUrl.trim().startsWith("http")) {
+        return config.sheetsWebhookUrl.trim();
+      }
+    } catch (e) {}
+
+    if (typeof APP_CONFIG !== "undefined" && APP_CONFIG.sheetsWebhookUrl && APP_CONFIG.sheetsWebhookUrl.trim().startsWith("http")) {
+      return APP_CONFIG.sheetsWebhookUrl.trim();
+    }
+    return "";
+  },
+
+  /**
    * Sends the test results to Google Sheets and/or Telegram based on configured settings.
    */
   async submitTestResults(student, evaluation) {
     const config = Storage.getTeacherConfig();
+    const webhookUrl = this.getWebhookUrl();
+
+    // Format all sections dynamically (Vocabulary, Grammar, Listening, Reading, Communication)
+    const secParts = [];
+    if (evaluation.sections) {
+      for (const [sKey, sObj] of Object.entries(evaluation.sections)) {
+        const title = sKey.charAt(0).toUpperCase() + sKey.slice(1);
+        secParts.push(`${title}: ${sObj.score}/${sObj.maxScore}`);
+      }
+    }
+    const sectionsFormatted = secParts.join(", ");
+
+    const studentFullName = student.fullName || `${student.firstName || ''} ${student.lastName || ''}`.trim() || "Anonymous Student";
+
     const payload = {
       type: "TEST_SUBMISSION",
-      timestamp: new Date().toLocaleString(),
-      studentName: `${student.firstName} ${student.lastName}`.trim(),
-      studentClass: student.studentClass || "N/A",
-      variant: evaluation.variantTitle,
+      timestamp: new Date().toLocaleString("ru-RU"),
+      studentName: studentFullName,
+      studentClass: student.studentClass || "—",
+      variant: evaluation.variantTitle || "English Test",
       totalScore: `${evaluation.totalScore} / ${evaluation.totalMax}`,
       percentage: `${evaluation.percentage}%`,
-      grade: evaluation.gradeTier.badge,
-      vocabScore: `${evaluation.sections.vocabulary.score} / ${evaluation.sections.vocabulary.maxScore}`,
-      grammarScore: `${evaluation.sections.grammar.score} / ${evaluation.sections.grammar.maxScore}`,
-      commScore: `${evaluation.sections.communication.score} / ${evaluation.sections.communication.maxScore}`,
+      grade: evaluation.gradeTier ? evaluation.gradeTier.badge : "Completed",
+      sections: sectionsFormatted,
+      vocabScore: evaluation.sections.vocabulary ? `${evaluation.sections.vocabulary.score} / ${evaluation.sections.vocabulary.maxScore}` : "N/A",
+      grammarScore: evaluation.sections.grammar ? `${evaluation.sections.grammar.score} / ${evaluation.sections.grammar.maxScore}` : "N/A",
+      commScore: evaluation.sections.communication ? `${evaluation.sections.communication.score} / ${evaluation.sections.communication.maxScore}` : "N/A",
       mistakesCount: evaluation.mistakes.length,
-      mistakesSummary: evaluation.mistakes.map(m => 
-        `Task ${m.taskNumber} [q:${m.id}] - Student: "${m.userAnswer || '(blank)'}" | Correct: "${m.expected}"`
-      ).join("; ")
+      mistakesSummary: evaluation.mistakes.length > 0 
+        ? evaluation.mistakes.map((m, idx) => 
+            `${idx + 1}. Task ${m.taskNumber} (Q: ${m.id}): написал(а) "${m.userAnswer || 'пусто'}" ➔ Верный ответ: "${m.expected}"`
+          ).join("\n")
+        : "Нет ошибок (100% правильных ответов)"
     };
 
     // Always archive locally first
@@ -40,10 +74,10 @@ const TeacherService = {
     };
 
     // 1. Google Sheets Webhook
-    if (config.sheetsWebhookUrl && config.sheetsWebhookUrl.trim().startsWith("http")) {
+    if (webhookUrl) {
       status.sheets.attempted = true;
       try {
-        await fetch(config.sheetsWebhookUrl.trim(), {
+        await fetch(webhookUrl, {
           method: "POST",
           mode: "no-cors", // Google Apps Script redirects (302) on POST; no-cors allows sending without CORS errors
           headers: {
