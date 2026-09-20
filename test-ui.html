@@ -38,6 +38,8 @@
       <form id="start-test-form">
         <div id="course-selector-container">
           <span id="selected-course-badge"></span>
+          <input type="radio" name="test-course" id="course-radio-gogetter1" value="gogetter1">
+          <input type="radio" name="test-course" id="course-radio-gogetter2" value="gogetter2">
           <input type="radio" name="test-course" id="course-radio-gogetter3" value="gogetter3" checked>
           <input type="radio" name="test-course" id="course-radio-gogetter4" value="gogetter4">
         </div>
@@ -115,6 +117,21 @@
   <script src="js/data/unit7.js"></script>
   <script src="js/data/unit8.js"></script>
   <script src="js/data/end_of_year.js"></script>
+
+  <!-- Load Go Getter 1 Modules -->
+  <script src="js/data/gg1/gg1_placeholder.js"></script>
+
+  <!-- Load Go Getter 2 Modules -->
+  <script src="js/data/gg2_unit1.js"></script>
+  <script src="js/data/gg2_unit2.js"></script>
+  <script src="js/data/gg2_unit3.js"></script>
+  <script src="js/data/gg2_unit4.js"></script>
+  <script src="js/data/gg2_mid_year.js"></script>
+  <script src="js/data/gg2_unit5.js"></script>
+  <script src="js/data/gg2_unit6.js"></script>
+  <script src="js/data/gg2_unit7.js"></script>
+  <script src="js/data/gg2_unit8.js"></script>
+  <script src="js/data/gg2_end_of_year.js"></script>
 
   <!-- Load Go Getter 3 Modules -->
   <script src="js/data/gg3_unit1.js"></script>
@@ -424,6 +441,36 @@
       UI.renderTestUI();
       const gg3EndAudio = document.getElementById("section-panel-listening").querySelector("audio");
       assert("GG3 End-of-Year audio source is gg3_track_11_end_of_year.mp3", gg3EndAudio && gg3EndAudio.getAttribute("src").includes("gg3_track_11_end_of_year.mp3"));
+
+      // 13. Test Course Switching and Go Getter 2 Data Integration
+      UI.onSelectCourse("gogetter2");
+      assert("Current course switched to gogetter2", UI.currentCourse === "gogetter2");
+      const gg2Units = TEST_DATA.getUnitsList("gogetter2");
+      assert("Go Getter 2 has 10 units (8 units + 2 exams)", gg2Units.length === 10);
+      assert("Go Getter 2 includes mid_year", gg2Units.some(u => u.id === "mid_year"));
+      assert("Go Getter 2 includes end_of_year", gg2Units.some(u => u.id === "end_of_year"));
+
+      // Test Go Getter 2 Mid-Year Test UI Rendering & Audio
+      UI.currentUnit = "mid_year";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+      const gg2MidAudio = document.getElementById("section-panel-listening").querySelector("audio");
+      assert("GG2 Mid-Year audio source is gg2_track_10_mid_year.mp3", gg2MidAudio && gg2MidAudio.getAttribute("src").includes("gg2_track_10_mid_year.mp3"));
+
+      // Test Go Getter 2 End-of-Year Test UI Rendering & Audio
+      UI.currentUnit = "end_of_year";
+      UI.currentVariant = "variantA";
+      UI.answers = {};
+      UI.renderTestUI();
+      const gg2EndAudio = document.getElementById("section-panel-listening").querySelector("audio");
+      assert("GG2 End-of-Year audio source is gg2_track_11_end_of_year.mp3", gg2EndAudio && gg2EndAudio.getAttribute("src").includes("gg2_track_11_end_of_year.mp3"));
+
+      // 14. Test Course Switching to Go Getter 1 (Empty State)
+      UI.onSelectCourse("gogetter1");
+      assert("Current course switched to gogetter1", UI.currentCourse === "gogetter1");
+      const gg1Units = TEST_DATA.getUnitsList("gogetter1");
+      assert("Go Getter 1 has 0 units currently", gg1Units.length === 0);
 
       // Switch back to gogetter4
       UI.onSelectCourse("gogetter4");

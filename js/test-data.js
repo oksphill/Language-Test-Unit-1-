@@ -1,20 +1,73 @@
 /**
  * Language Tests Central Aggregator & Multi-Course Engine
- * Supports Go Getter 3 (Level A2) & Go Getter 4 (Level A2+/B1)
- * Pearson Education Limited 2019 Photocopiable Test Sheets
+ * Supports Go Getter 1 (A1), Go Getter 2 (A1+), Go Getter 3 (A2), and Go Getter 4 (A2+/B1)
+ * Pearson Education Limited Photocopiable Test Sheets
  */
 
 const TEST_DATA = {
-  currentCourse: "gogetter4",
+  currentCourse: "gogetter2",
   currentUnit: "unit1",
 
   courses: {
+    gogetter1: {
+      id: "gogetter1",
+      name: "Go Getter 1",
+      level: "A1",
+      badge: "Level A1",
+      title: "Go Getter 1 (Level A1)",
+      desc: "Beginner • Units coming soon",
+      coverImage: "assets/images/cover_gg1.png",
+      isComingSoon: true,
+      units: {},
+      getUnitsList() {
+        return [];
+      }
+    },
+
+    gogetter2: {
+      id: "gogetter2",
+      name: "Go Getter 2",
+      level: "A1+",
+      badge: "Level A1+",
+      title: "Go Getter 2 (Level A1+)",
+      desc: "Elementary • 8 Units + 2 Exams • 30–50 pts",
+      coverImage: "assets/images/cover_gg2.jpg",
+      units: {
+        get unit1() { return window.GG2_UNIT_1_DATA; },
+        get unit2() { return window.GG2_UNIT_2_DATA; },
+        get unit3() { return window.GG2_UNIT_3_DATA; },
+        get unit4() { return window.GG2_UNIT_4_DATA; },
+        get mid_year() { return window.GG2_MID_YEAR_DATA; },
+        get unit5() { return window.GG2_UNIT_5_DATA; },
+        get unit6() { return window.GG2_UNIT_6_DATA; },
+        get unit7() { return window.GG2_UNIT_7_DATA; },
+        get unit8() { return window.GG2_UNIT_8_DATA; },
+        get end_of_year() { return window.GG2_END_OF_YEAR_DATA; }
+      },
+      getUnitsList() {
+        return [
+          { id: "unit1", number: 1, title: "My World & Family", icon: "🌍", points: 30, desc: "Countries, Nationalities, Family members, have got, Possessive 's, Making friends" },
+          { id: "unit2", number: 2, title: "School Life & Routines", icon: "🎒", points: 30, desc: "School subjects, Telling the time, Days, Present Simple (+/-/?) and short answers, Object pronouns, Suggestions" },
+          { id: "unit3", number: 3, title: "Free Time & Hobbies", icon: "🎨", points: 30, desc: "Free-time activities, Food & Drinks, Adverbs of frequency, can / can't, Buying snacks" },
+          { id: "unit4", number: 4, title: "Nature & Wildlife", icon: "🦁", points: 30, desc: "Geographical features, Landscape adjectives, Comparative & Superlative adjectives, Expressing opinions" },
+          { id: "mid_year", number: "1–4", title: "Mid-Year Test", icon: "⭐", points: 50, desc: "Units 1–4 Review: Vocab, Grammar, Audio Listening (Track 10), Communication, Reading" },
+          { id: "unit5", number: 5, title: "Places in Town", icon: "🏙️", points: 30, desc: "Town places, Prepositions of place, City adjectives, Past Simple 'be' (was/were), Directions" },
+          { id: "unit6", number: 6, title: "Jobs & Everyday Work", icon: "💼", points: 30, desc: "Jobs, Household chores, Past Simple regular & irregular verbs, Asking permission" },
+          { id: "unit7", number: 7, title: "Transport & Travel", icon: "✈️", points: 30, desc: "Transport words, Travel equipment, Past Simple negative & questions, Train station dialogue" },
+          { id: "unit8", number: 8, title: "Celebrations & Music", icon: "🎉", points: 30, desc: "Events, Music genres, Dates, Future with 'be going to', Question words, Making plans" },
+          { id: "end_of_year", number: "1–8", title: "End-of-Year Test", icon: "🏆", points: 50, desc: "Units 1–8 Full Review: Vocab, Grammar, Audio Listening (Track 11), Comm matching, Reading" }
+        ];
+      }
+    },
+
     gogetter3: {
       id: "gogetter3",
       name: "Go Getter 3",
       level: "A2",
+      badge: "Level A2",
       title: "Go Getter 3 (Level A2)",
       desc: "Pre-Intermediate • 8 Units + 2 Exams • 30–50 pts",
+      coverImage: "assets/images/cover_gg3.png",
       units: {
         get unit1() { return window.GG3_UNIT_1_DATA; },
         get unit2() { return window.GG3_UNIT_2_DATA; },
@@ -47,8 +100,10 @@ const TEST_DATA = {
       id: "gogetter4",
       name: "Go Getter 4",
       level: "A2+ / B1",
+      badge: "Level A2+ / B1",
       title: "Go Getter 4 (Level A2+ / B1)",
       desc: "Intermediate • 8 Units + 2 Exams • 35/50 pts",
+      coverImage: "assets/images/cover_gg4.jpg",
       units: {
         get unit1() { return window.UNIT_1_DATA; },
         get unit2() { return window.UNIT_2_DATA; },
@@ -80,44 +135,44 @@ const TEST_DATA = {
 
   // Backward compatibility getters for active course unit access
   get unit1() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit1) || window.GG3_UNIT_1_DATA || window.UNIT_1_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit1) || window.GG2_UNIT_1_DATA || window.GG3_UNIT_1_DATA || window.UNIT_1_DATA;
   },
   get unit2() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit2) || window.GG3_UNIT_2_DATA || window.UNIT_2_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit2) || window.GG2_UNIT_2_DATA || window.GG3_UNIT_2_DATA || window.UNIT_2_DATA;
   },
   get unit3() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit3) || window.GG3_UNIT_3_DATA || window.UNIT_3_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit3) || window.GG2_UNIT_3_DATA || window.GG3_UNIT_3_DATA || window.UNIT_3_DATA;
   },
   get unit4() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit4) || window.GG3_UNIT_4_DATA || window.UNIT_4_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit4) || window.GG2_UNIT_4_DATA || window.GG3_UNIT_4_DATA || window.UNIT_4_DATA;
   },
   get unit5() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit5) || window.GG3_UNIT_5_DATA || window.UNIT_5_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit5) || window.GG2_UNIT_5_DATA || window.GG3_UNIT_5_DATA || window.UNIT_5_DATA;
   },
   get unit6() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit6) || window.GG3_UNIT_6_DATA || window.UNIT_6_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit6) || window.GG2_UNIT_6_DATA || window.GG3_UNIT_6_DATA || window.UNIT_6_DATA;
   },
   get unit7() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit7) || window.GG3_UNIT_7_DATA || window.UNIT_7_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit7) || window.GG2_UNIT_7_DATA || window.GG3_UNIT_7_DATA || window.UNIT_7_DATA;
   },
   get unit8() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter3;
-    return (c.units && c.units.unit8) || window.GG3_UNIT_8_DATA || window.UNIT_8_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.unit8) || window.GG2_UNIT_8_DATA || window.GG3_UNIT_8_DATA || window.UNIT_8_DATA;
   },
   get mid_year() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter4;
-    return (c.units && c.units.mid_year) || window.GG3_MID_YEAR_DATA || window.MID_YEAR_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.mid_year) || window.GG2_MID_YEAR_DATA || window.GG3_MID_YEAR_DATA || window.MID_YEAR_DATA;
   },
   get end_of_year() {
-    const c = this.courses[this.currentCourse] || this.courses.gogetter4;
-    return (c.units && c.units.end_of_year) || window.GG3_END_OF_YEAR_DATA || window.END_OF_YEAR_DATA;
+    const c = this.courses[this.currentCourse] || this.courses.gogetter2;
+    return (c.units && c.units.end_of_year) || window.GG2_END_OF_YEAR_DATA || window.GG3_END_OF_YEAR_DATA || window.END_OF_YEAR_DATA;
   },
 
   get variantA() {
@@ -131,24 +186,26 @@ const TEST_DATA = {
   },
 
   getCourse(courseId) {
-    return this.courses[courseId] || this.courses[this.currentCourse] || this.courses.gogetter3;
+    return this.courses[courseId] || this.courses[this.currentCourse] || this.courses.gogetter2;
   },
 
   getTest(unitKey, variantKey, courseId) {
     const c = this.getCourse(courseId);
-    const u = (c.units && c.units[unitKey]) || (this.courses.gogetter4.units && this.courses.gogetter4.units[unitKey]) || this[unitKey] || this.unit1;
+    const u = (c.units && c.units[unitKey]) || (this.courses.gogetter2.units && this.courses.gogetter2.units[unitKey]) || this[unitKey] || this.unit1;
     return u[variantKey] || u.variantA;
   },
 
   getUnitsList(courseId) {
     const c = this.getCourse(courseId);
-    return c.getUnitsList();
+    return c.getUnitsList ? c.getUnitsList() : [];
   },
 
   getCoursesList() {
     return [
-      { id: "gogetter3", name: "Go Getter 3", level: "A2", icon: "📘", title: "Go Getter 3", badge: "Level A2", desc: "Pre-Intermediate • 8 Units + 2 Exams (30–50 pts)" },
-      { id: "gogetter4", name: "Go Getter 4", level: "A2+ / B1", icon: "📙", title: "Go Getter 4", badge: "Level A2+ / B1", desc: "Intermediate • 8 Units + 2 Exams (35–50 pts)" }
+      { id: "gogetter1", name: "Go Getter 1", level: "A1", badge: "Level A1", title: "Go Getter 1", desc: "Beginner • Units coming soon", coverImage: "assets/images/cover_gg1.png", isComingSoon: true },
+      { id: "gogetter2", name: "Go Getter 2", level: "A1+", badge: "Level A1+", title: "Go Getter 2", desc: "Elementary • 8 Units + 2 Exams (30–50 pts)", coverImage: "assets/images/cover_gg2.jpg" },
+      { id: "gogetter3", name: "Go Getter 3", level: "A2", badge: "Level A2", title: "Go Getter 3", desc: "Pre-Intermediate • 8 Units + 2 Exams (30–50 pts)", coverImage: "assets/images/cover_gg3.png" },
+      { id: "gogetter4", name: "Go Getter 4", level: "A2+ / B1", badge: "Level A2+ / B1", title: "Go Getter 4", desc: "Intermediate • 8 Units + 2 Exams (35–50 pts)", coverImage: "assets/images/cover_gg4.jpg" }
     ];
   }
 };

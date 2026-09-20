@@ -101,33 +101,80 @@
               <span class="step-badge step-badge-blue">STEP 2</span>
               <div class="step-header-text">
                 <span class="step-title">Choose Course & Level:</span>
-                <span id="selected-course-badge" class="selected-course-text">Go Getter 3 • Level A2 (Pre-Intermediate)</span>
+                <span id="selected-course-badge" class="selected-course-text">Go Getter 2 • Level A1+ (Elementary)</span>
               </div>
             </div>
             <div class="course-cards-grid" id="course-selector-grid">
+              <!-- Go Getter 1 (Pink) -->
               <label class="course-card-radio">
-                <input type="radio" name="test-course" value="gogetter3" checked>
+                <input type="radio" name="test-course" value="gogetter1">
                 <div class="course-card-box">
-                  <div class="course-card-header">
-                    <span class="course-card-icon">📘</span>
-                    <span class="course-card-badge">Level A2</span>
+                  <div class="course-cover-wrapper">
+                    <img src="assets/images/cover_gg1.png" alt="Go Getter 1 Textbook Cover" class="course-cover-img" loading="lazy">
+                    <span class="course-coming-badge">Soon</span>
                   </div>
-                  <span class="course-card-title">Go Getter 3</span>
-                  <span class="course-card-level">Pre-Intermediate</span>
-                  <span class="course-card-desc">8 Units (30 pts each)</span>
+                  <div class="course-info-wrapper">
+                    <div class="course-card-header">
+                      <span class="course-card-badge course-card-badge-pink">Level A1</span>
+                    </div>
+                    <span class="course-card-title">Go Getter 1</span>
+                    <span class="course-card-level" style="color: #BE185D;">Beginner</span>
+                    <span class="course-card-desc">Tests coming soon</span>
+                  </div>
                 </div>
               </label>
 
+              <!-- Go Getter 2 (Blue) -->
+              <label class="course-card-radio">
+                <input type="radio" name="test-course" value="gogetter2" checked>
+                <div class="course-card-box">
+                  <div class="course-cover-wrapper">
+                    <img src="assets/images/cover_gg2.jpg" alt="Go Getter 2 Textbook Cover" class="course-cover-img" loading="lazy">
+                  </div>
+                  <div class="course-info-wrapper">
+                    <div class="course-card-header">
+                      <span class="course-card-badge course-card-badge-blue">Level A1+</span>
+                    </div>
+                    <span class="course-card-title">Go Getter 2</span>
+                    <span class="course-card-level" style="color: #0284C7;">Elementary</span>
+                    <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Go Getter 3 (Orange) -->
+              <label class="course-card-radio">
+                <input type="radio" name="test-course" value="gogetter3">
+                <div class="course-card-box">
+                  <div class="course-cover-wrapper">
+                    <img src="assets/images/cover_gg3.png" alt="Go Getter 3 Textbook Cover" class="course-cover-img" loading="lazy">
+                  </div>
+                  <div class="course-info-wrapper">
+                    <div class="course-card-header">
+                      <span class="course-card-badge course-card-badge-orange">Level A2</span>
+                    </div>
+                    <span class="course-card-title">Go Getter 3</span>
+                    <span class="course-card-level" style="color: #EA580C;">Pre-Intermediate</span>
+                    <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                  </div>
+                </div>
+              </label>
+
+              <!-- Go Getter 4 (Purple) -->
               <label class="course-card-radio">
                 <input type="radio" name="test-course" value="gogetter4">
                 <div class="course-card-box">
-                  <div class="course-card-header">
-                    <span class="course-card-icon">📙</span>
-                    <span class="course-card-badge">Level A2+ / B1</span>
+                  <div class="course-cover-wrapper">
+                    <img src="assets/images/cover_gg4.jpg" alt="Go Getter 4 Textbook Cover" class="course-cover-img" loading="lazy">
                   </div>
-                  <span class="course-card-title">Go Getter 4</span>
-                  <span class="course-card-level">Intermediate</span>
-                  <span class="course-card-desc">8 Units + 2 Exams (35–50 pts)</span>
+                  <div class="course-info-wrapper">
+                    <div class="course-card-header">
+                      <span class="course-card-badge course-card-badge-purple">Level A2+/B1</span>
+                    </div>
+                    <span class="course-card-title">Go Getter 4</span>
+                    <span class="course-card-level" style="color: #7C3AED;">Intermediate</span>
+                    <span class="course-card-desc">8 Units + 2 Exams (35–50 pts)</span>
+                  </div>
                 </div>
               </label>
             </div>
@@ -406,6 +453,21 @@
   </div>
 
   <!-- JavaScript Modules in Dependency Order -->
+  <!-- Go Getter 1 (Level A1) Placeholder Data Module -->
+  <script src="js/data/gg1/gg1_placeholder.js"></script>
+
+  <!-- Go Getter 2 (Level A1+) Data Modules -->
+  <script src="js/data/gg2_unit1.js"></script>
+  <script src="js/data/gg2_unit2.js"></script>
+  <script src="js/data/gg2_unit3.js"></script>
+  <script src="js/data/gg2_unit4.js"></script>
+  <script src="js/data/gg2_mid_year.js"></script>
+  <script src="js/data/gg2_unit5.js"></script>
+  <script src="js/data/gg2_unit6.js"></script>
+  <script src="js/data/gg2_unit7.js"></script>
+  <script src="js/data/gg2_unit8.js"></script>
+  <script src="js/data/gg2_end_of_year.js"></script>
+
   <!-- Go Getter 3 (Level A2) Data Modules -->
   <script src="js/data/gg3_unit1.js"></script>
   <script src="js/data/gg3_unit2.js"></script>

@@ -15,7 +15,7 @@ const UI = {
   saveTimer: null,
 
   init() {
-    // Check URL parameters for pre-selected course: ?course=gg3 / ?course=gg4
+    // Check URL parameters for pre-selected course: ?course=gg1 / ?course=gg2 / ?course=gg3 / ?course=gg4
     try {
       if (typeof window !== "undefined" && window.location && window.location.search) {
         const p = new URLSearchParams(window.location.search);
@@ -23,6 +23,8 @@ const UI = {
         if (c) {
           if (c === "gg4" || c === "gogetter4" || c === "4") this.currentCourse = "gogetter4";
           else if (c === "gg3" || c === "gogetter3" || c === "3") this.currentCourse = "gogetter3";
+          else if (c === "gg2" || c === "gogetter2" || c === "2") this.currentCourse = "gogetter2";
+          else if (c === "gg1" || c === "gogetter1" || c === "1") this.currentCourse = "gogetter1";
         }
       }
     } catch (e) {}
@@ -148,7 +150,7 @@ const UI = {
   },
 
   /**
-   * Switches course between Go Getter 3 and Go Getter 4
+   * Switches course between Go Getter 1, 2, 3 and 4
    */
   onSelectCourse(courseId) {
     this.currentCourse = courseId;
@@ -158,7 +160,11 @@ const UI = {
     this.updateCourseBadge();
     this.renderUnitSelector(courseId);
     this.initUnitSelector();
-    this.onSelectUnit(this.currentUnit || "unit1");
+    const unitsList = typeof TEST_DATA !== "undefined" ? TEST_DATA.getUnitsList(courseId) : [];
+    if (unitsList && unitsList.length > 0) {
+      const selected = unitsList.some(u => u.id === this.currentUnit) ? this.currentUnit : unitsList[0].id;
+      this.onSelectUnit(selected);
+    }
   },
 
   /**
@@ -167,7 +173,11 @@ const UI = {
   updateCourseBadge() {
     const badge = document.getElementById("selected-course-badge");
     if (badge) {
-      if (this.currentCourse === "gogetter4") {
+      if (this.currentCourse === "gogetter1") {
+        badge.textContent = "Go Getter 1 • Level A1 (Beginner — Coming Soon)";
+      } else if (this.currentCourse === "gogetter2") {
+        badge.textContent = "Go Getter 2 • Level A1+ (Elementary)";
+      } else if (this.currentCourse === "gogetter4") {
         badge.textContent = "Go Getter 4 • Level A2+ / B1 (Intermediate)";
       } else {
         badge.textContent = "Go Getter 3 • Level A2 (Pre-Intermediate)";
@@ -183,6 +193,22 @@ const UI = {
     if (!grid || typeof TEST_DATA === "undefined") return;
 
     const unitsList = TEST_DATA.getUnitsList(courseId);
+    if (!unitsList || unitsList.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 2.25rem 1.5rem; text-align: center; background: #FFF5F7; border: 2px dashed #FDA4AF; border-radius: 16px; margin: 0.5rem 0;">
+          <span style="font-size: 2.5rem; display: block; margin-bottom: 0.6rem;">🌸</span>
+          <h3 style="color: #BE185D; margin-bottom: 0.4rem; font-size: 1.2rem;">Go Getter 1 (Level A1)</h3>
+          <p style="color: #64748B; font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.25rem; line-height: 1.5;">
+            Тесты для Go Getter 1 скоро будут загружены! Пожалуйста, выберите <strong>Go Getter 2</strong>, <strong>Go Getter 3</strong> или <strong>Go Getter 4</strong>, чтобы начать тестирование.
+          </p>
+          <button type="button" class="btn btn-secondary" onclick="TEST_UI.onSelectCourse('gogetter2'); const r = document.querySelector('input[name=test-course][value=gogetter2]'); if (r) r.checked = true;" style="font-weight: 700;">
+            Перейти к Go Getter 2 →
+          </button>
+        </div>
+      `;
+      return;
+    }
+
     let html = "";
     unitsList.forEach((u, idx) => {
       const isChecked = u.id === this.currentUnit || (idx === 0 && !unitsList.some(x => x.id === this.currentUnit));
