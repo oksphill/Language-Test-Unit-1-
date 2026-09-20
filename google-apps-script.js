@@ -17,6 +17,14 @@
 var TEACHER_EMAIL = "";
 
 /**
+ * Обработчик GET-запросов (проверка связи)
+ */
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ status: "ok", message: "English Test Webhook is active!" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
  * Обработчик входящих POST-запросов от сайта с тестами
  */
 function doPost(e) {

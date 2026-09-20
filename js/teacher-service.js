@@ -56,9 +56,9 @@ const TeacherService = {
       mistakesCount: evaluation.mistakes.length,
       mistakesSummary: evaluation.mistakes.length > 0 
         ? evaluation.mistakes.map((m, idx) => 
-            `${idx + 1}. Task ${m.taskNumber} (Q: ${m.id}): написал(а) "${m.userAnswer || 'пусто'}" ➔ Верный ответ: "${m.expected}"`
+            `${idx + 1}. Task ${m.taskNumber} (Item ${m.id}): answered "${m.userAnswer || 'BLANK'}" -> Correct: "${m.expected}"`
           ).join("\n")
-        : "Нет ошибок (100% правильных ответов)"
+        : "No mistakes (100% score)"
     };
 
     // Always archive locally first
@@ -83,7 +83,7 @@ const TeacherService = {
           headers: {
             "Content-Type": "text/plain;charset=utf-8"
           },
-          body: JSON.stringify(payload)
+          body: this.stringifyAscii(payload)
         });
         status.sheets.success = true;
       } catch (err) {
@@ -144,7 +144,7 @@ const TeacherService = {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
+          body: this.stringifyAscii(payload)
         });
         status.sheets.success = true;
       } catch (err) {
@@ -159,18 +159,22 @@ const TeacherService = {
         const text = `❓ *New Question from Student!*\n\n` +
           `👤 *Student:* ${payload.studentName} (${payload.studentClass})\n` +
           `📑 *Test:* ${payload.variant}\n` +
-          `🔢 *Task / Item:* ${payload.taskInfo}\n\n` +
-          `💬 *Question:* \n"${payload.questionText}"\n\n` +
+          `📌 *Task:* ${payload.taskInfo}\n` +
+          `💬 *Question:* "${payload.questionText}"\n\n` +
           `⏰ _${payload.timestamp}_`;
-
         const res = await this.sendTelegramMessage(
           config.telegramBotToken.trim(),
           config.telegramChatId.trim(),
           text
         );
-        status.telegram.success = res.ok;
+        if (res.ok) {
+          status.telegram.success = true;
+        } else {
+          status.telegram.error = res.description || "Telegram API rejected question";
+        }
       } catch (err) {
         console.warn("Telegram question submission failed:", err);
+        status.telegram.error = err.message || "Network error";
       }
     }
 
@@ -236,7 +240,7 @@ const TeacherService = {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
+        body: this.stringifyAscii({
           type: "PING_TEST",
           timestamp: new Date().toLocaleString(),
           message: "Test connection from English Test App"
@@ -269,5 +273,15 @@ const TeacherService = {
     } catch (err) {
       return { ok: false, message: err.message || "Network error connecting to Telegram" };
     }
+  },
+
+  /**
+   * Safely serializes payload to JSON escaping all non-ASCII unicode characters to \uXXXX.
+   * This guarantees 100% immunity from charset/encoding errors on Google Apps Script and proxies.
+   */
+  stringifyAscii(obj) {
+    return JSON.stringify(obj).replace(/[\u007F-\uFFFF]/g, function(chr) {
+      return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4);
+    });
   }
 };
