@@ -7,5 +7,5 @@
  * 3. Paste the URL into `sheetsWebhookUrl` below:
  */
 const APP_CONFIG = {
-  sheetsWebhookUrl: "https://script.google.com/macros/s/AKfycbzlqd3wWSchF55m6YWIGN-I_0IZpNqzqX4lpkXHHZzZGanTy5bOYHWY9HHtmw04rD4ziA/exec"
+  sheetsWebhookUrl: "https://script.google.com/macros/s/AKfycbwgEW927naXpaJhrA7CZ7K9EVMsyhYmrXZCjc7okevisCvmKbALItnxDaDnCrX-OKehEA/exec"
 };
