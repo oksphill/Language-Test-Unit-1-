@@ -199,10 +199,10 @@ const UI = {
           <span style="font-size: 2.5rem; display: block; margin-bottom: 0.6rem;">🌸</span>
           <h3 style="color: #BE185D; margin-bottom: 0.4rem; font-size: 1.2rem;">Go Getter 1 (Level A1)</h3>
           <p style="color: #64748B; font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.25rem; line-height: 1.5;">
-            Тесты для Go Getter 1 скоро будут загружены! Пожалуйста, выберите <strong>Go Getter 2</strong>, <strong>Go Getter 3</strong> или <strong>Go Getter 4</strong>, чтобы начать тестирование.
+            Tests for Go Getter 1 are coming soon! Please select <strong>Go Getter 2</strong>, <strong>Go Getter 3</strong>, or <strong>Go Getter 4</strong> to start testing.
           </p>
           <button type="button" class="btn btn-secondary" onclick="TEST_UI.onSelectCourse('gogetter2'); const r = document.querySelector('input[name=test-course][value=gogetter2]'); if (r) r.checked = true;" style="font-weight: 700;">
-            Перейти к Go Getter 2 →
+            Go to Go Getter 2 →
           </button>
         </div>
       `;
@@ -1065,17 +1065,17 @@ const UI = {
             <div class="sentence-order-header">
               <span class="gap-label">${it.label}</span>
               <div class="sentence-order-instruction">
-                <span class="order-hint-text">Передвигайте слова в правильном порядке:</span>
+                <span class="order-hint-text">Put the words in the correct order:</span>
               </div>
-              <button type="button" class="btn-order-reset" data-qid="${it.id}" title="Вернуть слова в исходное положение">
-                <span class="reset-icon">↺</span> Сбросить
+              <button type="button" class="btn-order-reset" data-qid="${it.id}" title="Reset word order">
+                <span class="reset-icon">↺</span> Reset
               </button>
             </div>
 
             <!-- Target: Sentence Construction Area (Dropzone) -->
             <div class="sentence-dropzone" id="dropzone-${it.id}" data-qid="${it.id}" aria-label="Sentence area">
               <div class="dropzone-placeholder" id="placeholder-${it.id}">
-                <span class="dropzone-icon">✋</span> Перетащите слова сюда или нажимайте на них
+                <span class="dropzone-icon">✋</span> Drag words here or tap them
               </div>
               <div class="sentence-chips-container" id="chips-container-${it.id}"></div>
             </div>
@@ -1493,10 +1493,10 @@ const UI = {
           chipEl.setAttribute("data-index", idx);
 
           chipEl.innerHTML = `
-            ${idx > 0 ? `<span class="chip-move-btn move-left" data-dir="-1" title="Сдвинуть влево">‹</span>` : ""}
+            ${idx > 0 ? `<span class="chip-move-btn move-left" data-dir="-1" title="Move left">‹</span>` : ""}
             <span class="chip-word-text">${info.word}</span>
-            ${idx < state.ordered.length - 1 ? `<span class="chip-move-btn move-right" data-dir="1" title="Сдвинуть вправо">›</span>` : ""}
-            <span class="chip-remove-btn" title="Убрать слово">×</span>
+            ${idx < state.ordered.length - 1 ? `<span class="chip-move-btn move-right" data-dir="1" title="Move right">›</span>` : ""}
+            <span class="chip-remove-btn" title="Remove word">×</span>
           `;
 
           // Move left / right click handlers
