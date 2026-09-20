@@ -7,5 +7,9 @@
  * 3. Paste the URL into `sheetsWebhookUrl` below:
  */
 const APP_CONFIG = {
-  sheetsWebhookUrl: "https://script.google.com/macros/s/AKfycbwgEW927naXpaJhrA7CZ7K9EVMsyhYmrXZCjc7okevisCvmKbALItnxDaDnCrX-OKehEA/exec"
+  // 1. Ваша личная таблица (по умолчанию):
+  sheetsWebhookUrl: "https://script.google.com/macros/s/AKfycbwgEW927naXpaJhrA7CZ7K9EVMsyhYmrXZCjc7okevisCvmKbALItnxDaDnCrX-OKehEA/exec",
+
+  // 2. Таблица для школы (когда ссылка открыта с ?school=1):
+  schoolWebhookUrl: ""
 };

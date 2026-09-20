@@ -5,9 +5,24 @@
 
 const TeacherService = {
   /**
-   * Returns configured Google Sheets Webhook URL from localStorage or APP_CONFIG
+   * Returns configured Google Sheets Webhook URL:
+   * - If URL parameter ?school is present, routes to APP_CONFIG.schoolWebhookUrl.
+   * - Otherwise routes to teacher's personal sheetsWebhookUrl.
    */
   getWebhookUrl() {
+    // 1. Check for school link: ?school=1 or ?school=true etc.
+    try {
+      if (typeof window !== "undefined" && window.location && window.location.search) {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("school")) {
+          if (typeof APP_CONFIG !== "undefined" && APP_CONFIG.schoolWebhookUrl && APP_CONFIG.schoolWebhookUrl.trim().startsWith("http")) {
+            return APP_CONFIG.schoolWebhookUrl.trim();
+          }
+        }
+      }
+    } catch (e) {}
+
+    // 2. Local storage override (if any)
     try {
       const config = Storage.getTeacherConfig();
       if (config.sheetsWebhookUrl && config.sheetsWebhookUrl.trim().startsWith("http")) {
@@ -15,6 +30,7 @@ const TeacherService = {
       }
     } catch (e) {}
 
+    // 3. Default personal webhook
     if (typeof APP_CONFIG !== "undefined" && APP_CONFIG.sheetsWebhookUrl && APP_CONFIG.sheetsWebhookUrl.trim().startsWith("http")) {
       return APP_CONFIG.sheetsWebhookUrl.trim();
     }
