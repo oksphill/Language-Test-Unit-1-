@@ -38,8 +38,6 @@ const UI = {
     this.renderUnitSelector(this.currentCourse);
     this.initUnitSelector();
     this.checkForResume();
-    this.initMagicCursor();
-    this.initInteractiveStepGuide();
   },
 
   bindEvents() {
@@ -69,10 +67,6 @@ const UI = {
           if (validIndicator) validIndicator.classList.remove("active");
           if (avatarBadge) avatarBadge.textContent = "👤";
           if (nameCard) nameCard.classList.remove("name-filled");
-        }
-
-        if (this.updateInteractiveGuide) {
-          this.updateInteractiveGuide();
         }
       };
 
@@ -137,187 +131,6 @@ const UI = {
   },
 
   /**
-   * Initializes Magic Wand Custom Cursor & Illumination Follower Aura on #screen-start
-   */
-  initMagicCursor() {
-    const startScreen = document.getElementById("screen-start");
-    const aura = document.getElementById("magic-cursor-aura");
-    const sparklesContainer = document.getElementById("magic-sparkles-container");
-    if (!startScreen || !aura) return;
-
-    // Check if device supports fine mouse pointer
-    const hasFinePointer = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(pointer: fine)").matches;
-    if (!hasFinePointer) {
-      aura.style.display = "none";
-      return;
-    }
-
-    let lastSparkleTime = 0;
-    const sparkleSymbols = ["✨", "⭐", "✦", "🌟", "💫"];
-
-    const createSparkle = (x, y, count = 1, isBurst = false) => {
-      if (!sparklesContainer) return;
-      for (let i = 0; i < count; i++) {
-        const span = document.createElement("span");
-        span.className = "magic-sparkle-particle";
-        span.textContent = sparkleSymbols[Math.floor(Math.random() * sparkleSymbols.length)];
-        span.style.left = `${x}px`;
-        span.style.top = `${y}px`;
-
-        const angle = isBurst ? (i / count) * 2 * Math.PI : (Math.random() * 2 * Math.PI);
-        const distance = isBurst ? (20 + Math.random() * 35) : (10 + Math.random() * 20);
-        const dx = Math.cos(angle) * distance;
-        const dy = Math.sin(angle) * distance;
-
-        span.style.setProperty("--dx", `${dx}px`);
-        span.style.setProperty("--dy", `${dy}px`);
-
-        sparklesContainer.appendChild(span);
-        setTimeout(() => span.remove(), 800);
-      }
-    };
-
-    startScreen.addEventListener("mousemove", (e) => {
-      aura.style.opacity = "1";
-      aura.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-
-      const now = Date.now();
-      if (now - lastSparkleTime > 75) {
-        lastSparkleTime = now;
-        createSparkle(e.clientX - 2, e.clientY - 2, 1, false);
-      }
-    });
-
-    startScreen.addEventListener("mouseleave", () => {
-      aura.style.opacity = "0";
-    });
-
-    startScreen.addEventListener("click", (e) => {
-      createSparkle(e.clientX, e.clientY, 6, true);
-    });
-  },
-
-  /**
-   * Initializes Interactive Step Pointers & Step Tracker ("что нажимать 1")
-   * Guides student smoothly: Step 1 (Name) -> Step 2 (Level) -> Step 3 (Unit) -> Step 4 (Start)
-   */
-  initInteractiveStepGuide() {
-    const studentNameInput = document.getElementById("student-name");
-    const nameCard = document.getElementById("student-name-card");
-    const courseCard = document.getElementById("course-step-card");
-    const unitsCard = document.getElementById("units-step-card");
-    const startBtn = document.getElementById("btn-start-test-main");
-
-    const guide1 = document.getElementById("step-guide-1");
-    const guide2 = document.getElementById("step-guide-2");
-    const guide3 = document.getElementById("step-guide-3");
-    const guide4 = document.getElementById("step-guide-4");
-
-    const stepItem1 = document.getElementById("stepper-item-1");
-    const stepItem2 = document.getElementById("stepper-item-2");
-    const stepItem3 = document.getElementById("stepper-item-3");
-    const stepItem4 = document.getElementById("stepper-item-4");
-
-    const conn1 = document.getElementById("stepper-conn-1");
-    const conn2 = document.getElementById("stepper-conn-2");
-    const conn3 = document.getElementById("stepper-conn-3");
-
-    const updateGuideState = () => {
-      const nameVal = studentNameInput ? studentNameInput.value.trim() : "";
-      const isNameEntered = nameVal.length >= 2;
-      const isCourseSelected = !!this.currentCourse;
-      const isUnitSelected = !!this.currentUnit;
-
-      // 1. STEP 1 (Name)
-      if (!isNameEntered) {
-        // Step 1 is ACTIVE
-        if (stepItem1) stepItem1.className = "stepper-item active";
-        if (stepItem2) stepItem2.className = "stepper-item";
-        if (stepItem3) stepItem3.className = "stepper-item";
-        if (stepItem4) stepItem4.className = "stepper-item";
-        if (conn1) conn1.classList.remove("completed");
-        if (conn2) conn2.classList.remove("completed");
-        if (conn3) conn3.classList.remove("completed");
-
-        if (guide1) {
-          guide1.className = "step-guide-tag active-guide";
-          guide1.innerHTML = `<span class="guide-bounce-hand">👉</span> <span class="guide-step-pill">1</span> <span class="guide-tag-msg"><strong>START HERE:</strong> Enter your full name</span>`;
-        }
-        if (guide2) guide2.className = "step-guide-tag";
-        if (guide3) guide3.className = "step-guide-tag";
-        if (guide4) guide4.className = "step-guide-tag step-guide-start";
-
-        if (nameCard) nameCard.classList.add("step-card-active");
-        if (studentNameInput) studentNameInput.classList.add("input-guide-glow");
-        if (courseCard) courseCard.classList.remove("step-card-active");
-        if (unitsCard) unitsCard.classList.remove("step-card-active");
-        if (startBtn) startBtn.classList.remove("ready-shimmer");
-        return;
-      }
-
-      // Name is filled!
-      if (nameCard) nameCard.classList.remove("step-card-active");
-      if (studentNameInput) studentNameInput.classList.remove("input-guide-glow");
-      if (stepItem1) stepItem1.className = "stepper-item completed";
-      if (conn1) conn1.classList.add("completed");
-      if (guide1) {
-        guide1.className = "step-guide-tag completed-guide";
-        guide1.innerHTML = `<span class="guide-step-pill">✓</span> <span class="guide-tag-msg">Name ready: <strong>${nameVal}</strong></span>`;
-      }
-
-      // 2. STEP 2 (Course) & STEP 3 (Unit)
-      if (isCourseSelected && isUnitSelected) {
-        if (stepItem2) stepItem2.className = "stepper-item completed";
-        if (conn2) conn2.classList.add("completed");
-        if (stepItem3) stepItem3.className = "stepper-item completed";
-        if (conn3) conn3.classList.add("completed");
-        if (stepItem4) stepItem4.className = "stepper-item active";
-
-        if (guide2) {
-          guide2.className = "step-guide-tag completed-guide";
-          guide2.innerHTML = `<span class="guide-step-pill">✓</span> <span class="guide-tag-msg">Level selected</span>`;
-        }
-        if (guide3) {
-          guide3.className = "step-guide-tag completed-guide";
-          guide3.innerHTML = `<span class="guide-step-pill">✓</span> <span class="guide-tag-msg">Unit ready</span>`;
-        }
-
-        // Highlight Step 4 / Ready to Start!
-        if (guide4) guide4.className = "step-guide-tag step-guide-start active-guide";
-        if (startBtn) startBtn.classList.add("ready-shimmer");
-      }
-    };
-
-    this.updateInteractiveGuide = updateGuideState;
-
-    // Click on Stepper items to scroll to corresponding card
-    if (stepItem1) {
-      stepItem1.addEventListener("click", () => {
-        if (nameCard) nameCard.scrollIntoView({ behavior: "smooth", block: "center" });
-        if (studentNameInput) studentNameInput.focus();
-      });
-    }
-    if (stepItem2) {
-      stepItem2.addEventListener("click", () => {
-        if (courseCard) courseCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-    }
-    if (stepItem3) {
-      stepItem3.addEventListener("click", () => {
-        if (unitsCard) unitsCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-    }
-    if (stepItem4) {
-      stepItem4.addEventListener("click", () => {
-        if (startBtn) startBtn.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-    }
-
-    // Initial check
-    updateGuideState();
-  },
-
-  /**
    * Initializes Course / Level Radio Selector
    */
   initCourseSelector() {
@@ -351,9 +164,6 @@ const UI = {
     if (unitsList && unitsList.length > 0) {
       const selected = unitsList.some(u => u.id === this.currentUnit) ? this.currentUnit : unitsList[0].id;
       this.onSelectUnit(selected);
-    }
-    if (this.updateInteractiveGuide) {
-      this.updateInteractiveGuide();
     }
   },
 
@@ -535,10 +345,6 @@ const UI = {
     if (headerSubtitle && this.activeScreen === "start") {
       headerSubtitle.textContent = info.title;
     }
-
-    if (this.updateInteractiveGuide) {
-      this.updateInteractiveGuide();
-    }
   },
 
   /**
@@ -632,16 +438,11 @@ const UI = {
         nameCard.classList.remove("shake-attention");
         void nameCard.offsetWidth; // Force DOM reflow to re-trigger animation
         nameCard.classList.add("shake-attention");
-        nameCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      const guide1 = document.getElementById("step-guide-1");
-      if (guide1) {
-        guide1.className = "step-guide-tag active-guide";
-        guide1.innerHTML = `<span class="guide-bounce-hand">👉</span> <span class="guide-step-pill">1</span> <span class="guide-tag-msg"><strong>START HERE:</strong> Please enter your name first!</span>`;
       }
       if (nameEl) {
         nameEl.focus();
       }
+      alert("Please enter your name.");
       return;
     }
 

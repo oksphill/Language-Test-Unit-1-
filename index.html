@@ -64,67 +64,8 @@
 
       <div class="start-card">
         <form id="start-test-form">
-          <!-- INTERACTIVE STEP TRACKER -->
-          <div class="start-stepper-tracker" id="start-stepper-tracker" aria-label="Test Setup Progress">
-            <div class="stepper-item active" id="stepper-item-1" data-step="1" title="Step 1: Your Name">
-              <div class="stepper-bubble">
-                <span class="stepper-num">1</span>
-                <span class="stepper-check">✓</span>
-              </div>
-              <div class="stepper-labels">
-                <span class="stepper-step-tag">STEP 1</span>
-                <span class="stepper-title">Your Name</span>
-              </div>
-            </div>
-
-            <div class="stepper-connector" id="stepper-conn-1"></div>
-
-            <div class="stepper-item" id="stepper-item-2" data-step="2" title="Step 2: Choose Course">
-              <div class="stepper-bubble">
-                <span class="stepper-num">2</span>
-                <span class="stepper-check">✓</span>
-              </div>
-              <div class="stepper-labels">
-                <span class="stepper-step-tag">STEP 2</span>
-                <span class="stepper-title">Level</span>
-              </div>
-            </div>
-
-            <div class="stepper-connector" id="stepper-conn-2"></div>
-
-            <div class="stepper-item" id="stepper-item-3" data-step="3" title="Step 3: Select Unit">
-              <div class="stepper-bubble">
-                <span class="stepper-num">3</span>
-                <span class="stepper-check">✓</span>
-              </div>
-              <div class="stepper-labels">
-                <span class="stepper-step-tag">STEP 3</span>
-                <span class="stepper-title">Unit</span>
-              </div>
-            </div>
-
-            <div class="stepper-connector" id="stepper-conn-3"></div>
-
-            <div class="stepper-item" id="stepper-item-4" data-step="4" title="Step 4: Ready to Start">
-              <div class="stepper-bubble">
-                <span class="stepper-num">🚀</span>
-              </div>
-              <div class="stepper-labels">
-                <span class="stepper-step-tag">START</span>
-                <span class="stepper-title">Begin</span>
-              </div>
-            </div>
-          </div>
-
           <!-- STEP 1: STUDENT NAME CARD -->
           <div class="name-step-card" id="student-name-card">
-            <!-- Interactive Step 1 Guide Pointer -->
-            <div class="step-guide-tag active-guide" id="step-guide-1">
-              <span class="guide-bounce-hand">👉</span>
-              <span class="guide-step-pill">1</span>
-              <span class="guide-tag-msg"><strong>START HERE:</strong> Enter your full name</span>
-            </div>
-
             <div class="step-header">
               <span class="step-badge">STEP 1</span>
               <div class="step-header-text">
@@ -156,13 +97,6 @@
 
           <!-- STEP 2: COURSE & LEVEL SELECTOR -->
           <div class="course-step-card" id="course-step-card">
-            <!-- Interactive Step 2 Guide Pointer -->
-            <div class="step-guide-tag" id="step-guide-2">
-              <span class="guide-bounce-hand">👉</span>
-              <span class="guide-step-pill">2</span>
-              <span class="guide-tag-msg"><strong>NEXT:</strong> Choose textbook level</span>
-            </div>
-
             <div class="step-header">
               <span class="step-badge step-badge-blue">STEP 2</span>
               <div class="step-header-text">
@@ -233,14 +167,7 @@
           </div>
 
           <!-- STEP 3: UNIT SELECTOR -->
-          <div class="units-step-card" id="units-step-card">
-            <!-- Interactive Step 3 Guide Pointer -->
-            <div class="step-guide-tag" id="step-guide-3">
-              <span class="guide-bounce-hand">👉</span>
-              <span class="guide-step-pill">3</span>
-              <span class="guide-tag-msg"><strong>NEXT:</strong> Select Unit or Exam</span>
-            </div>
-
+          <div class="units-step-card">
             <div class="step-header">
               <span class="step-badge step-badge-purple">STEP 3</span>
               <div class="step-header-text">
@@ -412,22 +339,12 @@
             </ul>
           </div>
 
-          <!-- Interactive Step 4 / Ready Guide Pointer -->
-          <div class="step-guide-tag step-guide-start" id="step-guide-4">
-            <span class="guide-bounce-hand">✨</span>
-            <span class="guide-tag-msg"><strong>READY:</strong> Click below to start your test!</span>
-          </div>
-
           <button type="submit" class="btn btn-primary btn-lg btn-start-animated" id="btn-start-test-main">
             <span class="btn-start-text">Start Test Now</span>
             <span class="btn-start-rocket">🚀</span>
           </button>
         </form>
       </div>
-
-      <!-- Magic Wand Glowing Follower Aura & Sparkles Container -->
-      <div id="magic-cursor-aura" class="magic-wand-aura" aria-hidden="true"></div>
-      <div id="magic-sparkles-container" class="magic-sparkles-container" aria-hidden="true"></div>
     </section>
 
     <!-- ====================================================================
