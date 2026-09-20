@@ -622,7 +622,119 @@ body {
 }
 
 /* ==========================================================================
-   STEP 2: Units Step Card
+   STEP 2: Course & Level Step Card
+   ========================================================================== */
+
+.course-step-card {
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 1.35rem 1.4rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-badge-blue {
+  background: linear-gradient(135deg, #2563EB, #3B82F6);
+}
+
+.selected-course-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #2563EB;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.course-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .course-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.course-card-radio {
+  cursor: pointer;
+  display: block;
+}
+
+.course-card-radio input[type="radio"] {
+  display: none;
+}
+
+.course-card-box {
+  border: 2px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  background: #F8FAFC;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.course-card-box:hover {
+  border-color: #93C5FD;
+  background: #EFF6FF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.1);
+}
+
+.course-card-radio input[type="radio"]:checked + .course-card-box {
+  border-color: #2563EB;
+  background: #EFF6FF;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), 0 8px 20px rgba(37, 99, 235, 0.14);
+}
+
+.course-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.course-card-icon {
+  font-size: 1.6rem;
+}
+
+.course-card-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+.course-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.course-card-level {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2563EB;
+}
+
+.course-card-desc {
+  font-size: 0.78rem;
+  color: #64748B;
+  margin-top: 0.15rem;
+}
+
+/* ==========================================================================
+   STEP 3: Units Step Card
    ========================================================================== */
 
 .units-step-card {

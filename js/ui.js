@@ -6,6 +6,7 @@
 const UI = {
   activeScreen: "start",
   activeSection: "vocabulary",
+  currentCourse: "gogetter3",
   currentUnit: "unit1",
   currentVariant: "variantA",
   student: null,
@@ -14,7 +15,25 @@ const UI = {
   saveTimer: null,
 
   init() {
+    // Check URL parameters for pre-selected course: ?course=gg3 / ?course=gg4
+    try {
+      if (typeof window !== "undefined" && window.location && window.location.search) {
+        const p = new URLSearchParams(window.location.search);
+        const c = p.get("course") || p.get("level");
+        if (c) {
+          if (c === "gg4" || c === "gogetter4" || c === "4") this.currentCourse = "gogetter4";
+          else if (c === "gg3" || c === "gogetter3" || c === "3") this.currentCourse = "gogetter3";
+        }
+      }
+    } catch (e) {}
+
+    if (typeof TEST_DATA !== "undefined") {
+      TEST_DATA.currentCourse = this.currentCourse;
+    }
+
     this.bindEvents();
+    this.initCourseSelector();
+    this.renderUnitSelector(this.currentCourse);
     this.initUnitSelector();
     this.checkForResume();
   },
@@ -110,6 +129,89 @@ const UI = {
   },
 
   /**
+   * Initializes Course / Level Radio Selector
+   */
+  initCourseSelector() {
+    const courseRadios = document.querySelectorAll('input[name="test-course"]');
+    courseRadios.forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          this.onSelectCourse(e.target.value);
+        }
+      });
+    });
+
+    // Sync radio with current active course
+    const curRadio = document.querySelector(`input[name="test-course"][value="${this.currentCourse}"]`);
+    if (curRadio) curRadio.checked = true;
+    this.updateCourseBadge();
+  },
+
+  /**
+   * Switches course between Go Getter 3 and Go Getter 4
+   */
+  onSelectCourse(courseId) {
+    this.currentCourse = courseId;
+    if (typeof TEST_DATA !== "undefined") {
+      TEST_DATA.currentCourse = courseId;
+    }
+    this.updateCourseBadge();
+    this.renderUnitSelector(courseId);
+    this.initUnitSelector();
+    this.onSelectUnit(this.currentUnit || "unit1");
+  },
+
+  /**
+   * Updates course badge text in header / start card
+   */
+  updateCourseBadge() {
+    const badge = document.getElementById("selected-course-badge");
+    if (badge) {
+      if (this.currentCourse === "gogetter4") {
+        badge.textContent = "Go Getter 4 • Level A2+ / B1 (Intermediate)";
+      } else {
+        badge.textContent = "Go Getter 3 • Level A2 (Pre-Intermediate)";
+      }
+    }
+  },
+
+  /**
+   * Dynamically renders Unit Selector cards based on selected course
+   */
+  renderUnitSelector(courseId) {
+    const grid = document.getElementById("unit-selector-grid");
+    if (!grid || typeof TEST_DATA === "undefined") return;
+
+    const unitsList = TEST_DATA.getUnitsList(courseId);
+    let html = "";
+    unitsList.forEach((u, idx) => {
+      const isChecked = u.id === this.currentUnit || (idx === 0 && !unitsList.some(x => x.id === this.currentUnit));
+      if (isChecked) this.currentUnit = u.id;
+      const numBadgeStyle = (u.id === "mid_year" || u.id === "end_of_year")
+        ? ` style="background: ${u.id === 'mid_year' ? '#4F46E5' : '#D97706'};"`
+        : "";
+      const boxStyle = (u.id === "mid_year" || u.id === "end_of_year")
+        ? ` style="border-color: ${u.id === 'mid_year' ? '#6366F1' : '#F59E0B'}; background: ${u.id === 'mid_year' ? '#F5F3FF' : '#FFFBEB'};"`
+        : "";
+
+      html += `
+        <label class="unit-card-radio">
+          <input type="radio" name="test-unit" id="unit-radio-${u.id}" value="${u.id}"${isChecked ? " checked" : ""}>
+          <div class="unit-card-box"${boxStyle}>
+            <div class="unit-card-top">
+              <span class="unit-card-num-badge"${numBadgeStyle}>${u.number}</span>
+              <span class="unit-card-icon">${u.icon || '📝'}</span>
+            </div>
+            <span class="unit-card-title">${u.title}</span>
+            <span class="unit-card-pts">${u.points} pts</span>
+          </div>
+        </label>
+      `;
+    });
+    grid.innerHTML = html;
+  },
+
+  /**
    * Initializes Unit Radio Selector on the start screen
    */
   initUnitSelector() {
@@ -131,12 +233,12 @@ const UI = {
    */
   onSelectUnit(unitKey) {
     this.currentUnit = unitKey;
-    const unitsList = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList() : [];
+    const unitsList = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList(this.currentCourse) : [];
     const info = unitsList.find((u) => u.id === unitKey) || {
       id: unitKey,
       number: unitKey.replace("unit", ""),
       title: unitKey === "mid_year" ? "Mid-Year Test" : (unitKey === "end_of_year" ? "End-of-Year Test" : `Unit ${unitKey.replace("unit", "")}`),
-      points: (unitKey === "mid_year" || unitKey === "end_of_year") ? 50 : 35,
+      points: (unitKey === "mid_year" || unitKey === "end_of_year") ? 50 : (this.currentCourse === "gogetter3" ? 30 : 35),
       desc: "Comprehensive English Language Assessment"
     };
 
@@ -147,24 +249,28 @@ const UI = {
         heroSubtitle.textContent = "Complete all 9 tasks to practice your Units 1–4 vocabulary, grammar, audio listening (Track 10), reading, and everyday communication skills.";
       } else if (unitKey === "end_of_year") {
         heroSubtitle.textContent = "Complete all 9 tasks to practice your Units 1–8 vocabulary, grammar, audio listening (Track 11), reading, and matching skills.";
-      } else if (unitKey === "unit1") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on clothes, past tenses, and everyday communication skills.";
-      } else if (unitKey === "unit2") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on jobs, present tenses, and workplace dialogues.";
-      } else if (unitKey === "unit3") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your sports vocabulary, Present Perfect, and sharing experiences.";
-      } else if (unitKey === "unit4") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on books and films, relative clauses, and movie reviews.";
-      } else if (unitKey === "unit5") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your music styles, past modals (could/had to), and making suggestions.";
-      } else if (unitKey === "unit6") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your nature & animals vocabulary, conditional sentences, and giving advice.";
-      } else if (unitKey === "unit7") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your technology inventions, passive voice, and step-by-step instructions.";
-      } else if (unitKey === "unit8") {
-        heroSubtitle.textContent = "Complete all 6 tasks to practice your feelings & relationships, reported speech, and emotional reactions.";
+      } else if (this.currentCourse === "gogetter3") {
+        heroSubtitle.textContent = `Complete all tasks to practice ${info.title} (${info.desc || "Vocabulary, Grammar & Communication"}).`;
       } else {
-        heroSubtitle.textContent = `Complete all tasks to practice ${info.desc || "your English language skills"}.`;
+        if (unitKey === "unit1") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on clothes, past tenses, and everyday communication skills.";
+        } else if (unitKey === "unit2") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on jobs, present tenses, and workplace dialogues.";
+        } else if (unitKey === "unit3") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your sports vocabulary, Present Perfect, and sharing experiences.";
+        } else if (unitKey === "unit4") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on books and films, relative clauses, and movie reviews.";
+        } else if (unitKey === "unit5") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your music styles, past modals (could/had to), and making suggestions.";
+        } else if (unitKey === "unit6") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your nature & animals vocabulary, conditional sentences, and giving advice.";
+        } else if (unitKey === "unit7") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your technology inventions, passive voice, and step-by-step instructions.";
+        } else if (unitKey === "unit8") {
+          heroSubtitle.textContent = "Complete all 6 tasks to practice your feelings & relationships, reported speech, and emotional reactions.";
+        } else {
+          heroSubtitle.textContent = `Complete all tasks to practice ${info.desc || "your English language skills"}.`;
+        }
       }
     }
 
@@ -172,7 +278,7 @@ const UI = {
     if (badge) {
       if (unitKey === "mid_year") badge.textContent = "Mid-Year Test (Units 1–4) • 50 pts";
       else if (unitKey === "end_of_year") badge.textContent = "End-of-Year Test (Units 1–8) • 50 pts";
-      else badge.textContent = `Unit ${info.number} • ${info.title}`;
+      else badge.textContent = `Unit ${info.number} • ${info.title} (${info.points || 30} pts)`;
     }
 
     const previewName = document.getElementById("preview-unit-name");
@@ -184,17 +290,17 @@ const UI = {
 
     const previewTopics = document.getElementById("preview-unit-topics");
     if (previewTopics) {
-      previewTopics.textContent = `${info.desc || info.description || ""} • ${info.points || 35} pts total`;
+      previewTopics.textContent = `${info.desc || info.description || ""} • ${info.points || 30} pts total`;
     }
 
     const varADesc = document.getElementById("variant-a-desc");
     if (varADesc) {
-      varADesc.textContent = `Photocopiable ${info.title} Variant A (${info.points || 35} pts)`;
+      varADesc.textContent = `Photocopiable ${info.title} Variant A (${info.points || 30} pts)`;
     }
 
     const varBDesc = document.getElementById("variant-b-desc");
     if (varBDesc) {
-      varBDesc.textContent = `Photocopiable ${info.title} Variant B (${info.points || 35} pts)`;
+      varBDesc.textContent = `Photocopiable ${info.title} Variant B (${info.points || 30} pts)`;
     }
 
     const headerLogoBadge = document.getElementById("app-logo-badge");
@@ -258,6 +364,16 @@ const UI = {
    */
   resumeSession(saved) {
     this.student = saved.student;
+    this.currentCourse = saved.course || (saved.student && saved.student.course) || "gogetter3";
+    if (typeof TEST_DATA !== "undefined") {
+      TEST_DATA.currentCourse = this.currentCourse;
+    }
+    const courseRadio = document.querySelector(`input[name="test-course"][value="${this.currentCourse}"]`);
+    if (courseRadio) courseRadio.checked = true;
+    this.updateCourseBadge();
+    this.renderUnitSelector(this.currentCourse);
+    this.initUnitSelector();
+
     this.currentUnit = saved.unit || saved.student.unit || "unit1";
     this.currentVariant = saved.student.variant || "variantA";
     this.answers = saved.answers || {};
@@ -283,6 +399,8 @@ const UI = {
   handleStartTest() {
     const nameEl = document.getElementById("student-name");
     const fullName = nameEl ? nameEl.value.trim() : "";
+    const courseRadio = document.querySelector('input[name="test-course"]:checked');
+    const course = courseRadio ? courseRadio.value : this.currentCourse || "gogetter3";
     const unitRadio = document.querySelector('input[name="test-unit"]:checked');
     const unit = unitRadio ? unitRadio.value : "unit1";
     const variantRadio = document.querySelector('input[name="test-variant"]:checked');
@@ -306,9 +424,13 @@ const UI = {
     const firstName = parts[0] || fullName;
     const lastName = parts.slice(1).join(" ") || "";
 
+    this.currentCourse = course;
+    if (typeof TEST_DATA !== "undefined") {
+      TEST_DATA.currentCourse = course;
+    }
     this.currentUnit = unit;
     this.currentVariant = variant;
-    this.student = { fullName, firstName, lastName, studentClass: "", variant, unit };
+    this.student = { fullName, firstName, lastName, studentClass: "", variant, unit, course };
     this.answers = {};
     this.activeSection = "vocabulary";
 
@@ -362,7 +484,7 @@ const UI = {
    */
   getSectionKeys() {
     const variant = (typeof TEST_DATA !== "undefined" && TEST_DATA.getTest)
-      ? TEST_DATA.getTest(this.currentUnit, this.currentVariant)
+      ? TEST_DATA.getTest(this.currentUnit, this.currentVariant, this.currentCourse)
       : null;
     if (variant && variant.sections) {
       return Object.keys(variant.sections);
@@ -414,7 +536,7 @@ const UI = {
    * Renders the complete test questions according to the active unit and variant.
    */
   renderTestUI() {
-    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
+    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant, this.currentCourse);
     if (!variant) return;
 
     // Header badge
@@ -437,7 +559,7 @@ const UI = {
 
     const headerSubtitle = document.getElementById("app-header-subtitle");
     if (headerSubtitle) {
-      const unitInfo = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList().find(u => u.id === this.currentUnit) : null;
+      const unitInfo = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList(this.currentCourse).find(u => u.id === this.currentUnit) : null;
       headerSubtitle.textContent = unitInfo ? unitInfo.title : variant.title;
     }
 
@@ -1366,19 +1488,17 @@ const UI = {
    * Updates the progress bar and answered counters across sections dynamically.
    */
   updateProgress() {
-    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
+    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant, this.currentCourse);
     if (!variant) return;
 
     let totalQ = 0;
     let answeredQ = 0;
-    const secCounts = { vocabulary: 0, grammar: 0, communication: 0 };
-    const secMax = {
-      vocabulary: variant.sections.vocabulary ? variant.sections.vocabulary.maxScore : 16,
-      grammar: variant.sections.grammar ? variant.sections.grammar.maxScore : 14,
-      communication: variant.sections.communication ? variant.sections.communication.maxScore : 5
-    };
+    const secCounts = {};
+    const secMax = {};
 
     for (const [secKey, section] of Object.entries(variant.sections)) {
+      secCounts[secKey] = 0;
+      secMax[secKey] = section.maxScore || 0;
       for (const task of section.tasks) {
         for (const qid of Object.keys(task.answers)) {
           totalQ++;
@@ -1400,7 +1520,7 @@ const UI = {
     }
 
     // Section badges
-    for (const secKey of ["vocabulary", "grammar", "communication"]) {
+    for (const secKey of Object.keys(variant.sections)) {
       const badge = document.getElementById(`badge-count-${secKey}`);
       if (badge) {
         badge.textContent = `${secCounts[secKey] || 0} / ${secMax[secKey] || 0}`;
@@ -1430,6 +1550,7 @@ const UI = {
 
   saveCurrentSession() {
     Storage.saveSession({
+      course: this.currentCourse,
       unit: this.currentUnit,
       student: this.student,
       answers: this.answers,
@@ -1441,7 +1562,7 @@ const UI = {
    * Submit Confirmation Modal
    */
   showSubmitConfirmation() {
-    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
+    const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant, this.currentCourse);
     let totalQuestions = 0;
     let answeredQuestions = 0;
     const unansweredIds = [];
@@ -1519,7 +1640,13 @@ const UI = {
    */
   async performFinalSubmission() {
     // 1. Grade the test
-    const evaluation = Validator.evaluateTest(this.currentVariant, this.answers, this.currentUnit);
+    const evaluation = Validator.evaluateTest(this.currentVariant, this.answers, this.currentUnit, this.currentCourse);
+
+    // Prefix variantTitle with friendly course name for teacher reporting & student view
+    const courseTitle = this.currentCourse === "gogetter4" ? "Go Getter 4" : "Go Getter 3";
+    if (evaluation && evaluation.variantTitle && !evaluation.variantTitle.includes("Go Getter")) {
+      evaluation.variantTitle = `${courseTitle} • ${evaluation.variantTitle}`;
+    }
 
     // 2. Clear active in-progress session
     Storage.clearSession();
@@ -1563,18 +1690,12 @@ const UI = {
         </div>
 
         <div class="section-scores-grid">
-          <div class="section-score-card">
-            <div class="section-score-name">Vocabulary</div>
-            <div class="section-score-val">${evaluation.sections.vocabulary.score} / ${evaluation.sections.vocabulary.maxScore}</div>
-          </div>
-          <div class="section-score-card">
-            <div class="section-score-name">Grammar</div>
-            <div class="section-score-val">${evaluation.sections.grammar.score} / ${evaluation.sections.grammar.maxScore}</div>
-          </div>
-          <div class="section-score-card">
-            <div class="section-score-name">Communication</div>
-            <div class="section-score-val">${evaluation.sections.communication.score} / ${evaluation.sections.communication.maxScore}</div>
-          </div>
+          ${Object.entries(evaluation.sections || {}).map(([sKey, sObj]) => `
+            <div class="section-score-card">
+              <div class="section-score-name">${sObj.title || (sKey.charAt(0).toUpperCase() + sKey.slice(1))}</div>
+              <div class="section-score-val">${sObj.score} / ${sObj.maxScore}</div>
+            </div>
+          `).join("")}
         </div>
 
         <div style="margin-top:1.5rem; display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
@@ -1678,7 +1799,7 @@ const UI = {
       sendBtn.textContent = "Sending...";
       if (statusMsg) statusMsg.innerHTML = `<span style="color:var(--text-muted)">Sending question to teacher...</span>`;
 
-      const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant);
+      const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant, this.currentCourse);
       const res = await TeacherService.sendStudentQuestion({
         student: this.student || { firstName: "Student", lastName: "", studentClass: "" },
         variantTitle: variant ? variant.title : "English Test",

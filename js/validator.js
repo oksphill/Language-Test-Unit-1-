@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Language Test Units 1-8 - Validator & Scoring Engine
  */
 
@@ -96,11 +96,15 @@ const Validator = {
    * @param {string} variantKey - 'variantA' or 'variantB'
    * @param {Object} userAnswers - Key-value map of question ID to user input
    * @param {string} [unitKey] - Optional unit key like 'unit1', 'unit2', ...
+   * @param {string} [courseId] - Optional course id like 'gogetter3' or 'gogetter4'
    */
-  evaluateTest(variantKey, userAnswers = {}, unitKey = null) {
+  evaluateTest(variantKey, userAnswers = {}, unitKey = null, courseId = null) {
+    const activeCourse = courseId || (window.TEST_DATA && window.TEST_DATA.currentCourse ? window.TEST_DATA.currentCourse : "gogetter3");
     const activeUnit = unitKey || (window.TEST_DATA && window.TEST_DATA.currentUnit ? window.TEST_DATA.currentUnit : "unit1");
     let variant;
-    if (window.TEST_DATA && window.TEST_DATA[activeUnit] && window.TEST_DATA[activeUnit][variantKey]) {
+    if (window.TEST_DATA && window.TEST_DATA.getTest) {
+      variant = window.TEST_DATA.getTest(activeUnit, variantKey, activeCourse);
+    } else if (window.TEST_DATA && window.TEST_DATA[activeUnit] && window.TEST_DATA[activeUnit][variantKey]) {
       variant = window.TEST_DATA[activeUnit][variantKey];
     } else if (window.TEST_DATA && window.TEST_DATA[variantKey]) {
       variant = window.TEST_DATA[variantKey];
@@ -109,6 +113,7 @@ const Validator = {
     if (!variant) throw new Error("Invalid test variant: " + activeUnit + " / " + variantKey);
 
     const results = {
+      courseId: activeCourse,
       unitKey: activeUnit,
       variantKey,
       variantTitle: variant.title,

@@ -95,13 +95,51 @@
             </div>
           </div>
 
-          <!-- STEP 2: UNIT SELECTOR -->
+          <!-- STEP 2: COURSE & LEVEL SELECTOR -->
+          <div class="course-step-card" id="course-step-card">
+            <div class="step-header">
+              <span class="step-badge step-badge-blue">STEP 2</span>
+              <div class="step-header-text">
+                <span class="step-title">Choose Course & Level:</span>
+                <span id="selected-course-badge" class="selected-course-text">Go Getter 3 • Level A2 (Pre-Intermediate)</span>
+              </div>
+            </div>
+            <div class="course-cards-grid" id="course-selector-grid">
+              <label class="course-card-radio">
+                <input type="radio" name="test-course" value="gogetter3" checked>
+                <div class="course-card-box">
+                  <div class="course-card-header">
+                    <span class="course-card-icon">📘</span>
+                    <span class="course-card-badge">Level A2</span>
+                  </div>
+                  <span class="course-card-title">Go Getter 3</span>
+                  <span class="course-card-level">Pre-Intermediate</span>
+                  <span class="course-card-desc">8 Units (30 pts each)</span>
+                </div>
+              </label>
+
+              <label class="course-card-radio">
+                <input type="radio" name="test-course" value="gogetter4">
+                <div class="course-card-box">
+                  <div class="course-card-header">
+                    <span class="course-card-icon">📙</span>
+                    <span class="course-card-badge">Level A2+ / B1</span>
+                  </div>
+                  <span class="course-card-title">Go Getter 4</span>
+                  <span class="course-card-level">Intermediate</span>
+                  <span class="course-card-desc">8 Units + 2 Exams (35–50 pts)</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 3: UNIT SELECTOR -->
           <div class="units-step-card">
             <div class="step-header">
-              <span class="step-badge step-badge-purple">STEP 2</span>
+              <span class="step-badge step-badge-purple">STEP 3</span>
               <div class="step-header-text">
-                <span class="step-title">Select Unit (1 – 8) or Exam:</span>
-                <span id="selected-unit-badge" class="selected-unit-text">Unit 1 • Clothes & Appearance</span>
+                <span class="step-title">Select Unit or Exam:</span>
+                <span id="selected-unit-badge" class="selected-unit-text">Unit 1 • Chores & Personality</span>
               </div>
             </div>
             <div class="unit-cards-grid" id="unit-selector-grid">
@@ -368,6 +406,17 @@
   </div>
 
   <!-- JavaScript Modules in Dependency Order -->
+  <!-- Go Getter 3 (Level A2) Data Modules -->
+  <script src="js/data/gg3_unit1.js"></script>
+  <script src="js/data/gg3_unit2.js"></script>
+  <script src="js/data/gg3_unit3.js"></script>
+  <script src="js/data/gg3_unit4.js"></script>
+  <script src="js/data/gg3_unit5.js"></script>
+  <script src="js/data/gg3_unit6.js"></script>
+  <script src="js/data/gg3_unit7.js"></script>
+  <script src="js/data/gg3_unit8.js"></script>
+
+  <!-- Go Getter 4 (Level A2+/B1) Data Modules -->
   <script src="js/data/unit1.js"></script>
   <script src="js/data/unit2.js"></script>
   <script src="js/data/unit3.js"></script>
