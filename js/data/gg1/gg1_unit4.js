@@ -84,6 +84,7 @@ window.GG1_UNIT_4_DATA = {
             title: "Look at the picture in Exercise 1. Complete the sentences with has got, hasn't got, have got, haven't got.",
             points: 4,
             type: "grammar-gap",
+            imageKey: "gg1_u4_monsters_a",
             example: "0 Martha has got big brown eyes.",
             items: [
               { id: "A_3_1", label: "1", textBefore: "Albert and Martha", prompt: "have got", textAfter: "long legs." },
@@ -250,6 +251,7 @@ window.GG1_UNIT_4_DATA = {
             title: "Look at the picture in Exercise 1. Complete the sentences with has got, hasn't got, have got, haven't got.",
             points: 4,
             type: "grammar-gap",
+            imageKey: "gg1_u4_monsters_b",
             example: "0 Martha has got big brown eyes.",
             items: [
               { id: "B_3_1", label: "1", textBefore: "Albert", prompt: "have got", textAfter: "curly blond hair." },

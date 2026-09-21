@@ -55,6 +55,7 @@ window.GG1_UNIT_2_DATA = {
             title: "Look at the picture in Exercise 1. Write the words.",
             points: 4,
             type: "word-bank",
+            imageKey: "gg1_u2_room_a",
             example: "0 F is a laptop computer.",
             sentences: [
               { textBefore: "1 J is a", gapId: "A_2_1", label: "1", textAfter: "." },
@@ -217,6 +218,7 @@ window.GG1_UNIT_2_DATA = {
             title: "Look at the picture in Exercise 1. Write the words.",
             points: 4,
             type: "word-bank",
+            imageKey: "gg1_u2_room_b",
             example: "0 D is a laptop computer.",
             sentences: [
               { textBefore: "1 U is a", gapId: "B_2_1", label: "1", textAfter: "." },

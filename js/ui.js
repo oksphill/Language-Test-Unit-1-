@@ -708,8 +708,9 @@ const UI = {
     }
 
     // Illustration (Unit 1 and visual tasks)
-    if (task.imageKey && typeof Illustrations !== "undefined") {
-      const illSvg = Illustrations.renderIllustration(task.imageKey);
+    const illHelper = (typeof Illustrations !== "undefined") ? Illustrations : (typeof window !== "undefined" ? window.Illustrations : null);
+    if (task.imageKey && illHelper) {
+      const illSvg = illHelper.renderIllustration(task.imageKey);
       if (illSvg) {
         html += `<div class="illustration-wrapper">${illSvg}</div>`;
       }
@@ -739,8 +740,8 @@ const UI = {
       return this.renderReadingTask(task);
     }
 
-    // 0.2 Matching Dialogue Tasks (Options a–i + conversations)
-    if (task.type === "matching-dialogue") {
+    // 0.2 Matching Dialogue Tasks (Options a–i + conversations, or numbering sentences)
+    if (task.type === "matching-dialogue" || task.type === "number-dialogue") {
       return this.renderMatchingDialogueTask(task);
     }
 
@@ -749,8 +750,8 @@ const UI = {
       return this.renderCircleChoiceTask(task);
     }
 
-    // 2. Sentence Order (Unit 7 passive unscramble)
-    if (task.type === "sentence-order") {
+    // 2. Sentence Order / Sentence Writing
+    if (task.type === "sentence-order" || task.type === "sentence-writing") {
       return this.renderSentenceOrderTask(task);
     }
 
@@ -934,14 +935,16 @@ const UI = {
     if (task.items && task.items.length > 0) {
       let rowsHtml = "";
       for (const it of task.items) {
+        const beforeText = it.before ?? it.textBefore ?? "";
+        const afterText = it.after ?? it.textAfter ?? "";
         rowsHtml += `
           <div class="grammar-item-row">
             <span class="gap-label">${it.label}</span>
-            ${it.before ? `<span>${it.before}</span> ` : ""}
+            ${beforeText ? `<span>${beforeText}</span> ` : ""}
             <span class="gap-inline-wrapper">
               <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
             </span>
-            ${it.after ? ` <span>${it.after}</span>` : ""}
+            ${afterText ? ` <span>${afterText}</span>` : ""}
           </div>
         `;
       }
@@ -970,15 +973,18 @@ const UI = {
 
     if (task.type === "reading-tf-ds" && task.items) {
       let rowsHtml = "";
+      const defaultOpts = task.options || ["T", "F", "DS"];
       for (const it of task.items) {
+        const itemOpts = it.options || defaultOpts;
+        const statementText = it.statement || it.text || "";
         html += `
           <div class="reading-tf-row">
             <div class="reading-tf-statement">
               <span class="gap-label">${it.label}</span>
-              <span>${it.statement}</span>
+              <span>${statementText}</span>
             </div>
             <div class="choice-pills-group" data-qid="${it.id}">
-              ${it.options.map((opt) => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
+              ${itemOpts.map((opt) => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
               <input type="hidden" class="test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" value="">
             </div>
           </div>
@@ -1005,8 +1011,62 @@ const UI = {
 
   /**
    * Renders Matching Dialogue tasks (options bank a-i + dialogue lines)
+  /**
+   * Renders Number Dialogue tasks (numbering lines 2–6, e.g. GG1 Unit 1 Task 6)
+   */
+  renderNumberDialogueTask(task) {
+    let html = `<div class="number-dialogue-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">`;
+    const totalCount = task.items ? task.items.length : 6;
+    const numOptions = [];
+    for (let i = 2; i <= totalCount; i++) {
+      numOptions.push(i);
+    }
+
+    for (const it of (task.items || [])) {
+      const sentenceText = it.text || it.prompt || "";
+      const isFixed = it.fixedOrder !== undefined || it.fixed === true;
+      
+      html += `
+        <div class="number-dialogue-row" style="display: flex; align-items: center; gap: 0.85rem; padding: 0.65rem 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;">
+      `;
+
+      if (isFixed) {
+        const val = it.fixedOrder || 1;
+        html += `
+          <div style="width: 52px; height: 38px; display: flex; align-items: center; justify-content: center; background: #e2e8f0; color: #334155; font-weight: 800; font-size: 1.1rem; border-radius: 8px; border: 2px solid #cbd5e1; flex-shrink: 0;">
+            ${val}
+          </div>
+          <span style="font-size: 1rem; color: #1e293b; font-weight: 500;">${sentenceText}</span>
+        `;
+      } else {
+        html += `
+          <select class="form-control test-gap number-dialogue-select" 
+                  id="input-${it.id}" 
+                  data-qid="${it.id}" 
+                  data-task="${task.id}"
+                  style="width: 60px; height: 38px; text-align: center; font-weight: 700; font-size: 1.05rem; padding: 0.2rem; border-radius: 8px; border: 2px solid #cbd5e1; background: #fff; cursor: pointer; flex-shrink: 0;">
+            <option value="">—</option>
+            ${numOptions.map(n => `<option value="${n}">${n}</option>`).join("")}
+          </select>
+          <span style="font-size: 1rem; color: #1e293b; font-weight: 500;">${sentenceText}</span>
+        `;
+      }
+
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  },
+
+  /**
+   * Renders Matching Dialogue tasks (options bank a-i + dialogue lines)
    */
   renderMatchingDialogueTask(task) {
+    if (!task.optionsList || task.type === "number-dialogue") {
+      return this.renderNumberDialogueTask(task);
+    }
+
     let html = "";
     if (task.optionsList && task.optionsList.length > 0) {
       const chips = task.optionsList
@@ -1030,7 +1090,7 @@ const UI = {
         <div class="matching-item-row">
           <div class="matching-prompt">
             <span class="gap-label">${it.label}</span>
-            <span>${it.prompt}</span>
+            <span>${it.prompt || it.text || ""}</span>
           </div>
           <div>
             <select class="form-control test-gap matching-select" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}">
@@ -1051,15 +1111,17 @@ const UI = {
   renderCircleChoiceTask(task) {
     let html = `<div class="choice-items-list">`;
     for (const it of task.items) {
+      const beforeText = it.before ?? it.textBefore ?? "";
+      const afterText = it.after ?? it.textAfter ?? "";
       html += `
         <div class="circle-choice-item">
           <span class="gap-label">${it.label}</span>
-          ${it.before ? `<span>${it.before}</span> ` : ""}
+          ${beforeText ? `<span>${beforeText}</span> ` : ""}
           <span class="choice-pills-group" data-qid="${it.id}">
             ${it.options.map(opt => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
             <input type="hidden" class="test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" value="">
           </span>
-          ${it.after ? ` <span>${it.after}</span>` : ""}
+          ${afterText ? ` <span>${afterText}</span>` : ""}
         </div>
       `;
     }
@@ -1068,13 +1130,16 @@ const UI = {
   },
 
   /**
-   * Renders sentence-order / sentence-writing tasks (Interactive draggable/tap word reordering)
+   * Renders sentence-order / sentence-writing tasks (Interactive draggable/tap word reordering or open sentence writing)
    */
   renderSentenceOrderTask(task) {
+    const isWritingTask = task.type === "sentence-writing" || 
+                          task.isSentenceWriting === true || 
+                          (task.title && task.title.toLowerCase().includes("write sentences"));
     let html = `<div class="sentence-order-list">`;
     for (const it of task.items) {
       const rawPrompt = it.prompt || "";
-      const isWordOrder = rawPrompt.includes("/") || rawPrompt.includes(" / ");
+      const isWordOrder = !isWritingTask && (rawPrompt.includes("/") || rawPrompt.includes(" / "));
       
       if (isWordOrder) {
         const tokens = rawPrompt.split(/\s*\/\s*/).map(s => s.trim()).filter(Boolean);
@@ -1189,33 +1254,46 @@ const UI = {
     let html = `<div class="grammar-items-list">`;
     for (const it of task.items) {
       let line = `<div class="grammar-item-row"><span class="gap-label">${it.label || ""}</span> `;
-      if (it.before) line += `<span>${it.before}</span> `;
+      const beforeText = it.before ?? it.textBefore ?? "";
+      if (beforeText) line += `<span>${beforeText}</span> `;
+
+      const verbPrompt = it.verb || (it.prompt && !["✓", "✗", "?", "possessive", "object pronoun"].includes(it.prompt) ? it.prompt : "");
+
       if (it.options && it.options.length > 0) {
         line += `
           <span class="choice-pills-group" data-qid="${it.id}">
             ${it.options.map(opt => `<button type="button" class="choice-pill-btn" data-qid="${it.id}" data-value="${opt}">${opt}</button>`).join("")}
             <input type="hidden" class="test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" value="">
           </span>
-          ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
+          ${verbPrompt ? `<span class="grammar-verb-prompt">(${verbPrompt})</span>` : ""}
         `;
       } else {
         line += `
           <span class="gap-inline-wrapper">
             <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
           </span>
-          ${it.verb ? `<span class="grammar-verb-prompt">(${it.verb})</span>` : ""}
+          ${verbPrompt ? `<span class="grammar-verb-prompt">(${verbPrompt})</span>` : ""}
         `;
       }
-      if (it.after) line += ` <span>${it.after}</span> `;
+      const afterText = it.after ?? it.textAfter ?? "";
+      if (afterText) line += ` <span>${afterText}</span> `;
+
+      // Check if prompt is a symbol (✓, ✗, ?) and not already present in afterText
+      if (it.prompt && ["✓", "✗", "?"].includes(it.prompt)) {
+        if (!afterText.includes(it.prompt) && !afterText.includes(`[${it.prompt}]`)) {
+          line += ` <span class="grammar-symbol-prompt" style="font-weight:700; margin-left:6px; color:#475569; font-size:1.05rem;">[${it.prompt}]</span>`;
+        }
+      }
 
       if (it.gapId2) {
+        const verbPrompt2 = it.verb2 || (it.prompt2 && !["✓", "✗", "?", "possessive", "object pronoun"].includes(it.prompt2) ? it.prompt2 : "");
         if (it.options2 && it.options2.length > 0) {
           line += `
             <span class="choice-pills-group" data-qid="${it.gapId2}">
               ${it.options2.map(opt => `<button type="button" class="choice-pill-btn" data-qid="${it.gapId2}" data-value="${opt}">${opt}</button>`).join("")}
               <input type="hidden" class="test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" value="">
             </span>
-            ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
+            ${verbPrompt2 ? `<span class="grammar-verb-prompt">(${verbPrompt2})</span>` : ""}
           `;
         } else {
           line += `
@@ -1223,10 +1301,11 @@ const UI = {
               <span class="gap-label">${it.label2 || ""}</span>
               <input type="text" class="gap-input test-gap" id="input-${it.gapId2}" data-qid="${it.gapId2}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
             </span>
-            ${it.verb2 ? `<span class="grammar-verb-prompt">(${it.verb2})</span>` : ""}
+            ${verbPrompt2 ? `<span class="grammar-verb-prompt">(${verbPrompt2})</span>` : ""}
           `;
         }
-        if (it.after2) line += ` <span>${it.after2}</span> `;
+        const afterText2 = it.after2 ?? it.textAfter2 ?? "";
+        if (afterText2) line += ` <span>${afterText2}</span> `;
       }
 
       line += `</div>`;
@@ -2367,3 +2446,7 @@ const UI = {
     requestAnimationFrame(animate);
   }
 };
+
+if (typeof window !== "undefined") {
+  window.UI = UI;
+}

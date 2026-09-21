@@ -53,6 +53,7 @@ window.GG1_UNIT_3_DATA = {
             title: "Look at the picture in Exercise 1. Complete the answers with prepositions of place.",
             points: 4,
             type: "word-bank",
+            imageKey: "gg1_u3_room_a",
             example: "Where's Cat A? It's ⁰in the bedroom.",
             sentences: [
               { textBefore: "Where's Cat B? It's", gapId: "A_2_1", label: "1", textAfter: "the desk." },
@@ -217,6 +218,7 @@ window.GG1_UNIT_3_DATA = {
             title: "Look at the picture in Exercise 1. Complete the answers with prepositions of place.",
             points: 4,
             type: "word-bank",
+            imageKey: "gg1_u3_room_b",
             example: "Where's Cat A? It's ⁰in the bedroom.",
             sentences: [
               { textBefore: "Where's Cat B? It's", gapId: "B_2_1", label: "1", textAfter: "to the table." },

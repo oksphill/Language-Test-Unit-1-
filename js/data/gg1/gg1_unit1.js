@@ -127,7 +127,8 @@ window.GG1_UNIT_1_DATA = {
             number: 5,
             title: "Look at the family tree in Exercise 1. Write sentences with possessive 's.",
             points: 4,
-            type: "sentence-order",
+            type: "sentence-writing",
+            imageKey: "gg1_u1_family_tree_a",
             example: "0 Bobo / Fritzi dad -> Bobo is Fritzi's dad.",
             items: [
               { id: "A_5_1", label: "1", prompt: "Gus mum / Dido" },
@@ -292,7 +293,8 @@ window.GG1_UNIT_1_DATA = {
             number: 5,
             title: "Look at the family tree in Exercise 1. Write sentences with possessive 's.",
             points: 4,
-            type: "sentence-order",
+            type: "sentence-writing",
+            imageKey: "gg1_u1_family_tree_b",
             example: "0 Goopy / Buzz dad -> Goopy is Buzz's dad.",
             items: [
               { id: "B_5_1", label: "1", prompt: "Lino mum / Hippy" },

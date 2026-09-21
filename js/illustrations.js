@@ -134,3 +134,7 @@ const Illustrations = {
     }
   }
 };
+
+if (typeof window !== "undefined") {
+  window.Illustrations = Illustrations;
+}
