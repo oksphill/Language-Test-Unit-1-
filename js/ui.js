@@ -925,32 +925,153 @@ const UI = {
   },
 
   /**
-   * Renders Listening gap tasks with audio player
+   * Renders Listening gap tasks with audio player, grouped person cards (Henry & Rosie) or tables (Jack/Tom/Jenny)
    */
   renderListeningGapTask(task) {
     let html = "";
     if (task.audioTrack) {
       html += this.renderAudioPlayer(task);
     }
-    if (task.items && task.items.length > 0) {
-      let rowsHtml = "";
-      for (const it of task.items) {
-        const beforeText = it.before ?? it.textBefore ?? "";
-        const afterText = it.after ?? it.textAfter ?? "";
-        rowsHtml += `
-          <div class="grammar-item-row">
-            <span class="gap-label">${it.label}</span>
-            ${beforeText ? `<span>${beforeText}</span> ` : ""}
-            <span class="gap-inline-wrapper">
-              <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
-            </span>
-            ${afterText ? ` <span>${afterText}</span>` : ""}
-          </div>
-        `;
+
+    // Support structured table (e.g. Mid-Year Test Jack / Tom / Jenny)
+    if (task.table) {
+      html += this.renderListeningTable(task);
+      return html;
+    }
+
+    // Extract items (supporting items array, or sentences array with gapId/id)
+    const items = (task.items && task.items.length > 0)
+      ? task.items
+      : (task.sentences ? task.sentences.map(s => ({
+          id: s.id || s.gapId,
+          label: s.label,
+          before: s.textBefore || s.before || "",
+          after: s.textAfter || s.after || "",
+          group: s.group,
+          question: s.question
+        })) : []);
+
+    if (items && items.length > 0) {
+      // If items have groups (e.g. "Henry", "Rosie")
+      const hasGroups = items.some(it => it.group);
+      if (hasGroups) {
+        let currentGroup = null;
+        let groupCardsHtml = "";
+        let currentGroupItems = [];
+
+        const flushGroup = (grpName, grpItems) => {
+          if (!grpName && grpItems.length === 0) return "";
+          let exampleHtml = "";
+          if (task.groupExamples && task.groupExamples[grpName]) {
+            exampleHtml = `<div class="listening-example-badge"><strong>Example:</strong> ${task.groupExamples[grpName]}</div>`;
+          } else if (grpName === "Henry" && task.example) {
+            exampleHtml = `<div class="listening-example-badge"><strong>Example:</strong> ${task.example}</div>`;
+          }
+
+          let rows = "";
+          for (const it of grpItems) {
+            const beforeText = it.before ?? it.textBefore ?? "";
+            const afterText = it.after ?? it.textAfter ?? "";
+            rows += `
+              <div class="listening-item-card">
+                ${it.question ? `<div class="listening-item-prompt"><span class="gap-label">${it.label}</span> ${it.question}</div>` : ""}
+                <div class="listening-input-row">
+                  ${!it.question ? `<span class="gap-label">${it.label}</span> ` : ""}
+                  ${beforeText ? `<span class="listening-text-prefix">${beforeText}</span> ` : ""}
+                  <span class="gap-inline-wrapper">
+                    <input type="text" class="gap-input test-gap listening-gap-input" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="...">
+                  </span>
+                  ${afterText ? ` <span class="listening-text-suffix">${afterText}</span>` : ""}
+                </div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="listening-group-container">
+              <div class="listening-group-header">
+                <span class="listening-group-icon">👤</span>
+                <span class="listening-group-name">${grpName}</span>
+              </div>
+              ${exampleHtml}
+              <div class="listening-group-body">
+                ${rows}
+              </div>
+            </div>
+          `;
+        };
+
+        for (const it of items) {
+          const grp = it.group || "Questions";
+          if (grp !== currentGroup) {
+            if (currentGroupItems.length > 0) {
+              groupCardsHtml += flushGroup(currentGroup, currentGroupItems);
+              currentGroupItems = [];
+            }
+            currentGroup = grp;
+          }
+          currentGroupItems.push(it);
+        }
+        if (currentGroupItems.length > 0) {
+          groupCardsHtml += flushGroup(currentGroup, currentGroupItems);
+        }
+
+        html += `<div class="listening-groups-wrapper">${groupCardsHtml}</div>`;
+      } else {
+        // Standard non-grouped listening gap items
+        let rowsHtml = "";
+        for (const it of items) {
+          const beforeText = it.before ?? it.textBefore ?? "";
+          const afterText = it.after ?? it.textAfter ?? "";
+          rowsHtml += `
+            <div class="grammar-item-row">
+              <span class="gap-label">${it.label}</span>
+              ${it.question ? `<div class="listening-item-prompt">${it.question}</div>` : ""}
+              ${beforeText ? `<span>${beforeText}</span> ` : ""}
+              <span class="gap-inline-wrapper">
+                <input type="text" class="gap-input test-gap" id="input-${it.id}" data-qid="${it.id}" data-task="${task.id}" autocomplete="off" autocorrect="off" spellcheck="false">
+              </span>
+              ${afterText ? ` <span>${afterText}</span>` : ""}
+            </div>
+          `;
+        }
+        html += `<div class="grammar-items-list">${rowsHtml}</div>`;
       }
-      html += `<div class="grammar-items-list">${rowsHtml}</div>`;
     }
     return html;
+  },
+
+  /**
+   * Renders structured table for Listening tasks (e.g. Mid-Year Test Jack/Tom/Jenny)
+   */
+  renderListeningTable(task) {
+    if (!task.table) return "";
+    const headers = task.table.headers || ["Name", "Hair", "Age"];
+    const rows = task.table.rows || [];
+
+    let theadHtml = headers.map(h => `<th>${h}</th>`).join("");
+    let tbodyHtml = "";
+
+    for (const r of rows) {
+      tbodyHtml += "<tr>";
+      tbodyHtml += `<td class="listening-col-name"><strong>${r.name}</strong></td>`;
+      tbodyHtml += `<td class="listening-col-hair">${r.hairHtml}</td>`;
+      tbodyHtml += `<td class="listening-col-age">${r.ageHtml}</td>`;
+      tbodyHtml += "</tr>";
+    }
+
+    return `
+      <div class="listening-table-card">
+        <table class="listening-custom-table">
+          <thead>
+            <tr>${theadHtml}</tr>
+          </thead>
+          <tbody>
+            ${tbodyHtml}
+          </tbody>
+        </table>
+      </div>
+    `;
   },
 
   /**

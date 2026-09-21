@@ -188,14 +188,34 @@ window.GG1_MID_YEAR_DATA = {
             audioTrack: "assets/audio/gg1_track_10_mid_year.mp3",
             audioTitle: "Go Getter 1 Track 10 — Mid-Year Test",
             audioDesc: "Listen to the description of Jack, Tom and Jenny (Track 10)",
-            example: "Jack's hair: short black",
-            sentences: [
-              { textBefore: "<strong>Jack</strong>: Hair: short black | Age: 1", gapId: "MY_A_7_1", label: "1", textAfter: "" },
-              { textBefore: "<br><strong>Tom</strong>: Hair: 2", gapId: "MY_A_7_2", label: "2", textAfter: "spiky | Age: 3" },
-              { textBefore: "", gapId: "MY_A_7_3", label: "3", textAfter: "" },
-              { textBefore: "<br><strong>Jenny</strong>: Hair: 4", gapId: "MY_A_7_4", label: "4", textAfter: "wavy 5" },
-              { textBefore: "| Age: 6", gapId: "MY_A_7_5", label: "5", textAfter: "" },
-              { textBefore: "", gapId: "MY_A_7_6", label: "6", textAfter: "" }
+            example: "Jack's hair: short, ⁰black",
+            table: {
+              headers: ["Name", "Hair", "Age"],
+              rows: [
+                {
+                  name: "Jack",
+                  hairHtml: "short, <em>⁰black</em>",
+                  ageHtml: `<span class="gap-label">1</span> <input type="text" class="gap-input test-gap listening-gap-input" id="input-MY_A_7_1" data-qid="MY_A_7_1" data-task="task_7" placeholder="..." autocomplete="off">`
+                },
+                {
+                  name: "Tom",
+                  hairHtml: `<span class="gap-label">2</span> <input type="text" class="gap-input test-gap listening-gap-input" id="input-MY_A_7_2" data-qid="MY_A_7_2" data-task="task_7" placeholder="..." autocomplete="off">, spiky`,
+                  ageHtml: `<span class="gap-label">3</span> <input type="text" class="gap-input test-gap listening-gap-input" id="input-MY_A_7_3" data-qid="MY_A_7_3" data-task="task_7" placeholder="..." autocomplete="off">`
+                },
+                {
+                  name: "Jenny",
+                  hairHtml: `<span class="gap-label">4</span> <input type="text" class="gap-input test-gap listening-gap-input" id="input-MY_A_7_4" data-qid="MY_A_7_4" data-task="task_7" placeholder="..." autocomplete="off">, wavy, <span class="gap-label">5</span> <input type="text" class="gap-input test-gap listening-gap-input" id="input-MY_A_7_5" data-qid="MY_A_7_5" data-task="task_7" placeholder="..." autocomplete="off">`,
+                  ageHtml: `<span class="gap-label">6</span> <input type="text" class="gap-input test-gap listening-gap-input" id="input-MY_A_7_6" data-qid="MY_A_7_6" data-task="task_7" placeholder="..." autocomplete="off">`
+                }
+              ]
+            },
+            items: [
+              { id: "MY_A_7_1", label: "1", before: "Jack's age:", after: "" },
+              { id: "MY_A_7_2", label: "2", before: "Tom's hair:", after: "spiky" },
+              { id: "MY_A_7_3", label: "3", before: "Tom's age:", after: "" },
+              { id: "MY_A_7_4", label: "4", before: "Jenny's hair length:", after: "wavy" },
+              { id: "MY_A_7_5", label: "5", before: "Jenny's hair colour:", after: "" },
+              { id: "MY_A_7_6", label: "6", before: "Jenny's age:", after: "" }
             ],
             answers: {
               "MY_A_7_1": { expected: ["14", "fourteen"], explanation: "Jack is 14 years old." },

@@ -894,6 +894,177 @@
 }
 
 /* ==========================================================================
+   LISTENING GROUP & TABLE COMPONENTS (Henry & Rosie / Jack, Tom, Jenny)
+   ========================================================================== */
+.listening-groups-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.listening-group-container {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.listening-group-container:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.listening-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid #F1F5F9;
+}
+
+.listening-group-icon {
+  font-size: 1.35rem;
+}
+
+.listening-group-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.01em;
+}
+
+.listening-example-badge {
+  background: #EFF6FF;
+  border-left: 3px solid #3B82F6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  color: #334155;
+  margin-bottom: 1rem;
+}
+
+.listening-example-badge strong {
+  color: #1D4ED8;
+}
+
+.listening-example-badge em {
+  font-style: normal;
+  text-decoration: underline;
+  color: #1E293B;
+  font-weight: 600;
+}
+
+.listening-item-card {
+  background: #FAFAFA;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.listening-item-card:last-child {
+  margin-bottom: 0;
+}
+
+.listening-item-prompt {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.listening-item-prompt .gap-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #4F46E5;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 0.35rem;
+}
+
+.listening-input-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: #1E293B;
+}
+
+.listening-text-prefix, .listening-text-suffix {
+  font-weight: 500;
+}
+
+.listening-gap-input {
+  min-width: 140px;
+  max-width: 220px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1E293B;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.listening-gap-input:focus {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  outline: none;
+}
+
+/* Listening Table (Mid-Year Test) */
+.listening-table-card {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.listening-custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.listening-custom-table th {
+  background: #F1F5F9;
+  color: #334155;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 2px solid #CBD5E1;
+}
+
+.listening-custom-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #E2E8F0;
+  vertical-align: middle;
+  color: #1E293B;
+}
+
+.listening-custom-table tr:last-child td {
+  border-bottom: none;
+}
+
+.listening-custom-table td input {
+  margin: 0 0.35rem;
+}
+
+/* ==========================================================================
    READING PASSAGE & QUESTIONS COMPONENT
    ========================================================================== */
 .reading-passage-box {
