@@ -50,9 +50,11 @@ function doPost(e) {
       ? data.teacher.trim()
       : "—";
     var variant = data.variant || "—";
-    var scoreText = (data.totalScore || "0") + " (" + (data.percentage || "0%") + ")";
+    var gradeInfo = data.grade ? (" [" + data.grade + "]") : "";
+    var scoreText = (data.totalScore || "0") + " (" + (data.percentage || "0%") + ")" + gradeInfo;
     var mistakesCount = data.mistakesCount !== undefined ? data.mistakesCount : 0;
-    var mistakesSummary = data.mistakesSummary || "No mistakes (100% score)";
+    var sectionsInfo = data.sections ? ("Разделы: " + data.sections + "\n\n") : "";
+    var mistakesSummary = sectionsInfo + (data.mistakesSummary || "No mistakes (100% score)");
 
     // Добавляем строку в основную таблицу
     mainSheet.appendRow([

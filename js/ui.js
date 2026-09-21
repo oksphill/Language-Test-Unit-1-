@@ -2184,6 +2184,9 @@ const UI = {
           <button type="button" class="btn btn-secondary btn-sm" onclick="window.print()">
             🖨️ Print / Save PDF
           </button>
+          <button type="button" class="btn btn-success btn-sm" id="btn-export-excel">
+            📊 Скачать Excel (.csv)
+          </button>
           <button type="button" class="btn btn-primary btn-sm" id="btn-retake-test">
             🔄 Switch Unit / Retake
           </button>
@@ -2233,6 +2236,14 @@ const UI = {
 
     container.innerHTML = html;
 
+    // Excel export button
+    const excelBtn = document.getElementById("btn-export-excel");
+    if (excelBtn) {
+      excelBtn.addEventListener("click", () => {
+        this.exportResultsToExcel(evaluation);
+      });
+    }
+
     // Retake button
     const retakeBtn = document.getElementById("btn-retake-test");
     if (retakeBtn) {
@@ -2249,6 +2260,77 @@ const UI = {
         this.openAskTeacherModal(taskInfo);
       });
     });
+  },
+
+  /**
+   * Generates and downloads an Excel-compatible CSV file with complete test breakdown
+   */
+  exportResultsToExcel(evaluation) {
+    const student = this.student || {};
+    const studentName = student.fullName || `${student.firstName || ''} ${student.lastName || ''}`.trim() || "Студент";
+    const studentClass = student.studentClass || "—";
+    const teacherName = (student.teacher && student.teacher.trim()) ? student.teacher.trim() : "—";
+    const testTitle = evaluation.variantTitle || "English Test";
+    const dateStr = new Date().toLocaleString("ru-RU");
+
+    const rows = [];
+    rows.push(["ОТЧЕТ О РЕЗУЛЬТАТАХ ТЕСТИРОВАНИЯ"]);
+    rows.push(["Дата и время", dateStr]);
+    rows.push(["ФИО ученика", studentName]);
+    rows.push(["Класс", studentClass]);
+    rows.push(["Учитель", teacherName]);
+    rows.push(["Тест / Вариант", testTitle]);
+    rows.push(["Итоговый балл", `${evaluation.totalScore} из ${evaluation.totalMax}`]);
+    rows.push(["Процент выполнения", `${evaluation.percentage}%`]);
+    rows.push(["Оценка / Статус", evaluation.gradeTier ? evaluation.gradeTier.badge : "Completed"]);
+    rows.push(["Количество ошибок", evaluation.mistakes ? evaluation.mistakes.length : 0]);
+    rows.push([]);
+
+    rows.push(["БАЛЛЫ ПО РАЗДЕЛАМ"]);
+    rows.push(["Раздел", "Набрано баллов", "Максимум"]);
+    if (evaluation.sections) {
+      for (const [sKey, sObj] of Object.entries(evaluation.sections)) {
+        const title = sObj.title || (sKey.charAt(0).toUpperCase() + sKey.slice(1));
+        rows.push([title, sObj.score, sObj.maxScore]);
+      }
+    }
+    rows.push([]);
+
+    rows.push(["ПОДРОБНЫЙ РАЗБОР ОТВЕТОВ ПО ЗАДАНИЯМ"]);
+    rows.push(["№", "Задание", "Пункт", "Ответ ученика", "Правильный ответ", "Результат", "Балл", "Пояснение"]);
+
+    let itemIndex = 1;
+    for (const [qid, qRes] of Object.entries(evaluation.questions || {})) {
+      const isCorrect = qRes.isCorrect;
+      rows.push([
+        itemIndex++,
+        `Задание ${qRes.taskNumber}`,
+        qid,
+        qRes.userAnswer || "(нет ответа)",
+        qRes.expected || "",
+        isCorrect ? "Верно" : "Ошибка",
+        isCorrect ? 1 : 0,
+        qRes.explanation || ""
+      ]);
+    }
+
+    const csvContent = "\uFEFF" + rows.map(r => 
+      r.map(cell => {
+        const str = String(cell ?? "").replace(/"/g, '""');
+        return `"${str}"`;
+      }).join(";")
+    ).join("\r\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeName = (studentName + "_" + testTitle).replace(/[^a-zA-Zа-яА-Я0-9_-]/g, "_");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Результат_${safeName}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   },
 
   /**
