@@ -76,28 +76,6 @@ const UI = {
       updateNameValidation();
     }
 
-    // Teacher Name Input - dynamic validation & micro-interactions (Optional)
-    const teacherNameInput = document.getElementById("teacher-name");
-    if (teacherNameInput) {
-      const updateTeacherValidation = () => {
-        const val = teacherNameInput.value.trim();
-        const validIndicator = document.getElementById("teacher-valid-indicator");
-        const teacherCard = document.getElementById("teacher-step-card");
-
-        if (val.length >= 2) {
-          if (validIndicator) validIndicator.classList.add("active");
-          if (teacherCard) teacherCard.classList.add("teacher-filled");
-        } else {
-          if (validIndicator) validIndicator.classList.remove("active");
-          if (teacherCard) teacherCard.classList.remove("teacher-filled");
-        }
-      };
-
-      teacherNameInput.addEventListener("input", updateTeacherValidation);
-      teacherNameInput.addEventListener("change", updateTeacherValidation);
-      updateTeacherValidation();
-    }
-
     // Section Tab Switching
     document.querySelectorAll(".section-tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -179,6 +157,8 @@ const UI = {
     if (typeof TEST_DATA !== "undefined") {
       TEST_DATA.currentCourse = courseId;
     }
+    const curRadio = document.querySelector(`input[name="test-course"][value="${courseId}"]`);
+    if (curRadio) curRadio.checked = true;
     this.updateCourseBadge();
     this.renderUnitSelector(courseId);
     this.initUnitSelector();
@@ -196,7 +176,7 @@ const UI = {
     const badge = document.getElementById("selected-course-badge");
     if (badge) {
       if (this.currentCourse === "gogetter1") {
-        badge.textContent = "Go Getter 1 • Level A1 (Beginner — Coming Soon)";
+        badge.textContent = "Go Getter 1 • Level A1 (Beginner)";
       } else if (this.currentCourse === "gogetter2") {
         badge.textContent = "Go Getter 2 • Level A1+ (Elementary)";
       } else if (this.currentCourse === "gogetter4") {
@@ -214,22 +194,8 @@ const UI = {
     const grid = document.getElementById("unit-selector-grid");
     if (!grid || typeof TEST_DATA === "undefined") return;
 
-    const unitsList = TEST_DATA.getUnitsList(courseId);
-    if (!unitsList || unitsList.length === 0) {
-      grid.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 2.25rem 1.5rem; text-align: center; background: #FFF5F7; border: 2px dashed #FDA4AF; border-radius: 16px; margin: 0.5rem 0;">
-          <span style="font-size: 2.5rem; display: block; margin-bottom: 0.6rem;">🌸</span>
-          <h3 style="color: #BE185D; margin-bottom: 0.4rem; font-size: 1.2rem;">Go Getter 1 (Level A1)</h3>
-          <p style="color: #64748B; font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.25rem; line-height: 1.5;">
-            Tests for Go Getter 1 are coming soon! Please select <strong>Go Getter 2</strong>, <strong>Go Getter 3</strong>, or <strong>Go Getter 4</strong> to start testing.
-          </p>
-          <button type="button" class="btn btn-secondary" onclick="TEST_UI.onSelectCourse('gogetter2'); const r = document.querySelector('input[name=test-course][value=gogetter2]'); if (r) r.checked = true;" style="font-weight: 700;">
-            Go to Go Getter 2 →
-          </button>
-        </div>
-      `;
-      return;
-    }
+    const rawList = TEST_DATA.getUnitsList(courseId);
+    const unitsList = (rawList && rawList.length > 0) ? rawList : TEST_DATA.getUnitsList("gogetter2");
 
     let html = "";
     unitsList.forEach((u, idx) => {
@@ -281,6 +247,9 @@ const UI = {
    */
   onSelectUnit(unitKey) {
     this.currentUnit = unitKey;
+    const unitRadio = document.querySelector(`input[name="test-unit"][value="${unitKey}"]`);
+    if (unitRadio) unitRadio.checked = true;
+
     const unitsList = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList(this.currentCourse) : [];
     const info = unitsList.find((u) => u.id === unitKey) || {
       id: unitKey,
@@ -351,16 +320,24 @@ const UI = {
       varBDesc.textContent = `Photocopiable ${info.title} Variant B (${info.points || 30} pts)`;
     }
 
+    const courseLabels = {
+      gogetter1: "Go Getter 1",
+      gogetter2: "Go Getter 2",
+      gogetter3: "Go Getter 3",
+      gogetter4: "Go Getter 4"
+    };
+    const courseTitle = courseLabels[this.currentCourse] || "Go Getter";
+
     const headerLogoBadge = document.getElementById("app-logo-badge");
     if (headerLogoBadge && this.activeScreen === "start") {
-      headerLogoBadge.textContent = unitKey === "mid_year" ? "1-4" : (unitKey === "end_of_year" ? "1-8" : info.number);
+      headerLogoBadge.textContent = unitKey === "mid_year" ? "1–4" : (unitKey === "end_of_year" ? "1–8" : info.number);
     }
 
     const headerTitle = document.getElementById("app-header-title");
     if (headerTitle && this.activeScreen === "start") {
-      if (unitKey === "mid_year") headerTitle.textContent = "Language Test • Mid-Year (Units 1–4)";
-      else if (unitKey === "end_of_year") headerTitle.textContent = "Language Test • End-of-Year (Units 1–8)";
-      else headerTitle.textContent = `Language Test • Unit ${info.number}`;
+      if (unitKey === "mid_year") headerTitle.textContent = `${courseTitle} • Mid-Year (Units 1–4)`;
+      else if (unitKey === "end_of_year") headerTitle.textContent = `${courseTitle} • End-of-Year (Units 1–8)`;
+      else headerTitle.textContent = `${courseTitle} • Unit ${info.number}`;
     }
 
     const headerSubtitle = document.getElementById("app-header-subtitle");
@@ -412,16 +389,6 @@ const UI = {
    */
   resumeSession(saved) {
     this.student = saved.student;
-    if (saved.student) {
-      const teacherInput = document.getElementById("teacher-name");
-      if (teacherInput && saved.student.teacher) {
-        teacherInput.value = saved.student.teacher;
-        const validIndicator = document.getElementById("teacher-valid-indicator");
-        const teacherCard = document.getElementById("teacher-step-card");
-        if (validIndicator) validIndicator.classList.add("active");
-        if (teacherCard) teacherCard.classList.add("teacher-filled");
-      }
-    }
     this.currentCourse = saved.course || (saved.student && saved.student.course) || "gogetter3";
     if (typeof TEST_DATA !== "undefined") {
       TEST_DATA.currentCourse = this.currentCourse;
@@ -457,8 +424,6 @@ const UI = {
   handleStartTest() {
     const nameEl = document.getElementById("student-name");
     const fullName = nameEl ? nameEl.value.trim() : "";
-    const teacherEl = document.getElementById("teacher-name");
-    const teacher = teacherEl ? teacherEl.value.trim() : "";
     const courseRadio = document.querySelector('input[name="test-course"]:checked');
     const course = courseRadio ? courseRadio.value : this.currentCourse || "gogetter3";
     const unitRadio = document.querySelector('input[name="test-unit"]:checked');
@@ -490,7 +455,7 @@ const UI = {
     }
     this.currentUnit = unit;
     this.currentVariant = variant;
-    this.student = { fullName, firstName, lastName, teacher, studentClass: "", variant, unit, course };
+    this.student = { fullName, firstName, lastName, studentClass: "", variant, unit, course };
     this.answers = {};
     this.activeSection = "vocabulary";
 
@@ -599,28 +564,47 @@ const UI = {
     const variant = TEST_DATA.getTest(this.currentUnit, this.currentVariant, this.currentCourse);
     if (!variant) return;
 
+    // Course title, unit name, variant label for top header
+    const courseLabels = {
+      gogetter1: "Go Getter 1",
+      gogetter2: "Go Getter 2",
+      gogetter3: "Go Getter 3",
+      gogetter4: "Go Getter 4"
+    };
+    const courseTitle = courseLabels[this.currentCourse] || "Go Getter";
+
+    const unitNum = this.currentUnit.replace("unit", "");
+    let testName = "";
+    if (this.currentUnit === "mid_year") {
+      testName = "Mid-Year Test (Units 1–4)";
+    } else if (this.currentUnit === "end_of_year") {
+      testName = "End-of-Year Test (Units 1–8)";
+    } else {
+      testName = `Unit ${unitNum}`;
+    }
+
+    const variantLabel = this.currentVariant === "variantB" ? "Variant B" : "Variant A";
+    const fullTestTitle = `${courseTitle} • ${testName} • ${variantLabel}`;
+
     // Header badge
     const badge = document.getElementById("active-variant-badge");
-    if (badge) badge.textContent = variant.title;
+    if (badge) badge.textContent = fullTestTitle;
 
     // Header logo badge and title
-    const unitNum = this.currentUnit.replace("unit", "");
     const logoBadge = document.getElementById("app-logo-badge");
     if (logoBadge) {
-      logoBadge.textContent = this.currentUnit === "mid_year" ? "1-4" : (this.currentUnit === "end_of_year" ? "1-8" : unitNum);
+      logoBadge.textContent = this.currentUnit === "mid_year" ? "1–4" : (this.currentUnit === "end_of_year" ? "1–8" : unitNum);
     }
 
     const headerTitle = document.getElementById("app-header-title");
     if (headerTitle) {
-      if (this.currentUnit === "mid_year") headerTitle.textContent = "Language Test • Mid-Year (Units 1–4)";
-      else if (this.currentUnit === "end_of_year") headerTitle.textContent = "Language Test • End-of-Year (Units 1–8)";
-      else headerTitle.textContent = `Language Test • Unit ${unitNum}`;
+      headerTitle.textContent = fullTestTitle;
     }
 
     const headerSubtitle = document.getElementById("app-header-subtitle");
     if (headerSubtitle) {
       const unitInfo = (typeof TEST_DATA !== "undefined" && TEST_DATA.getUnitsList) ? TEST_DATA.getUnitsList(this.currentCourse).find(u => u.id === this.currentUnit) : null;
-      headerSubtitle.textContent = unitInfo ? unitInfo.title : variant.title;
+      headerSubtitle.textContent = unitInfo ? `${unitInfo.title} • Language Test ${variantLabel.replace("Variant ", "")}` : `Language Test ${variantLabel.replace("Variant ", "")}`;
     }
 
     // Dynamic Section Tabs Navigation
@@ -2056,7 +2040,13 @@ const UI = {
     const evaluation = Validator.evaluateTest(this.currentVariant, this.answers, this.currentUnit, this.currentCourse);
 
     // Prefix variantTitle with friendly course name for teacher reporting & student view
-    const courseTitle = this.currentCourse === "gogetter4" ? "Go Getter 4" : "Go Getter 3";
+    const courseLabels = {
+      gogetter1: "Go Getter 1",
+      gogetter2: "Go Getter 2",
+      gogetter3: "Go Getter 3",
+      gogetter4: "Go Getter 4"
+    };
+    const courseTitle = courseLabels[this.currentCourse] || "Go Getter";
     if (evaluation && evaluation.variantTitle && !evaluation.variantTitle.includes("Go Getter")) {
       evaluation.variantTitle = `${courseTitle} • ${evaluation.variantTitle}`;
     }
@@ -2099,7 +2089,7 @@ const UI = {
         <h2>${grade.title}</h2>
         <p style="color:var(--text-muted); max-width:540px; margin:0 auto 1rem;">${grade.message}</p>
         <div class="student-meta">
-          👤 <strong>${this.student.fullName || `${this.student.firstName} ${this.student.lastName}`.trim()}</strong>${this.student.studentClass ? ` • 🏫 Class: ${this.student.studentClass}` : ''}${this.student.teacher ? ` • 👩‍🏫 Teacher: ${this.student.teacher}` : ''} • 📑 ${evaluation.variantTitle}
+          👤 <strong>${this.student.fullName || `${this.student.firstName} ${this.student.lastName}`.trim()}</strong>${this.student.studentClass ? ` • 🏫 Class: ${this.student.studentClass}` : ''} • 📑 ${evaluation.variantTitle}
         </div>
 
         <div class="section-scores-grid">

@@ -44,10 +44,6 @@
           <input type="radio" name="test-course" id="course-radio-gogetter4" value="gogetter4">
         </div>
         <input type="text" id="student-name" value="Test Student" placeholder="e.g. Sarah Jenkins">
-        <div id="teacher-step-card">
-          <input type="text" id="teacher-name">
-          <span id="teacher-valid-indicator"></span>
-        </div>
         <span id="selected-unit-badge"></span>
         <div id="unit-selector-grid">
           <input type="radio" name="test-unit" id="unit-radio-unit1" value="unit1" checked>
@@ -123,7 +119,16 @@
   <script src="js/data/end_of_year.js"></script>
 
   <!-- Load Go Getter 1 Modules -->
-  <script src="js/data/gg1/gg1_placeholder.js"></script>
+  <script src="js/data/gg1/gg1_unit1.js"></script>
+  <script src="js/data/gg1/gg1_unit2.js"></script>
+  <script src="js/data/gg1/gg1_unit3.js"></script>
+  <script src="js/data/gg1/gg1_unit4.js"></script>
+  <script src="js/data/gg1/gg1_mid_year.js"></script>
+  <script src="js/data/gg1/gg1_unit5.js"></script>
+  <script src="js/data/gg1/gg1_unit6.js"></script>
+  <script src="js/data/gg1/gg1_unit7.js"></script>
+  <script src="js/data/gg1/gg1_unit8.js"></script>
+  <script src="js/data/gg1/gg1_end_of_year.js"></script>
 
   <!-- Load Go Getter 2 Modules -->
   <script src="js/data/gg2_unit1.js"></script>
@@ -470,11 +475,15 @@
       const gg2EndAudio = document.getElementById("section-panel-listening").querySelector("audio");
       assert("GG2 End-of-Year audio source is gg2_track_11_end_of_year.mp3", gg2EndAudio && gg2EndAudio.getAttribute("src").includes("gg2_track_11_end_of_year.mp3"));
 
-      // 14. Test Course Switching to Go Getter 1 (Empty State)
+      // 14. Test Course Switching to Go Getter 1 (Full 10 Units & No Coming-Soon Box)
       UI.onSelectCourse("gogetter1");
       assert("Current course switched to gogetter1", UI.currentCourse === "gogetter1");
       const gg1Units = TEST_DATA.getUnitsList("gogetter1");
-      assert("Go Getter 1 has 0 units currently", gg1Units.length === 0);
+      assert("Go Getter 1 has 10 units (8 units + 2 exams)", gg1Units.length === 10);
+      assert("Go Getter 1 includes mid_year", gg1Units.some(u => u.id === "mid_year"));
+      assert("Go Getter 1 includes end_of_year", gg1Units.some(u => u.id === "end_of_year"));
+      assert("Go Getter 1 selector grid has 10 unit cards", document.querySelectorAll("#unit-selector-grid .unit-card-box").length === 10);
+      assert("Go Getter 1 renders no placeholder coming-soon box", !document.getElementById("unit-selector-grid").textContent.includes("coming soon"));
 
       // Switch back to gogetter4
       UI.onSelectCourse("gogetter4");
@@ -591,47 +600,61 @@
       assert("GG4 Unit 7 Task 4 inputs have empty placeholder", !u7FirstInput.placeholder);
 
       // ======================================================================
-      // 16. OPTIONAL TEACHER FIELD & REPORTING
+      // 16. HEADER DISPLAY (TEXTBOOK • TEST NUMBER • VARIANT) & REMOVAL OF TEACHER CARD
       // ======================================================================
-      const teacherInput = document.getElementById("teacher-name");
       const teacherCard = document.getElementById("teacher-step-card");
-      const teacherIndicator = document.getElementById("teacher-valid-indicator");
+      assert("Teacher step card does NOT exist in DOM (removed as requested)", !teacherCard);
 
-      assert("Teacher name input exists in DOM", !!teacherInput);
-      assert("Teacher name input has no placeholder", !teacherInput.placeholder);
-      assert("Teacher card element exists in DOM", !!teacherCard);
-
-      // Test 1: Empty teacher is allowed and optional (does not block start)
-      teacherInput.value = "";
-      document.getElementById("student-name").value = "Alice Cooper";
-      UI.handleStartTest();
-      assert("Starting test with empty teacher succeeds", UI.activeScreen === "test");
-      assert("Student object has empty teacher string", UI.student.teacher === "");
-
-      // Test 2: Filled teacher is saved in UI.student
+      // Test 1: Starting test works with student name only
       UI.switchScreen("start");
-      teacherInput.value = "Mrs. Smith";
-      teacherInput.dispatchEvent(new Event("input"));
-      assert("Teacher input reflects in teacher-filled class", teacherCard.classList.contains("teacher-filled"));
-      assert("Teacher input reflects in valid indicator active", teacherIndicator.classList.contains("active"));
+      document.getElementById("student-name").value = "Alice Cooper";
+      UI.onSelectCourse("gogetter3");
+      UI.onSelectUnit("unit1");
+      const varARadio = document.querySelector('input[name="test-variant"][value="variantA"]');
+      if (varARadio) varARadio.checked = true;
 
       UI.handleStartTest();
-      assert("Starting test with teacher succeeds", UI.activeScreen === "test");
-      assert("Student object contains teacher name", UI.student.teacher === "Mrs. Smith");
+      assert("Starting test with student name succeeds", UI.activeScreen === "test");
+      assert("Student object has student name", UI.student.fullName === "Alice Cooper");
 
-      // Test 3: Session persistence
-      UI.saveCurrentSession();
-      const savedSession = Storage.getSession();
-      assert("Saved session contains teacher", savedSession.student.teacher === "Mrs. Smith");
+      // Test 2: Top Header & Variant Badge for GG3 Unit 1 Variant A
+      const headerTitleEl = document.getElementById("app-header-title");
+      const activeBadgeEl = document.getElementById("active-variant-badge");
+      assert("Header title displays 'Go Getter 3 • Unit 1 • Variant A'", headerTitleEl.textContent === "Go Getter 3 • Unit 1 • Variant A");
+      assert("Active variant badge displays 'Go Getter 3 • Unit 1 • Variant A'", activeBadgeEl.textContent === "Go Getter 3 • Unit 1 • Variant A");
 
-      // Test 4: Session resume restores teacher input
-      teacherInput.value = "";
-      teacherCard.classList.remove("teacher-filled");
-      UI.resumeSession(savedSession);
-      assert("Resuming session restores teacher input value", teacherInput.value === "Mrs. Smith");
-      assert("Resuming session restores teacher-filled class", teacherCard.classList.contains("teacher-filled"));
+      // Test 3: Top Header & Variant Badge for GG3 Unit 5 Variant B
+      UI.currentUnit = "unit5";
+      UI.currentVariant = "variantB";
+      UI.renderTestUI();
+      assert("Header title displays 'Go Getter 3 • Unit 5 • Variant B'", headerTitleEl.textContent === "Go Getter 3 • Unit 5 • Variant B");
+      assert("Active variant badge displays 'Go Getter 3 • Unit 5 • Variant B'", activeBadgeEl.textContent === "Go Getter 3 • Unit 5 • Variant B");
 
-      // Test 5: TeacherService.submitTestResults payload includes teacher
+      // Test 4: Top Header & Variant Badge for GG2 Mid-Year Variant B
+      UI.currentCourse = "gogetter2";
+      UI.currentUnit = "mid_year";
+      UI.currentVariant = "variantB";
+      UI.renderTestUI();
+      assert("Header title displays 'Go Getter 2 • Mid-Year Test (Units 1–4) • Variant B'", headerTitleEl.textContent === "Go Getter 2 • Mid-Year Test (Units 1–4) • Variant B");
+      assert("Active variant badge displays 'Go Getter 2 • Mid-Year Test (Units 1–4) • Variant B'", activeBadgeEl.textContent === "Go Getter 2 • Mid-Year Test (Units 1–4) • Variant B");
+
+      // Test 5: Top Header & Variant Badge for GG4 End-of-Year Variant A
+      UI.currentCourse = "gogetter4";
+      UI.currentUnit = "end_of_year";
+      UI.currentVariant = "variantA";
+      UI.renderTestUI();
+      assert("Header title displays 'Go Getter 4 • End-of-Year Test (Units 1–8) • Variant A'", headerTitleEl.textContent === "Go Getter 4 • End-of-Year Test (Units 1–8) • Variant A");
+      assert("Active variant badge displays 'Go Getter 4 • End-of-Year Test (Units 1–8) • Variant A'", activeBadgeEl.textContent === "Go Getter 4 • End-of-Year Test (Units 1–8) • Variant A");
+
+      // Test 6: Top Header & Variant Badge for GG1 Unit 2 Variant A
+      UI.currentCourse = "gogetter1";
+      UI.currentUnit = "unit2";
+      UI.currentVariant = "variantA";
+      UI.renderTestUI();
+      assert("Header title displays 'Go Getter 1 • Unit 2 • Variant A'", headerTitleEl.textContent === "Go Getter 1 • Unit 2 • Variant A");
+      assert("Active variant badge displays 'Go Getter 1 • Unit 2 • Variant A'", activeBadgeEl.textContent === "Go Getter 1 • Unit 2 • Variant A");
+
+      // Test 7: TeacherService submission operates cleanly
       let capturedPayload = null;
       const originalArchive = Storage.archiveSubmission;
       Storage.archiveSubmission = function(rec) {
@@ -639,7 +662,7 @@
         return originalArchive.call(Storage, rec);
       };
       const mockEvaluation = {
-        variantTitle: "Unit 1 Test A",
+        variantTitle: "Go Getter 3 • Unit 1 • Variant A",
         totalScore: 35,
         totalMax: 35,
         percentage: 100,
@@ -649,12 +672,8 @@
       };
       TeacherService.submitTestResults(UI.student, mockEvaluation);
       Storage.archiveSubmission = originalArchive;
-      assert("TeacherService payload includes teacher property", !!capturedPayload && capturedPayload.teacher === "Mrs. Smith");
-
-      // Test 6: TeacherService payload defaults to '—' when teacher is empty
-      UI.student.teacher = "";
-      TeacherService.submitTestResults(UI.student, mockEvaluation);
-      assert("TeacherService payload defaults to '—' when teacher is empty", Storage.getSubmissionsArchive()[0].payload.teacher === "—");
+      assert("TeacherService archives submission cleanly", !!capturedPayload && capturedPayload.studentName === "Alice Cooper");
+      assert("TeacherService payload defaults teacher to '—'", capturedPayload.teacher === "—");
 
     } catch (e) {
       assert("Unhandled Exception in UI Test Suite", false, e.toString() + "\n" + e.stack);

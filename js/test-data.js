@@ -15,12 +15,33 @@ const TEST_DATA = {
       level: "A1",
       badge: "Level A1",
       title: "Go Getter 1 (Level A1)",
-      desc: "Beginner • Units coming soon",
+      desc: "Beginner • 8 Units + 2 Exams • 30–50 pts",
       coverImage: "assets/images/cover_gg1.png",
-      isComingSoon: true,
-      units: {},
+      units: {
+        get unit1() { return window.GG1_UNIT_1_DATA; },
+        get unit2() { return window.GG1_UNIT_2_DATA; },
+        get unit3() { return window.GG1_UNIT_3_DATA; },
+        get unit4() { return window.GG1_UNIT_4_DATA; },
+        get mid_year() { return window.GG1_MID_YEAR_DATA; },
+        get unit5() { return window.GG1_UNIT_5_DATA; },
+        get unit6() { return window.GG1_UNIT_6_DATA; },
+        get unit7() { return window.GG1_UNIT_7_DATA; },
+        get unit8() { return window.GG1_UNIT_8_DATA; },
+        get end_of_year() { return window.GG1_END_OF_YEAR_DATA; }
+      },
       getUnitsList() {
-        return [];
+        return [
+          { id: "unit1", number: 1, title: "Family & Friends", icon: "👋", points: 30, desc: "Family members, Countries & Nationalities, to be, Possessive 's" },
+          { id: "unit2", number: 2, title: "Clothes & Possessions", icon: "👕", points: 30, desc: "Clothes, Gadgets, Demonstratives (this/that/these/those), to be questions" },
+          { id: "unit3", number: 3, title: "House & Home", icon: "🏠", points: 30, desc: "Rooms, Furniture, There is / There are, Prepositions of place" },
+          { id: "unit4", number: 4, title: "Appearance & Body", icon: "👁️", points: 30, desc: "Body parts, Adjectives, Have got, Possessive adjectives" },
+          { id: "mid_year", number: "1–4", title: "Mid-Year Test", icon: "⭐", points: 50, desc: "Units 1–4 Review Exam: Vocab, Grammar, Audio Track 10, Reading" },
+          { id: "unit5", number: 5, title: "Abilities & Free Time", icon: "⚽", points: 30, desc: "Action verbs, Outdoor activities, Can / Can't, Suggestions" },
+          { id: "unit6", number: 6, title: "Daily Routine & Time", icon: "⏰", points: 30, desc: "Daily activities, Months, Present Simple he/she/it, Telling time" },
+          { id: "unit7", number: 7, title: "Animals & Pets", icon: "🐾", points: 30, desc: "Animals, Present Simple negatives & questions, Buying tickets" },
+          { id: "unit8", number: 8, title: "Sports & Weather", icon: "☀️", points: 30, desc: "Sports, Healthy habits, Like/hate + -ing, Object pronouns, Weather" },
+          { id: "end_of_year", number: "1–8", title: "End-of-Year Test", icon: "🏆", points: 50, desc: "Units 1–8 Full Review Exam: Vocab, Grammar, Audio Track 11, Reading" }
+        ];
       }
     },
 
@@ -202,7 +223,7 @@ const TEST_DATA = {
 
   getCoursesList() {
     return [
-      { id: "gogetter1", name: "Go Getter 1", level: "A1", badge: "Level A1", title: "Go Getter 1", desc: "Beginner • Units coming soon", coverImage: "assets/images/cover_gg1.png", isComingSoon: true },
+      { id: "gogetter1", name: "Go Getter 1", level: "A1", badge: "Level A1", title: "Go Getter 1", desc: "Beginner • 8 Units + 2 Exams (30–50 pts)", coverImage: "assets/images/cover_gg1.png" },
       { id: "gogetter2", name: "Go Getter 2", level: "A1+", badge: "Level A1+", title: "Go Getter 2", desc: "Elementary • 8 Units + 2 Exams (30–50 pts)", coverImage: "assets/images/cover_gg2.jpg" },
       { id: "gogetter3", name: "Go Getter 3", level: "A2", badge: "Level A2", title: "Go Getter 3", desc: "Pre-Intermediate • 8 Units + 2 Exams (30–50 pts)", coverImage: "assets/images/cover_gg3.png" },
       { id: "gogetter4", name: "Go Getter 4", level: "A2+ / B1", badge: "Level A2+ / B1", title: "Go Getter 4", desc: "Intermediate • 8 Units + 2 Exams (35–50 pts)", coverImage: "assets/images/cover_gg4.jpg" }

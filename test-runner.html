@@ -33,7 +33,16 @@
   <script src="js/data/end_of_year.js"></script>
 
   <!-- Load Go Getter 1 Modules -->
-  <script src="js/data/gg1/gg1_placeholder.js"></script>
+  <script src="js/data/gg1/gg1_unit1.js"></script>
+  <script src="js/data/gg1/gg1_unit2.js"></script>
+  <script src="js/data/gg1/gg1_unit3.js"></script>
+  <script src="js/data/gg1/gg1_unit4.js"></script>
+  <script src="js/data/gg1/gg1_mid_year.js"></script>
+  <script src="js/data/gg1/gg1_unit5.js"></script>
+  <script src="js/data/gg1/gg1_unit6.js"></script>
+  <script src="js/data/gg1/gg1_unit7.js"></script>
+  <script src="js/data/gg1/gg1_unit8.js"></script>
+  <script src="js/data/gg1/gg1_end_of_year.js"></script>
 
   <!-- Load Go Getter 2 Modules -->
   <script src="js/data/gg2_unit1.js"></script>
@@ -342,10 +351,75 @@
         assert(`[GG2 ${examKey} Variant B] Zero mistakes`, evalB.mistakes.length === 0, `Mistakes: ${evalB.mistakes.map(m=>m.id).join(',')}`);
       }
 
-      // 2g. Go Getter 1 and Courses List
+      // 2g. Go Getter 1 Units 1 to 8 (30 points each, Variant A & Variant B)
+      const gg1Units = ["unit1", "unit2", "unit3", "unit4", "unit5", "unit6", "unit7", "unit8"];
+      for (const uKey of gg1Units) {
+        const testA = TEST_DATA.getTest(uKey, "variantA", "gogetter1");
+        const testB = TEST_DATA.getTest(uKey, "variantB", "gogetter1");
+        assert(`[GG1 ${uKey}] Variant A defined`, !!testA);
+        assert(`[GG1 ${uKey}] Variant B defined`, !!testB);
+        assert(`[GG1 ${uKey}] Variant A total points is 30`, testA.totalPoints === 30);
+        assert(`[GG1 ${uKey}] Variant B total points is 30`, testB.totalPoints === 30);
+
+        // Perfect score Variant A
+        const perfectA = {};
+        for (const sec of Object.values(testA.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectA[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalA = Validator.evaluateTest("variantA", perfectA, uKey, "gogetter1");
+        assert(`[GG1 ${uKey} Variant A] Total Score is 30/30`, evalA.totalScore === 30, `Got: ${evalA.totalScore}`);
+        assert(`[GG1 ${uKey} Variant A] Percentage is 100%`, evalA.percentage === 100);
+        assert(`[GG1 ${uKey} Variant A] Zero mistakes`, evalA.mistakes.length === 0, `Mistakes: ${evalA.mistakes.map(m=>m.id).join(',')}`);
+
+        // Perfect score Variant B
+        const perfectB = {};
+        for (const sec of Object.values(testB.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectB[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalB = Validator.evaluateTest("variantB", perfectB, uKey, "gogetter1");
+        assert(`[GG1 ${uKey} Variant B] Total Score is 30/30`, evalB.totalScore === 30, `Got: ${evalB.totalScore}`);
+        assert(`[GG1 ${uKey} Variant B] Percentage is 100%`, evalB.percentage === 100);
+        assert(`[GG1 ${uKey} Variant B] Zero mistakes`, evalB.mistakes.length === 0, `Mistakes: ${evalB.mistakes.map(m=>m.id).join(',')}`);
+      }
+
+      // 2h. Go Getter 1 Mid-Year and End-of-Year Exams (50 points each, audio tracks attached)
+      for (const examKey of ["mid_year", "end_of_year"]) {
+        const testA = TEST_DATA.getTest(examKey, "variantA", "gogetter1");
+        assert(`[GG1 ${examKey}] Variant A defined`, !!testA);
+        assert(`[GG1 ${examKey}] Variant A total points is 50`, testA.totalPoints === 50);
+        assert(`[GG1 ${examKey}] Has audioTrack`, !!testA.audioTrack);
+
+        // Check 5 sections exist
+        const aSecs = Object.keys(testA.sections);
+        assert(`[GG1 ${examKey} Variant A] has 5 sections`, aSecs.length === 5 && aSecs.includes("listening") && aSecs.includes("reading"));
+
+        // Perfect score Variant A
+        const perfectA = {};
+        for (const sec of Object.values(testA.sections)) {
+          for (const task of sec.tasks) {
+            for (const [qId, ansObj] of Object.entries(task.answers)) {
+              perfectA[qId] = ansObj.expected[0];
+            }
+          }
+        }
+        const evalA = Validator.evaluateTest("variantA", perfectA, examKey, "gogetter1");
+        assert(`[GG1 ${examKey} Variant A] Total Score is 50/50`, evalA.totalScore === 50, `Got: ${evalA.totalScore}`);
+        assert(`[GG1 ${examKey} Variant A] Percentage is 100%`, evalA.percentage === 100);
+        assert(`[GG1 ${examKey} Variant A] Zero mistakes`, evalA.mistakes.length === 0, `Mistakes: ${evalA.mistakes.map(m=>m.id).join(',')}`);
+      }
+
+      // 2i. Go Getter 1 and Courses List
       const allCourses = TEST_DATA.getCoursesList();
       assert("Courses list contains 4 courses (GG1, GG2, GG3, GG4)", allCourses.length === 4);
-      assert("Go Getter 1 is marked coming soon", allCourses.find(c => c.id === "gogetter1")?.isComingSoon === true);
+      assert("Go Getter 1 is available with 10 units (8 units + 2 exams)", TEST_DATA.getUnitsList("gogetter1").length === 10);
       assert("All 4 courses have cover images", allCourses.every(c => typeof c.coverImage === "string" && c.coverImage.length > 0));
 
       // 3. Normalization & Contraction Equivalence Tests
