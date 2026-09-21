@@ -1,15 +1,20 @@
-# Language Test Unit 1 — Pearson English Interactive Testing
+# Language Tests Units 1–8 — Pearson English Interactive Testing
 
-An interactive, kid-friendly educational web application based on the official **Pearson English Language Test Unit 1** (Photocopiable materials). Fully responsive, designed in clear and accessible English (A2–B1 level), featuring instant grading with pedagogical explanations, auto-saving, and automated teacher reporting via **Google Sheets** and **Telegram**.
+An interactive, kid-friendly educational web application based on the official **Pearson English Language Tests** (Photocopiable materials). Fully responsive, featuring instant grading with pedagogical explanations, auto-saving, Excel export, and automated teacher reporting via **Google Sheets** and **Telegram**.
+
+### 📚 Supported Courses:
+- **Go Getter 1 (Level A1 / Beginner)**: Units 1–8, Mid-Year Exam (Audio Track 10), End-of-Year Exam (Audio Track 11) with original illustrations and family trees. (30–50 pts)
+- **Go Getter 2 (Level A1+ / Elementary)**: Units 1–8 + Exams. (30–50 pts)
+- **Go Getter 3 (Level A2 / Pre-Intermediate)**: Units 1–8 + Exams. (30–50 pts)
+- **Go Getter 4 (Level A2+/B1 / Intermediate)**: Units 1–8 + Exams. (35–50 pts)
 
 ---
 
 ## 🌟 Key Features
 
-1. **Dual Test Variants (A & B)**:
-   - **Variant A**: Focuses on Mrs Cook (accessories) and Gregory Cook (clothes & appearance).
-   - **Variant B**: Focuses on Mrs Smith (accessories) and Lee (clothes & appearance).
-   - Exact fidelity to Pearson print sheets (35 points total: 16 Vocabulary, 14 Grammar, 5 Communication).
+1. **Dual Test Variants (A & B) Across All Units**:
+   - Exact fidelity to Pearson print sheets (1 point per item, matching textbook totals).
+   - Authentic illustrations, dialogues, and audio listening tracks.
 
 2. **Interactive Question Types**:
    - **Task 1 (5 pts)**: Picture description with interactive Word Bank (clickable chips or direct typing) and custom vector SVG illustrations.

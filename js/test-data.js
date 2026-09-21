@@ -5,7 +5,7 @@
  */
 
 const TEST_DATA = {
-  currentCourse: "gogetter2",
+  currentCourse: "gogetter1",
   currentUnit: "unit1",
 
   courses: {

@@ -6,7 +6,7 @@
 const UI = {
   activeScreen: "start",
   activeSection: "vocabulary",
-  currentCourse: "gogetter3",
+  currentCourse: "gogetter1",
   currentUnit: "unit1",
   currentVariant: "variantA",
   student: null,
