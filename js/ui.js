@@ -59,6 +59,11 @@ const UI = {
         const validIndicator = document.getElementById("name-valid-indicator");
         const avatarBadge = document.getElementById("name-avatar-badge");
         const nameCard = document.getElementById("student-name-card");
+        const errorBadge = document.getElementById("name-error-badge");
+
+        if (errorBadge && val.length > 0) {
+          errorBadge.style.display = "none";
+        }
 
         if (val.length >= 2) {
           if (validIndicator) validIndicator.classList.add("active");
@@ -510,7 +515,7 @@ const UI = {
             <strong>Welcome back, ${studentName}!</strong>
             <span>You have an unfinished test (Unit ${unitNum}, ${variantName}).</span>
           </div>
-          <div style="display:flex; gap: 0.5rem; flex-wrap:wrap;">
+          <div class="resume-banner-actions">
             <button type="button" class="btn btn-sm btn-primary" id="btn-resume-session">Resume Test</button>
             <button type="button" class="btn btn-sm btn-secondary" id="btn-discard-session">Start Fresh</button>
           </div>
@@ -579,15 +584,19 @@ const UI = {
 
     if (!fullName) {
       const nameCard = document.getElementById("student-name-card");
+      const errorBadge = document.getElementById("name-error-badge");
       if (nameCard) {
         nameCard.classList.remove("shake-attention");
         void nameCard.offsetWidth; // Force DOM reflow to re-trigger animation
         nameCard.classList.add("shake-attention");
       }
+      if (errorBadge) {
+        errorBadge.style.display = "flex";
+      }
       if (nameEl) {
         nameEl.focus();
+        nameEl.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-      alert("Please enter your name.");
       return;
     }
 

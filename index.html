@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Language Tests Units 1–8 — Pearson English Interactive Testing</title>
   <meta name="description" content="Interactive English Language Tests Units 1 to 8 based on Pearson Tests with automatic grading, error review, and teacher reporting.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20260922_1">
-  <link rel="stylesheet" href="css/components.css?v=20260922_1">
+  <link rel="stylesheet" href="css/style.css?v=20260922_2">
+  <link rel="stylesheet" href="css/components.css?v=20260922_2">
 </head>
 <body>
 
@@ -63,7 +63,7 @@
       <div id="resume-session-prompt" style="display: none; max-width: 620px; margin: 0 auto 1.5rem;"></div>
 
       <div class="start-card">
-        <form id="start-test-form">
+        <form id="start-test-form" novalidate>
           <!-- STEP 1: STUDENT NAME CARD -->
           <div class="name-step-card" id="student-name-card">
             <div class="step-header">
@@ -87,6 +87,12 @@
               <div class="name-valid-indicator" id="name-valid-indicator" title="Name entered!">
                 <span>✓</span>
               </div>
+            </div>
+
+            <!-- Accessible Inline Validation Error Banner (Stays inside form card, never overflows) -->
+            <div class="name-error-badge" id="name-error-badge" style="display: none;" role="alert">
+              <span>⚠️</span>
+              <span>Please enter your name to start the test (Введите имя)</span>
             </div>
             
             <div class="name-hint-row">

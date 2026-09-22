@@ -64,12 +64,30 @@ html {
   color: var(--text-main);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  width: 100%;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* App Container */
@@ -394,17 +412,21 @@ body {
 }
 
 .start-hero h2 {
-  font-size: 2.15rem;
+  font-size: clamp(1.4rem, 4.5vw, 2.15rem);
   font-weight: 800;
   color: var(--text-main);
   margin-bottom: 0.5rem;
   letter-spacing: -0.02em;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .start-hero p {
-  font-size: 1.05rem;
+  font-size: clamp(0.92rem, 2.5vw, 1.05rem);
   color: var(--text-muted);
   line-height: 1.5;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .start-card {
@@ -414,6 +436,7 @@ body {
   padding: 2.25rem;
   box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
   max-width: 620px;
+  width: 100%;
   margin: 0 auto;
   position: relative;
   animation: cardScaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -610,15 +633,35 @@ body {
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
 }
 
-.name-hint-row {
+.name-error-badge {
+  background: #FEF2F2;
+  border: 1.5px solid #FCA5A5;
+  color: #991B1B;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12);
+  animation: fadeIn 0.25s ease-out forwards;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.name-hint-row {
+  display: flex;
+  align-items: flex-start;
   gap: 0.4rem;
   font-size: 0.82rem;
   font-weight: 600;
   color: #6366F1;
   margin-top: 0.75rem;
   padding-left: 0.25rem;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 /* ==========================================================================
@@ -1134,19 +1177,46 @@ body {
 /* Resume prompt banner */
 .resume-banner {
   background: #EFF6FF;
-  border: 1px solid #BFDBFE;
+  border: 1.5px solid #BFDBFE;
   border-radius: var(--radius-md);
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+  width: 100%;
+  max-width: 100%;
 }
 
 .resume-banner-text {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: #1E40AF;
+  line-height: 1.45;
+  min-width: 0;
+  flex: 1;
+}
+
+.resume-banner-text strong {
+  display: block;
+  font-size: 1rem;
+  color: #1E3A8A;
+  margin-bottom: 0.2rem;
+  word-break: break-word;
+}
+
+.resume-banner-text span {
+  display: block;
+  word-break: break-word;
+}
+
+.resume-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 /* ==========================================================================
@@ -1740,16 +1810,35 @@ body {
   border-radius: var(--radius-md);
 }
 
-/* Media Queries for Responsiveness */
+/* ==========================================================================
+   Media Queries for Responsiveness across all devices (Tablets, iPhone, Galaxy)
+   ========================================================================== */
+
+/* Tablets & Smaller Laptops (<= 768px) */
 @media (max-width: 768px) {
+  /* Prevent iOS automatic zoom on focus across all inputs & selects */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="search"],
+  input[type="password"],
+  select,
+  textarea,
+  .name-input-field,
+  .synced-order-input {
+    font-size: 16px !important;
+  }
+
   .unit-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.65rem;
   }
   .app-container {
     padding: 1.25rem 0.85rem 4.5rem 0.85rem;
   }
 }
 
+/* Mobile Devices (<= 640px) */
 @media (max-width: 640px) {
   /* Header Mobile Optimization */
   .header-inner {
@@ -1808,6 +1897,27 @@ body {
     font-size: 0.78rem;
   }
 
+  /* Resume Banner Mobile Stack (Eliminates horizontal overflow) */
+  .resume-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .resume-banner-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .resume-banner-actions .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
   /* Test Progress Header */
   .progress-header {
     flex-wrap: wrap;
@@ -1832,6 +1942,39 @@ body {
   }
 
   /* Start Screen & Forms */
+  .start-hero {
+    margin: 1rem auto 1.5rem;
+    padding: 0 0.35rem;
+  }
+  .start-card {
+    padding: 1.25rem 0.9rem;
+    border-radius: 18px;
+  }
+  .name-step-card {
+    padding: 1rem 0.85rem;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+  }
+  .name-avatar-badge {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    font-size: 1.25rem;
+    border-radius: 10px;
+  }
+  .name-valid-indicator {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    font-size: 0.85rem;
+  }
+  .course-step-card,
+  .units-step-card,
+  .variant-step-card {
+    padding: 1rem 0.85rem;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+  }
   .name-grid {
     grid-template-columns: 1fr;
   }
@@ -1854,27 +1997,33 @@ body {
   .unit-preview-banner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.4rem;
+    gap: 0.35rem;
     padding: 0.75rem 0.85rem;
+    width: 100%;
   }
   .btn-start-animated {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     padding: 0.95rem 1.25rem;
+    justify-content: center;
   }
 
-  /* Section Tabs Mobile Grid */
+  /* Section Tabs Mobile Grid: 1 column touch cards */
   .section-tabs {
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    grid-template-columns: 1fr !important;
     gap: 0.4rem;
   }
   .section-tab-btn {
-    padding: 0.45rem 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
   }
 
   /* Task Cards & Components */
   .task-card {
-    padding: 1.1rem 0.9rem;
+    padding: 1.1rem 0.85rem;
     border-radius: 14px;
     margin-bottom: 1.25rem;
   }
@@ -1898,6 +2047,10 @@ body {
   .sentence-order-item {
     padding: 0.85rem;
     border-radius: 12px;
+    margin-bottom: 1.25rem;
+  }
+  .sentence-order-instruction {
+    min-width: 0;
   }
   .sentence-dropzone,
   .word-bank-pool {
@@ -1929,6 +2082,7 @@ body {
   .matching-select {
     width: 100%;
     min-width: unset;
+    font-size: 16px !important;
   }
 
   /* Circle choice pills */
@@ -1938,16 +2092,19 @@ body {
     padding: 0.6rem 0.3rem;
   }
   .choice-pill-btn {
-    padding: 0.2rem 0.55rem;
-    font-size: 0.82rem;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.85rem;
+    min-height: 36px;
   }
 
   /* Results Screen */
   .results-hero-card {
     padding: 1.5rem 1rem;
+    border-radius: 18px;
   }
   .section-scores-grid {
     grid-template-columns: 1fr;
+    gap: 0.65rem;
   }
   .student-meta {
     font-size: 0.85rem;
@@ -1961,6 +2118,7 @@ body {
   }
   .test-footer-actions .btn {
     width: 100%;
+    min-height: 44px;
   }
   .floating-help-btn {
     bottom: 1rem;
@@ -1973,6 +2131,7 @@ body {
   }
 }
 
+/* Very Small Mobile Screens (<= 420px, e.g. Samsung Galaxy A, iPhone SE) */
 @media (max-width: 420px) {
   .brand-titles h1 {
     font-size: 0.88rem;
@@ -1982,6 +2141,17 @@ body {
   }
   .save-indicator {
     display: none;
+  }
+  .start-card {
+    padding: 1rem 0.75rem;
+    border-radius: 16px;
+  }
+  .name-input-wrapper {
+    padding: 0.35rem 0.4rem 0.35rem 0.65rem;
+    gap: 0.5rem;
+  }
+  .resume-banner-actions {
+    grid-template-columns: 1fr;
   }
   .unit-cards-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1996,8 +2166,5 @@ body {
   .unit-card-pts {
     font-size: 0.68rem;
     padding: 0.1rem 0.35rem;
-  }
-  .section-tabs {
-    grid-template-columns: 1fr !important;
   }
 }
