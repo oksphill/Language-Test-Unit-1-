@@ -7,8 +7,8 @@
   <meta name="description" content="Interactive English Language Tests Units 1 to 8 based on Pearson Tests with automatic grading, error review, and teacher reporting.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20260921_7">
-  <link rel="stylesheet" href="css/components.css?v=20260921_7">
+  <link rel="stylesheet" href="css/style.css?v=20260922_1">
+  <link rel="stylesheet" href="css/components.css?v=20260922_1">
 </head>
 <body>
 
@@ -96,7 +96,7 @@
           </div>
 
           <!-- STEP 2: COURSE & LEVEL SELECTOR -->
-          <div class="course-step-card" id="course-step-card">
+          <div class="course-step-card wizard-step step-hidden" id="course-step-card">
             <div class="step-header">
               <span class="step-badge step-badge-blue">STEP 2</span>
               <div class="step-header-text">
@@ -164,7 +164,7 @@
           </div>
 
           <!-- STEP 3: UNIT SELECTOR -->
-          <div class="units-step-card">
+          <div class="units-step-card wizard-step step-hidden" id="units-step-card">
             <div class="step-header">
               <span class="step-badge step-badge-purple">STEP 3</span>
               <div class="step-header-text">
@@ -302,9 +302,17 @@
             </div>
           </div>
 
-          <!-- Variant Selector -->
-          <div class="form-group">
-            <span class="variant-selector-label">Select Test Variant:</span>
+          </div> <!-- /units-step-card -->
+
+          <!-- STEP 4: VARIANT SELECTOR -->
+          <div class="variant-step-card wizard-step step-hidden" id="variant-step-card">
+            <div class="step-header">
+              <span class="step-badge step-badge-emerald">STEP 4</span>
+              <div class="step-header-text">
+                <span class="step-title">Select Test Variant:</span>
+                <span id="selected-variant-badge" class="selected-variant-text">Variant A (Standard)</span>
+              </div>
+            </div>
             <div class="variant-cards-grid">
               <label class="variant-card-radio">
                 <input type="radio" name="test-variant" value="variantA" checked>
@@ -323,23 +331,33 @@
               </label>
             </div>
           </div>
-          </div> <!-- /units-step-card -->
 
-          <!-- Quick Instructions -->
-          <div class="instructions-box">
-            <h4>📌 Instructions for Students</h4>
-            <ul class="instructions-list">
-              <li>Read each question and the examples carefully.</li>
-              <li>You can type your answers or click words from the word banks.</li>
-              <li>Your answers are saved automatically as you type.</li>
-              <li>Review your score and mistake breakdown immediately after finishing!</li>
-            </ul>
+          <!-- STEP 5: INSTRUCTIONS & START -->
+          <div class="start-action-step-card wizard-step step-hidden" id="start-action-step-card">
+            <div class="step-header" style="margin-bottom: 0.85rem;">
+              <span class="step-badge step-badge-amber">STEP 5</span>
+              <div class="step-header-text">
+                <span class="step-title">Review & Start:</span>
+                <span class="step-subtitle">Read quick tips before you launch the test</span>
+              </div>
+            </div>
+
+            <!-- Quick Instructions -->
+            <div class="instructions-box">
+              <h4>📌 Instructions for Students</h4>
+              <ul class="instructions-list">
+                <li>Read each question and the examples carefully.</li>
+                <li>You can type your answers or click words from the word banks.</li>
+                <li>Your answers are saved automatically as you type.</li>
+                <li>Review your score and mistake breakdown immediately after finishing!</li>
+              </ul>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-start-animated" id="btn-start-test-main">
+              <span class="btn-start-text">Start Test Now</span>
+              <span class="btn-start-rocket">🚀</span>
+            </button>
           </div>
-
-          <button type="submit" class="btn btn-primary btn-lg btn-start-animated" id="btn-start-test-main">
-            <span class="btn-start-text">Start Test Now</span>
-            <span class="btn-start-rocket">🚀</span>
-          </button>
         </form>
       </div>
     </section>
@@ -437,60 +455,60 @@
 
   <!-- JavaScript Modules in Dependency Order -->
   <!-- Go Getter 1 (Level A1) Data Modules -->
-  <script src="js/data/gg1/gg1_unit1.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit2.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit3.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit4.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_mid_year.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit5.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit6.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit7.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_unit8.js?v=20260921_7"></script>
-  <script src="js/data/gg1/gg1_end_of_year.js?v=20260921_7"></script>
+  <script src="js/data/gg1/gg1_unit1.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit2.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit3.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit4.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_mid_year.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit5.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit6.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit7.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_unit8.js?v=20260922_1"></script>
+  <script src="js/data/gg1/gg1_end_of_year.js?v=20260922_1"></script>
 
   <!-- Go Getter 2 (Level A1+) Data Modules -->
-  <script src="js/data/gg2_unit1.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit2.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit3.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit4.js?v=20260921_7"></script>
-  <script src="js/data/gg2_mid_year.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit5.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit6.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit7.js?v=20260921_7"></script>
-  <script src="js/data/gg2_unit8.js?v=20260921_7"></script>
-  <script src="js/data/gg2_end_of_year.js?v=20260921_7"></script>
+  <script src="js/data/gg2_unit1.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit2.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit3.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit4.js?v=20260922_1"></script>
+  <script src="js/data/gg2_mid_year.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit5.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit6.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit7.js?v=20260922_1"></script>
+  <script src="js/data/gg2_unit8.js?v=20260922_1"></script>
+  <script src="js/data/gg2_end_of_year.js?v=20260922_1"></script>
 
   <!-- Go Getter 3 (Level A2) Data Modules -->
-  <script src="js/data/gg3_unit1.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit2.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit3.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit4.js?v=20260921_7"></script>
-  <script src="js/data/gg3_mid_year.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit5.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit6.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit7.js?v=20260921_7"></script>
-  <script src="js/data/gg3_unit8.js?v=20260921_7"></script>
-  <script src="js/data/gg3_end_of_year.js?v=20260921_7"></script>
+  <script src="js/data/gg3_unit1.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit2.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit3.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit4.js?v=20260922_1"></script>
+  <script src="js/data/gg3_mid_year.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit5.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit6.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit7.js?v=20260922_1"></script>
+  <script src="js/data/gg3_unit8.js?v=20260922_1"></script>
+  <script src="js/data/gg3_end_of_year.js?v=20260922_1"></script>
 
   <!-- Go Getter 4 (Level A2+/B1) Data Modules -->
-  <script src="js/data/unit1.js?v=20260921_7"></script>
-  <script src="js/data/unit2.js?v=20260921_7"></script>
-  <script src="js/data/unit3.js?v=20260921_7"></script>
-  <script src="js/data/unit4.js?v=20260921_7"></script>
-  <script src="js/data/mid_year.js?v=20260921_7"></script>
-  <script src="js/data/unit5.js?v=20260921_7"></script>
-  <script src="js/data/unit6.js?v=20260921_7"></script>
-  <script src="js/data/unit7.js?v=20260921_7"></script>
-  <script src="js/data/unit8.js?v=20260921_7"></script>
-  <script src="js/data/end_of_year.js?v=20260921_7"></script>
-  <script src="js/test-data.js?v=20260921_7"></script>
-  <script src="js/illustrations.js?v=20260921_7"></script>
-  <script src="js/validator.js?v=20260921_7"></script>
-  <script src="js/storage.js?v=20260921_7"></script>
-  <script src="js/config.js?v=20260921_7"></script>
-  <script src="js/teacher-service.js?v=20260921_7"></script>
-  <script src="js/ui.js?v=20260921_7"></script>
-  <script src="js/app.js?v=20260921_7"></script>
+  <script src="js/data/unit1.js?v=20260922_1"></script>
+  <script src="js/data/unit2.js?v=20260922_1"></script>
+  <script src="js/data/unit3.js?v=20260922_1"></script>
+  <script src="js/data/unit4.js?v=20260922_1"></script>
+  <script src="js/data/mid_year.js?v=20260922_1"></script>
+  <script src="js/data/unit5.js?v=20260922_1"></script>
+  <script src="js/data/unit6.js?v=20260922_1"></script>
+  <script src="js/data/unit7.js?v=20260922_1"></script>
+  <script src="js/data/unit8.js?v=20260922_1"></script>
+  <script src="js/data/end_of_year.js?v=20260922_1"></script>
+  <script src="js/test-data.js?v=20260922_1"></script>
+  <script src="js/illustrations.js?v=20260922_1"></script>
+  <script src="js/validator.js?v=20260922_1"></script>
+  <script src="js/storage.js?v=20260922_1"></script>
+  <script src="js/config.js?v=20260922_1"></script>
+  <script src="js/teacher-service.js?v=20260922_1"></script>
+  <script src="js/ui.js?v=20260922_1"></script>
+  <script src="js/app.js?v=20260922_1"></script>
 
 </body>
 </html>

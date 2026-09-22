@@ -37,6 +37,7 @@ const UI = {
     this.initCourseSelector();
     this.renderUnitSelector(this.currentCourse);
     this.initUnitSelector();
+    this.initStepWizard();
     this.checkForResume();
   },
 
@@ -347,6 +348,151 @@ const UI = {
   },
 
   /**
+   * Initializes Progressive Step Wizard on the Start Screen
+   * Step 1: Student Name -> Step 2: Course -> Step 3: Unit -> Step 4: Variant -> Step 5: Start Test
+   */
+  initStepWizard() {
+    const nameInput = document.getElementById("student-name");
+    const courseCard = document.getElementById("course-step-card");
+    const unitsCard = document.getElementById("units-step-card");
+    const variantCard = document.getElementById("variant-step-card");
+    const startCard = document.getElementById("start-action-step-card");
+
+    if (!nameInput || !courseCard || !unitsCard || !variantCard || !startCard) return;
+
+    let step2Unlocked = false;
+    let step3Unlocked = false;
+    let step4Unlocked = false;
+    let step5Unlocked = false;
+
+    const showStep = (el, autoScroll = true) => {
+      if (!el) return;
+      if (el.classList.contains("step-hidden")) {
+        el.classList.remove("step-hidden");
+        el.classList.add("step-visible");
+        if (autoScroll) {
+          setTimeout(() => {
+            el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }, 100);
+        }
+      }
+    };
+
+    const unlockStep2 = (autoScroll = true) => {
+      if (!step2Unlocked) {
+        step2Unlocked = true;
+        showStep(courseCard, autoScroll);
+      }
+    };
+
+    const unlockStep3 = (autoScroll = true) => {
+      if (!step3Unlocked) {
+        step3Unlocked = true;
+        showStep(unitsCard, autoScroll);
+      }
+    };
+
+    const unlockStep4 = (autoScroll = true) => {
+      if (!step4Unlocked) {
+        step4Unlocked = true;
+        showStep(variantCard, autoScroll);
+      }
+    };
+
+    const unlockStep5 = (autoScroll = true) => {
+      if (!step5Unlocked) {
+        step5Unlocked = true;
+        showStep(startCard, autoScroll);
+      }
+    };
+
+    // 1. Name input handler: unlock Step 2 when name >= 2 chars
+    const checkName = (autoScroll = true) => {
+      const val = nameInput.value.trim();
+      if (val.length >= 2) {
+        unlockStep2(autoScroll);
+      }
+    };
+
+    nameInput.addEventListener("input", () => checkName(true));
+    nameInput.addEventListener("change", () => checkName(true));
+
+    // Handle Enter key in name field - smooth jump to Step 2 instead of premature submit
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const val = nameInput.value.trim();
+        if (val.length >= 2) {
+          unlockStep2(true);
+          nameInput.blur();
+        }
+      }
+    });
+
+    // 2. Course selection: clicking any course card advances to Step 3
+    document.querySelectorAll(".course-card-radio").forEach((card) => {
+      card.addEventListener("click", () => {
+        setTimeout(() => {
+          unlockStep3(true);
+        }, 80);
+      });
+    });
+
+    // 3. Unit selection: clicking any unit card advances to Step 4
+    // Use event delegation on #unit-selector-grid since unit cards get re-rendered when course changes
+    const unitGrid = document.getElementById("unit-selector-grid");
+    if (unitGrid) {
+      unitGrid.addEventListener("click", (e) => {
+        const unitRadio = e.target.closest(".unit-card-radio");
+        if (unitRadio) {
+          setTimeout(() => {
+            unlockStep4(true);
+          }, 80);
+        }
+      });
+    }
+
+    // 4. Variant selection: clicking Variant A or B advances to Step 5
+    document.querySelectorAll(".variant-card-radio").forEach((card) => {
+      card.addEventListener("click", () => {
+        setTimeout(() => {
+          unlockStep5(true);
+        }, 80);
+      });
+    });
+
+    // Variant badge sync
+    const updateVariantBadge = () => {
+      const checkedVariant = document.querySelector('input[name="test-variant"]:checked');
+      const badge = document.getElementById("selected-variant-badge");
+      if (badge && checkedVariant) {
+        badge.textContent = checkedVariant.value === "variantA" ? "Variant A (Standard)" : "Variant B (Alternative)";
+      }
+    };
+    document.querySelectorAll('input[name="test-variant"]').forEach((r) => {
+      r.addEventListener("change", updateVariantBadge);
+    });
+    updateVariantBadge();
+
+    // Check if name is already pre-filled (e.g. browser autofill or restored student info)
+    const initialName = nameInput.value.trim();
+    if (initialName.length >= 2) {
+      unlockStep2(false);
+      unlockStep3(false);
+      unlockStep4(false);
+      unlockStep5(false);
+    }
+
+    // Helper method to unlock all steps (used when switching unit from within active test)
+    this.unlockAllStartSteps = () => {
+      unlockStep2(false);
+      unlockStep3(false);
+      unlockStep4(false);
+      unlockStep5(false);
+    };
+  },
+
+  /**
    * Check if an in-progress session exists in LocalStorage.
    */
   checkForResume() {
@@ -478,6 +624,13 @@ const UI = {
     document.querySelectorAll(".screen").forEach((sc) => sc.classList.remove("active"));
     const target = document.getElementById(`screen-${screenName}`);
     if (target) target.classList.add("active");
+
+    // If returning to start screen with student already established, unlock all steps
+    if (screenName === "start" && this.student && this.student.fullName) {
+      if (typeof this.unlockAllStartSteps === "function") {
+        this.unlockAllStartSteps();
+      }
+    }
 
     // Header student tag
     const studentTag = document.getElementById("header-student-tag");

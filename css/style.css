@@ -850,11 +850,87 @@ body {
 }
 
 /* ==========================================================================
-   STEP 3: Units Step Card
+   STEP 3: Units Step Card & Wizard Progressive Reveal
    ========================================================================== */
 
 .units-step-card {
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 1.35rem 1.4rem;
   margin-bottom: 1.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   STEP 4: Variant Step Card
+   ========================================================================== */
+
+.variant-step-card {
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 1.35rem 1.4rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.selected-variant-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #059669;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.step-badge-emerald {
+  background: linear-gradient(135deg, #059669, #10B981);
+}
+
+.step-badge-amber {
+  background: linear-gradient(135deg, #D97706, #F59E0B);
+}
+
+/* ==========================================================================
+   STEP 5: Start Action Step Card
+   ========================================================================== */
+
+.start-action-step-card {
+  margin-bottom: 1.75rem;
+}
+
+/* ==========================================================================
+   Progressive Step Wizard Animations
+   ========================================================================== */
+
+.wizard-step {
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wizard-step.step-hidden {
+  display: none !important;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.wizard-step.step-visible {
+  display: block !important;
+  opacity: 1;
+  transform: translateY(0);
+  animation: stepFadeSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stepFadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ==========================================================================
