@@ -558,8 +558,8 @@ input, select, textarea, button {
   background: #FFFFFF;
   border: 2.5px solid #CBD5E1;
   border-radius: 16px;
-  padding: 0.4rem 0.5rem 0.4rem 0.85rem;
-  gap: 0.65rem;
+  padding: 0.5rem 0.85rem;
+  gap: 0.75rem;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
@@ -594,6 +594,8 @@ input, select, textarea, button {
 
 .name-input-field {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   border: none;
   outline: none;
   background: transparent;
@@ -610,33 +612,51 @@ input, select, textarea, button {
   font-size: 1.02rem;
 }
 
-/* Confirm button (OK) inside Name input wrapper */
+/* Dedicated wrapper for OK button below the name input */
+.name-confirm-wrapper {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  animation: slideDownFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .btn-name-confirm {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: 220px;
   background: linear-gradient(135deg, #4F46E5, #6366F1);
   color: #FFFFFF;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 1.05rem;
   letter-spacing: 0.04em;
-  padding: 0.5rem 1.15rem;
-  border-radius: 12px;
+  padding: 0.65rem 1.5rem;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-  flex-shrink: 0;
-  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
   user-select: none;
-  min-height: 42px;
-  min-width: 58px;
+  min-height: 46px;
 }
 
 .btn-name-confirm:hover {
   background: linear-gradient(135deg, #4338CA, #4F46E5);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
 }
 
 .btn-name-confirm:active {
@@ -655,16 +675,16 @@ input, select, textarea, button {
 
 @keyframes btnPulse {
   0%, 100% {
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 4px 14px rgba(79, 70, 229, 0.45);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 6px 22px rgba(79, 70, 229, 0.55);
   }
 }
 
 .btn-name-confirm.confirmed {
   background: linear-gradient(135deg, #059669, #10B981);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
   animation: none;
 }
 
@@ -1997,14 +2017,16 @@ input, select, textarea, button {
     font-size: 1.25rem;
     border-radius: 10px;
   }
-  .btn-name-confirm {
-    padding: 0.45rem 0.8rem;
-    font-size: 0.88rem;
-    min-height: 38px;
-    gap: 0.25rem;
+  .name-confirm-wrapper {
+    margin-top: 0.75rem;
+    width: 100%;
   }
-  .btn-name-confirm .confirm-btn-sub {
-    display: none;
+  .btn-name-confirm {
+    max-width: 100%;
+    width: 100%;
+    min-height: 46px;
+    font-size: 1.05rem;
+    padding: 0.7rem 1.25rem;
   }
   .course-step-card,
   .units-step-card,
@@ -2185,13 +2207,19 @@ input, select, textarea, button {
     border-radius: 16px;
   }
   .name-input-wrapper {
-    padding: 0.35rem 0.4rem 0.35rem 0.65rem;
-    gap: 0.45rem;
+    padding: 0.45rem 0.65rem;
+    gap: 0.5rem;
+  }
+  .name-confirm-wrapper {
+    margin-top: 0.65rem;
+    width: 100%;
   }
   .btn-name-confirm {
-    padding: 0.4rem 0.65rem;
-    font-size: 0.85rem;
-    min-height: 36px;
+    max-width: 100%;
+    width: 100%;
+    min-height: 46px;
+    font-size: 1.02rem;
+    padding: 0.65rem 1rem;
   }
   .resume-banner-actions {
     grid-template-columns: 1fr;

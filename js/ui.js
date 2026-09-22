@@ -54,6 +54,7 @@ const UI = {
     // Student Name Input - dynamic validation & micro-interactions
     const studentNameInput = document.getElementById("student-name");
     const confirmNameBtn = document.getElementById("btn-name-confirm");
+    const confirmWrapper = document.getElementById("name-confirm-wrapper");
     if (studentNameInput) {
       const updateNameValidation = () => {
         const val = studentNameInput.value.trim();
@@ -61,6 +62,14 @@ const UI = {
 
         if (errorBadge && val.length > 0) {
           errorBadge.style.display = "none";
+        }
+
+        if (confirmWrapper) {
+          if (val.length >= 1) {
+            confirmWrapper.style.display = "flex";
+          } else {
+            confirmWrapper.style.display = "none";
+          }
         }
 
         if (confirmNameBtn) {
@@ -78,6 +87,7 @@ const UI = {
 
       studentNameInput.addEventListener("input", updateNameValidation);
       studentNameInput.addEventListener("change", updateNameValidation);
+      studentNameInput.addEventListener("keyup", updateNameValidation);
       // Run once on load in case of browser autofill
       updateNameValidation();
     }
@@ -413,6 +423,7 @@ const UI = {
 
     // 1. Name confirmation handler: ONLY unlocks Step 2 when user clicks "OK" or presses Enter
     const confirmNameBtn = document.getElementById("btn-name-confirm");
+    const confirmWrapper = document.getElementById("name-confirm-wrapper");
 
     const handleConfirmName = () => {
       const val = nameInput.value.trim();
@@ -437,6 +448,7 @@ const UI = {
       if (errorBadge) errorBadge.style.display = "none";
       if (nameCard) nameCard.classList.add("name-filled");
       if (avatarBadge) avatarBadge.textContent = "🎓";
+      if (confirmWrapper) confirmWrapper.style.display = "flex";
       if (confirmNameBtn) {
         confirmNameBtn.classList.remove("ready");
         confirmNameBtn.classList.add("confirmed");
@@ -511,6 +523,7 @@ const UI = {
     // Check if name is already pre-filled (e.g. browser autofill or restored student info)
     const initialName = nameInput.value.trim();
     if (initialName.length >= 2) {
+      if (confirmWrapper) confirmWrapper.style.display = "flex";
       if (confirmNameBtn) {
         confirmNameBtn.classList.remove("ready");
         confirmNameBtn.classList.add("confirmed");
