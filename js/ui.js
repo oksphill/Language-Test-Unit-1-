@@ -71,8 +71,6 @@ const UI = {
             confirmNameBtn.classList.remove("confirmed");
             confirmNameBtn.innerHTML = `
               <span class="confirm-btn-label">ОК</span>
-              <span class="confirm-btn-sub">Подтвердить</span>
-              <span class="confirm-btn-check">✓</span>
             `;
           }
         }
@@ -443,8 +441,7 @@ const UI = {
         confirmNameBtn.classList.remove("ready");
         confirmNameBtn.classList.add("confirmed");
         confirmNameBtn.innerHTML = `
-          <span class="confirm-btn-label">✓ ОК</span>
-          <span class="confirm-btn-sub">Принято</span>
+          <span class="confirm-btn-label">ОК</span>
         `;
       }
       nameInput.blur();
@@ -518,8 +515,7 @@ const UI = {
         confirmNameBtn.classList.remove("ready");
         confirmNameBtn.classList.add("confirmed");
         confirmNameBtn.innerHTML = `
-          <span class="confirm-btn-label">✓ ОК</span>
-          <span class="confirm-btn-sub">Принято</span>
+          <span class="confirm-btn-label">ОК</span>
         `;
       }
       const nameCard = document.getElementById("student-name-card");
