@@ -53,26 +53,28 @@ const UI = {
 
     // Student Name Input - dynamic validation & micro-interactions
     const studentNameInput = document.getElementById("student-name");
+    const confirmNameBtn = document.getElementById("btn-name-confirm");
     if (studentNameInput) {
       const updateNameValidation = () => {
         const val = studentNameInput.value.trim();
-        const validIndicator = document.getElementById("name-valid-indicator");
-        const avatarBadge = document.getElementById("name-avatar-badge");
-        const nameCard = document.getElementById("student-name-card");
         const errorBadge = document.getElementById("name-error-badge");
 
         if (errorBadge && val.length > 0) {
           errorBadge.style.display = "none";
         }
 
-        if (val.length >= 2) {
-          if (validIndicator) validIndicator.classList.add("active");
-          if (avatarBadge) avatarBadge.textContent = "🎓";
-          if (nameCard) nameCard.classList.add("name-filled");
-        } else {
-          if (validIndicator) validIndicator.classList.remove("active");
-          if (avatarBadge) avatarBadge.textContent = "👤";
-          if (nameCard) nameCard.classList.remove("name-filled");
+        if (confirmNameBtn) {
+          if (val.length >= 2) {
+            confirmNameBtn.classList.add("ready");
+          } else {
+            confirmNameBtn.classList.remove("ready");
+            confirmNameBtn.classList.remove("confirmed");
+            confirmNameBtn.innerHTML = `
+              <span class="confirm-btn-label">ОК</span>
+              <span class="confirm-btn-sub">Подтвердить</span>
+              <span class="confirm-btn-check">✓</span>
+            `;
+          }
         }
       };
 
@@ -411,26 +413,56 @@ const UI = {
       }
     };
 
-    // 1. Name input handler: unlock Step 2 when name >= 2 chars
-    const checkName = (autoScroll = true) => {
+    // 1. Name confirmation handler: ONLY unlocks Step 2 when user clicks "OK" or presses Enter
+    const confirmNameBtn = document.getElementById("btn-name-confirm");
+
+    const handleConfirmName = () => {
       const val = nameInput.value.trim();
-      if (val.length >= 2) {
-        unlockStep2(autoScroll);
+      const errorBadge = document.getElementById("name-error-badge");
+      const nameCard = document.getElementById("student-name-card");
+      const avatarBadge = document.getElementById("name-avatar-badge");
+
+      if (val.length < 2) {
+        if (nameCard) {
+          nameCard.classList.remove("shake-attention");
+          void nameCard.offsetWidth;
+          nameCard.classList.add("shake-attention");
+        }
+        if (errorBadge) {
+          errorBadge.style.display = "flex";
+        }
+        nameInput.focus();
+        return;
       }
+
+      // Valid name confirmed!
+      if (errorBadge) errorBadge.style.display = "none";
+      if (nameCard) nameCard.classList.add("name-filled");
+      if (avatarBadge) avatarBadge.textContent = "🎓";
+      if (confirmNameBtn) {
+        confirmNameBtn.classList.remove("ready");
+        confirmNameBtn.classList.add("confirmed");
+        confirmNameBtn.innerHTML = `
+          <span class="confirm-btn-label">✓ ОК</span>
+          <span class="confirm-btn-sub">Принято</span>
+        `;
+      }
+      nameInput.blur();
+      unlockStep2(true);
     };
 
-    nameInput.addEventListener("input", () => checkName(true));
-    nameInput.addEventListener("change", () => checkName(true));
+    if (confirmNameBtn) {
+      confirmNameBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleConfirmName();
+      });
+    }
 
-    // Handle Enter key in name field - smooth jump to Step 2 instead of premature submit
+    // Handle Enter key in name field - confirm and proceed to Step 2
     nameInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        const val = nameInput.value.trim();
-        if (val.length >= 2) {
-          unlockStep2(true);
-          nameInput.blur();
-        }
+        handleConfirmName();
       }
     });
 
@@ -482,6 +514,19 @@ const UI = {
     // Check if name is already pre-filled (e.g. browser autofill or restored student info)
     const initialName = nameInput.value.trim();
     if (initialName.length >= 2) {
+      if (confirmNameBtn) {
+        confirmNameBtn.classList.remove("ready");
+        confirmNameBtn.classList.add("confirmed");
+        confirmNameBtn.innerHTML = `
+          <span class="confirm-btn-label">✓ ОК</span>
+          <span class="confirm-btn-sub">Принято</span>
+        `;
+      }
+      const nameCard = document.getElementById("student-name-card");
+      if (nameCard) nameCard.classList.add("name-filled");
+      const avatarBadge = document.getElementById("name-avatar-badge");
+      if (avatarBadge) avatarBadge.textContent = "🎓";
+
       unlockStep2(false);
       unlockStep3(false);
       unlockStep4(false);

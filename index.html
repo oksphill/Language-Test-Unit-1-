@@ -7,8 +7,8 @@
   <meta name="description" content="Interactive English Language Tests Units 1 to 8 based on Pearson Tests with automatic grading, error review, and teacher reporting.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20260922_2">
-  <link rel="stylesheet" href="css/components.css?v=20260922_2">
+  <link rel="stylesheet" href="css/style.css?v=20260922_3">
+  <link rel="stylesheet" href="css/components.css?v=20260922_3">
 </head>
 <body>
 
@@ -84,9 +84,11 @@
                 required 
                 autocomplete="name"
               >
-              <div class="name-valid-indicator" id="name-valid-indicator" title="Name entered!">
-                <span>✓</span>
-              </div>
+              <button type="button" class="btn-name-confirm" id="btn-name-confirm" title="Подтвердить имя и перейти дальше (OK)">
+                <span class="confirm-btn-label">ОК</span>
+                <span class="confirm-btn-sub">Подтвердить</span>
+                <span class="confirm-btn-check">✓</span>
+              </button>
             </div>
 
             <!-- Accessible Inline Validation Error Banner (Stays inside form card, never overflows) -->
