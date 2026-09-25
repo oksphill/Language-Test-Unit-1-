@@ -7,8 +7,8 @@
   <meta name="description" content="Interactive English Language Tests Units 1 to 8 based on Pearson Tests with automatic grading, error review, and teacher reporting.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20260922_5">
-  <link rel="stylesheet" href="css/components.css?v=20260922_5">
+  <link rel="stylesheet" href="css/style.css?v=20260925_1">
+  <link rel="stylesheet" href="css/components.css?v=20260925_1">
 </head>
 <body>
 
@@ -110,64 +110,143 @@
             <div class="step-header">
               <span class="step-badge step-badge-blue">STEP 2</span>
               <div class="step-header-text">
-                <span class="step-title">Choose Course & Level:</span>
-                <span id="selected-course-badge" class="selected-course-text">Go Getter 1 • Level A1 (Beginner)</span>
+                <span class="step-title">Choose Course & Level <span class="step-title-ru">(Выберите ваш уровень)</span>:</span>
+                <span id="selected-course-badge" class="selected-course-text pulse-waiting">👇 Нажмите на свой учебник ниже</span>
               </div>
             </div>
+
+            <!-- Child-Friendly Step 2 Notification / Guidance Banner -->
+            <div class="course-step-notice" id="course-step-notice" role="alert">
+              <div class="notice-icon-box">
+                <span class="notice-icon-main" id="notice-icon-main">📚</span>
+              </div>
+              <div class="notice-body">
+                <div class="notice-headline">
+                  <span class="notice-tag">ШАГ 2 ИЗ 5</span>
+                  <strong id="notice-headline-text">Выберите уровень вашего учебника:</strong>
+                </div>
+                <p class="notice-instruction" id="notice-instruction-text">
+                  Нажмите на карточку с учебником <strong>Go Getter</strong>, по которому вы учитесь! <span class="notice-pointer">👇</span>
+                </p>
+                <div class="notice-tips" id="notice-tips-container">
+                  <span class="tip-pill tip-pink">📕 <strong>1</strong> — Начальный (A1)</span>
+                  <span class="tip-pill tip-blue">📘 <strong>2</strong> — Базовый (A1+)</span>
+                  <span class="tip-pill tip-orange">📙 <strong>3</strong> — Ниже среднего (A2)</span>
+                  <span class="tip-pill tip-purple">📗 <strong>4</strong> — Средний (A2+/B1)</span>
+                </div>
+                <div class="notice-subtext" id="notice-subtext-box">
+                  <span class="notice-subtext-icon">💡</span>
+                  <span>Не уверены, какой выбрать? Посмотрите на обложку вашей книги или спросите учителя.</span>
+                </div>
+              </div>
+            </div>
+
             <div class="course-cards-grid" id="course-selector-grid">
               <!-- Go Getter 1 (Pink) -->
-              <label class="course-card-radio">
-                <input type="radio" name="test-course" value="gogetter1" checked>
+              <label class="course-card-radio" data-course-id="gogetter1">
+                <input type="radio" name="test-course" value="gogetter1">
                 <div class="course-card-box course-card-pink">
-                  <div class="course-card-header">
-                    <span class="course-card-icon">📁</span>
-                    <span class="course-card-badge">Level A1</span>
+                  <div class="course-card-top-row">
+                    <div class="course-cover-preview">
+                      <img src="assets/images/cover_gg1.png" alt="Go Getter 1 Cover" class="course-cover-img" loading="lazy">
+                    </div>
+                    <div class="course-card-info">
+                      <div class="course-card-header">
+                        <span class="course-card-badge">Level A1</span>
+                        <span class="course-card-selection-tag">✓ ВЫБРАН</span>
+                      </div>
+                      <span class="course-card-title">Go Getter 1</span>
+                      <span class="course-card-level">Beginner • <span class="ru-level">Начальный</span></span>
+                      <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                    </div>
                   </div>
-                  <span class="course-card-title">Go Getter 1</span>
-                  <span class="course-card-level">Beginner</span>
-                  <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                  <div class="course-card-action">
+                    <span class="course-action-btn">
+                      <span class="course-action-icon">👉</span>
+                      <span class="course-action-label">Нажмите, чтобы выбрать</span>
+                    </span>
+                  </div>
                 </div>
               </label>
 
               <!-- Go Getter 2 (Blue) -->
-              <label class="course-card-radio">
+              <label class="course-card-radio" data-course-id="gogetter2">
                 <input type="radio" name="test-course" value="gogetter2">
                 <div class="course-card-box course-card-blue">
-                  <div class="course-card-header">
-                    <span class="course-card-icon">📁</span>
-                    <span class="course-card-badge">Level A1+</span>
+                  <div class="course-card-top-row">
+                    <div class="course-cover-preview">
+                      <img src="assets/images/cover_gg2.jpg" alt="Go Getter 2 Cover" class="course-cover-img" loading="lazy">
+                    </div>
+                    <div class="course-card-info">
+                      <div class="course-card-header">
+                        <span class="course-card-badge">Level A1+</span>
+                        <span class="course-card-selection-tag">✓ ВЫБРАН</span>
+                      </div>
+                      <span class="course-card-title">Go Getter 2</span>
+                      <span class="course-card-level">Elementary • <span class="ru-level">Базовый</span></span>
+                      <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                    </div>
                   </div>
-                  <span class="course-card-title">Go Getter 2</span>
-                  <span class="course-card-level">Elementary</span>
-                  <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                  <div class="course-card-action">
+                    <span class="course-action-btn">
+                      <span class="course-action-icon">👉</span>
+                      <span class="course-action-label">Нажмите, чтобы выбрать</span>
+                    </span>
+                  </div>
                 </div>
               </label>
 
               <!-- Go Getter 3 (Orange) -->
-              <label class="course-card-radio">
+              <label class="course-card-radio" data-course-id="gogetter3">
                 <input type="radio" name="test-course" value="gogetter3">
                 <div class="course-card-box course-card-orange">
-                  <div class="course-card-header">
-                    <span class="course-card-icon">📁</span>
-                    <span class="course-card-badge">Level A2</span>
+                  <div class="course-card-top-row">
+                    <div class="course-cover-preview">
+                      <img src="assets/images/cover_gg3.png" alt="Go Getter 3 Cover" class="course-cover-img" loading="lazy">
+                    </div>
+                    <div class="course-card-info">
+                      <div class="course-card-header">
+                        <span class="course-card-badge">Level A2</span>
+                        <span class="course-card-selection-tag">✓ ВЫБРАН</span>
+                      </div>
+                      <span class="course-card-title">Go Getter 3</span>
+                      <span class="course-card-level">Pre-Intermediate • <span class="ru-level">Ниже среднего</span></span>
+                      <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                    </div>
                   </div>
-                  <span class="course-card-title">Go Getter 3</span>
-                  <span class="course-card-level">Pre-Intermediate</span>
-                  <span class="course-card-desc">8 Units + 2 Exams (30–50 pts)</span>
+                  <div class="course-card-action">
+                    <span class="course-action-btn">
+                      <span class="course-action-icon">👉</span>
+                      <span class="course-action-label">Нажмите, чтобы выбрать</span>
+                    </span>
+                  </div>
                 </div>
               </label>
 
               <!-- Go Getter 4 (Purple) -->
-              <label class="course-card-radio">
+              <label class="course-card-radio" data-course-id="gogetter4">
                 <input type="radio" name="test-course" value="gogetter4">
                 <div class="course-card-box course-card-purple">
-                  <div class="course-card-header">
-                    <span class="course-card-icon">📁</span>
-                    <span class="course-card-badge">Level A2+/B1</span>
+                  <div class="course-card-top-row">
+                    <div class="course-cover-preview">
+                      <img src="assets/images/cover_gg4.jpg" alt="Go Getter 4 Cover" class="course-cover-img" loading="lazy">
+                    </div>
+                    <div class="course-card-info">
+                      <div class="course-card-header">
+                        <span class="course-card-badge">Level A2+/B1</span>
+                        <span class="course-card-selection-tag">✓ ВЫБРАН</span>
+                      </div>
+                      <span class="course-card-title">Go Getter 4</span>
+                      <span class="course-card-level">Intermediate • <span class="ru-level">Средний уровень</span></span>
+                      <span class="course-card-desc">8 Units + 2 Exams (35–50 pts)</span>
+                    </div>
                   </div>
-                  <span class="course-card-title">Go Getter 4</span>
-                  <span class="course-card-level">Intermediate</span>
-                  <span class="course-card-desc">8 Units + 2 Exams (35–50 pts)</span>
+                  <div class="course-card-action">
+                    <span class="course-action-btn">
+                      <span class="course-action-icon">👉</span>
+                      <span class="course-action-label">Нажмите, чтобы выбрать</span>
+                    </span>
+                  </div>
                 </div>
               </label>
             </div>
@@ -517,8 +596,8 @@
   <script src="js/storage.js?v=20260922_1"></script>
   <script src="js/config.js?v=20260922_1"></script>
   <script src="js/teacher-service.js?v=20260922_1"></script>
-  <script src="js/ui.js?v=20260922_5"></script>
-  <script src="js/app.js?v=20260922_1"></script>
+  <script src="js/ui.js?v=20260925_1"></script>
+  <script src="js/app.js?v=20260925_1"></script>
 
 </body>
 </html>

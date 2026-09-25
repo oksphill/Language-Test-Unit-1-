@@ -7,6 +7,7 @@ const UI = {
   activeScreen: "start",
   activeSection: "vocabulary",
   currentCourse: "gogetter1",
+  courseChosenByUser: false,
   currentUnit: "unit1",
   currentVariant: "variantA",
   student: null,
@@ -21,10 +22,10 @@ const UI = {
         const p = new URLSearchParams(window.location.search);
         const c = p.get("course") || p.get("level");
         if (c) {
-          if (c === "gg4" || c === "gogetter4" || c === "4") this.currentCourse = "gogetter4";
-          else if (c === "gg3" || c === "gogetter3" || c === "3") this.currentCourse = "gogetter3";
-          else if (c === "gg2" || c === "gogetter2" || c === "2") this.currentCourse = "gogetter2";
-          else if (c === "gg1" || c === "gogetter1" || c === "1") this.currentCourse = "gogetter1";
+          if (c === "gg4" || c === "gogetter4" || c === "4") { this.currentCourse = "gogetter4"; this.courseChosenByUser = true; }
+          else if (c === "gg3" || c === "gogetter3" || c === "3") { this.currentCourse = "gogetter3"; this.courseChosenByUser = true; }
+          else if (c === "gg2" || c === "gogetter2" || c === "2") { this.currentCourse = "gogetter2"; this.courseChosenByUser = true; }
+          else if (c === "gg1" || c === "gogetter1" || c === "1") { this.currentCourse = "gogetter1"; this.courseChosenByUser = true; }
         }
       }
     } catch (e) {}
@@ -154,15 +155,25 @@ const UI = {
     courseRadios.forEach((radio) => {
       radio.addEventListener("change", (e) => {
         if (e.target.checked) {
+          this.courseChosenByUser = true;
           this.onSelectCourse(e.target.value);
         }
       });
     });
 
-    // Sync radio with current active course
-    const curRadio = document.querySelector(`input[name="test-course"][value="${this.currentCourse}"]`);
-    if (curRadio) curRadio.checked = true;
-    this.updateCourseBadge();
+    if (this.courseChosenByUser) {
+      const curRadio = document.querySelector(`input[name="test-course"][value="${this.currentCourse}"]`);
+      if (curRadio) curRadio.checked = true;
+      this.updateCourseBadge();
+      this.updateStep2Cards();
+      this.updateStep2Notice(true, this.currentCourse);
+    } else {
+      // Clear radio checks initially so all 4 cards invite student selection
+      courseRadios.forEach((r) => (r.checked = false));
+      this.updateCourseBadge();
+      this.updateStep2Cards();
+      this.updateStep2Notice(false);
+    }
   },
 
   /**
@@ -170,12 +181,15 @@ const UI = {
    */
   onSelectCourse(courseId) {
     this.currentCourse = courseId;
+    this.courseChosenByUser = true;
     if (typeof TEST_DATA !== "undefined") {
       TEST_DATA.currentCourse = courseId;
     }
     const curRadio = document.querySelector(`input[name="test-course"][value="${courseId}"]`);
     if (curRadio) curRadio.checked = true;
     this.updateCourseBadge();
+    this.updateStep2Cards();
+    this.updateStep2Notice(true, courseId);
     this.renderUnitSelector(courseId);
     this.initUnitSelector();
     const unitsList = typeof TEST_DATA !== "undefined" ? TEST_DATA.getUnitsList(courseId) : [];
@@ -186,11 +200,101 @@ const UI = {
   },
 
   /**
+   * Updates Step 2 notice/alert banner dynamically
+   */
+  updateStep2Notice(isChosen, courseId) {
+    const notice = document.getElementById("course-step-notice");
+    if (!notice) return;
+
+    const courseNames = {
+      gogetter1: { name: "Go Getter 1", level: "A1 (Beginner)", ru: "Начальный", color: "#BE185D" },
+      gogetter2: { name: "Go Getter 2", level: "A1+ (Elementary)", ru: "Базовый", color: "#0284C7" },
+      gogetter3: { name: "Go Getter 3", level: "A2 (Pre-Intermediate)", ru: "Ниже среднего", color: "#EA580C" },
+      gogetter4: { name: "Go Getter 4", level: "A2+/B1 (Intermediate)", ru: "Средний уровень", color: "#7C3AED" }
+    };
+
+    const iconEl = document.getElementById("notice-icon-main");
+    const headlineEl = document.getElementById("notice-headline-text");
+    const instructionEl = document.getElementById("notice-instruction-text");
+    const subtextEl = document.getElementById("notice-subtext-box");
+
+    if (isChosen && courseId && courseNames[courseId]) {
+      const c = courseNames[courseId];
+      notice.classList.add("notice-success");
+      if (iconEl) iconEl.textContent = "🎉";
+      if (headlineEl) {
+        headlineEl.innerHTML = `Уровень выбран: <span style="color: ${c.color}; font-weight: 800;">${c.name} • ${c.level}</span>`;
+      }
+      if (instructionEl) {
+        instructionEl.innerHTML = `Отлично! Выбран <strong>${c.name} (${c.ru})</strong>. Теперь выберите тест (юнит) ниже в <strong>Шаге 3</strong> 👇`;
+      }
+      if (subtextEl) {
+        subtextEl.innerHTML = `<span class="notice-subtext-icon">🔄</span><span>Ошиблись уровнем? Просто нажмите на любую другую карточку выше, чтобы сменить его.</span>`;
+      }
+    } else {
+      notice.classList.remove("notice-success");
+      if (iconEl) iconEl.textContent = "📚";
+      if (headlineEl) {
+        headlineEl.textContent = "Выберите уровень вашего учебника:";
+      }
+      if (instructionEl) {
+        instructionEl.innerHTML = `Нажмите на карточку с учебником <strong>Go Getter</strong>, по которому вы учитесь! <span class="notice-pointer">👇</span>`;
+      }
+      if (subtextEl) {
+        subtextEl.innerHTML = `<span class="notice-subtext-icon">💡</span><span>Не уверены, какой выбрать? Посмотрите на обложку вашей книги или спросите учителя.</span>`;
+      }
+    }
+  },
+
+  /**
+   * Updates visual states of Step 2 course card boxes and action buttons
+   */
+  updateStep2Cards() {
+    const checkedRadio = document.querySelector('input[name="test-course"]:checked');
+    const checkedVal = checkedRadio ? checkedRadio.value : (this.courseChosenByUser ? this.currentCourse : null);
+
+    document.querySelectorAll(".course-card-radio").forEach((label) => {
+      const radio = label.querySelector('input[name="test-course"]');
+      const box = label.querySelector(".course-card-box");
+      const actionBtn = label.querySelector(".course-action-btn");
+      const actionIcon = label.querySelector(".course-action-icon");
+      const actionLabel = label.querySelector(".course-action-label");
+      const isSelected = checkedVal && radio && radio.value === checkedVal;
+
+      if (box) {
+        if (isSelected) {
+          box.classList.add("is-selected");
+        } else {
+          box.classList.remove("is-selected");
+        }
+      }
+
+      if (actionBtn && actionIcon && actionLabel) {
+        if (isSelected) {
+          actionBtn.classList.add("is-active");
+          actionIcon.textContent = "✓";
+          actionLabel.textContent = "Выбран этот уровень";
+        } else {
+          actionBtn.classList.remove("is-active");
+          actionIcon.textContent = this.courseChosenByUser ? "🔄" : "👉";
+          actionLabel.textContent = this.courseChosenByUser ? "Сменить на этот" : "Нажмите, чтобы выбрать";
+        }
+      }
+    });
+  },
+
+  /**
    * Updates course badge text in header / start card
    */
   updateCourseBadge() {
     const badge = document.getElementById("selected-course-badge");
     if (badge) {
+      if (!this.courseChosenByUser) {
+        badge.textContent = "👇 Выберите ваш уровень ниже";
+        badge.className = "selected-course-text pulse-waiting";
+        return;
+      }
+      badge.className = "selected-course-text confirmed";
       if (this.currentCourse === "gogetter1") {
         badge.textContent = "Go Getter 1 • Level A1 (Beginner)";
       } else if (this.currentCourse === "gogetter2") {
@@ -397,6 +501,12 @@ const UI = {
       if (!step2Unlocked) {
         step2Unlocked = true;
         showStep(courseCard, autoScroll);
+        const grid = document.getElementById("course-selector-grid");
+        if (grid && !this.courseChosenByUser) {
+          grid.classList.add("cards-attention-pulse");
+        }
+        this.updateStep2Cards();
+        this.updateStep2Notice(this.courseChosenByUser, this.currentCourse);
       }
     };
 
@@ -478,9 +588,20 @@ const UI = {
     // 2. Course selection: clicking any course card advances to Step 3
     document.querySelectorAll(".course-card-radio").forEach((card) => {
       card.addEventListener("click", () => {
+        const radio = card.querySelector('input[name="test-course"]');
+        if (radio) {
+          radio.checked = true;
+          this.courseChosenByUser = true;
+          this.onSelectCourse(radio.value);
+        }
+        const grid = document.getElementById("course-selector-grid");
+        if (grid) grid.classList.remove("cards-attention-pulse");
+        this.updateStep2Cards();
+        this.updateStep2Notice(true, this.currentCourse);
+
         setTimeout(() => {
           unlockStep3(true);
-        }, 80);
+        }, 120);
       });
     });
 
@@ -595,12 +716,15 @@ const UI = {
   resumeSession(saved) {
     this.student = saved.student;
     this.currentCourse = saved.course || (saved.student && saved.student.course) || "gogetter3";
+    this.courseChosenByUser = true;
     if (typeof TEST_DATA !== "undefined") {
       TEST_DATA.currentCourse = this.currentCourse;
     }
     const courseRadio = document.querySelector(`input[name="test-course"][value="${this.currentCourse}"]`);
     if (courseRadio) courseRadio.checked = true;
     this.updateCourseBadge();
+    this.updateStep2Cards();
+    this.updateStep2Notice(true, this.currentCourse);
     this.renderUnitSelector(this.currentCourse);
     this.initUnitSelector();
 
