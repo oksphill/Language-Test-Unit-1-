@@ -290,19 +290,19 @@ const UI = {
     const badge = document.getElementById("selected-course-badge");
     if (badge) {
       if (!this.courseChosenByUser) {
-        badge.textContent = "👇 Выберите ваш уровень ниже";
+        badge.textContent = "Нажмите на ваш учебник GoGetter, по которому вы учитесь 👇";
         badge.className = "selected-course-text pulse-waiting";
         return;
       }
       badge.className = "selected-course-text confirmed";
       if (this.currentCourse === "gogetter1") {
-        badge.textContent = "Go Getter 1 • Level A1 (Beginner)";
+        badge.textContent = "✓ Выбран: Go Getter 1 • Level A1 (Beginner)";
       } else if (this.currentCourse === "gogetter2") {
-        badge.textContent = "Go Getter 2 • Level A1+ (Elementary)";
+        badge.textContent = "✓ Выбран: Go Getter 2 • Level A1+ (Elementary)";
       } else if (this.currentCourse === "gogetter4") {
-        badge.textContent = "Go Getter 4 • Level A2+ / B1 (Intermediate)";
+        badge.textContent = "✓ Выбран: Go Getter 4 • Level A2+ / B1 (Intermediate)";
       } else {
-        badge.textContent = "Go Getter 3 • Level A2 (Pre-Intermediate)";
+        badge.textContent = "✓ Выбран: Go Getter 3 • Level A2 (Pre-Intermediate)";
       }
     }
   },
