@@ -379,36 +379,10 @@ const UI = {
       desc: "Comprehensive English Language Assessment"
     };
 
-    // Dynamic start screen subtitle based on test content
+    // General start screen hero subtitle - keeps start screen neutral
     const heroSubtitle = document.getElementById("start-hero-subtitle");
     if (heroSubtitle) {
-      if (unitKey === "mid_year") {
-        heroSubtitle.textContent = "Complete all 9 tasks to practice your Units 1–4 vocabulary, grammar, audio listening (Track 10), reading, and everyday communication skills.";
-      } else if (unitKey === "end_of_year") {
-        heroSubtitle.textContent = "Complete all 9 tasks to practice your Units 1–8 vocabulary, grammar, audio listening (Track 11), reading, and matching skills.";
-      } else if (this.currentCourse === "gogetter3") {
-        heroSubtitle.textContent = `Complete all tasks to practice ${info.title} (${info.desc || "Vocabulary, Grammar & Communication"}).`;
-      } else {
-        if (unitKey === "unit1") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on clothes, past tenses, and everyday communication skills.";
-        } else if (unitKey === "unit2") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on jobs, present tenses, and workplace dialogues.";
-        } else if (unitKey === "unit3") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your sports vocabulary, Present Perfect, and sharing experiences.";
-        } else if (unitKey === "unit4") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your vocabulary on books and films, relative clauses, and movie reviews.";
-        } else if (unitKey === "unit5") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your music styles, past modals (could/had to), and making suggestions.";
-        } else if (unitKey === "unit6") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your nature & animals vocabulary, conditional sentences, and giving advice.";
-        } else if (unitKey === "unit7") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your technology inventions, passive voice, and step-by-step instructions.";
-        } else if (unitKey === "unit8") {
-          heroSubtitle.textContent = "Complete all 6 tasks to practice your feelings & relationships, reported speech, and emotional reactions.";
-        } else {
-          heroSubtitle.textContent = `Complete all tasks to practice ${info.desc || "your English language skills"}.`;
-        }
-      }
+      heroSubtitle.textContent = "Complete all tasks to practice your vocabulary, grammar, and communication skills.";
     }
 
     const badge = document.getElementById("selected-unit-badge");
@@ -438,31 +412,6 @@ const UI = {
     const varBDesc = document.getElementById("variant-b-desc");
     if (varBDesc) {
       varBDesc.textContent = `Photocopiable ${info.title} Variant B (${info.points || 30} pts)`;
-    }
-
-    const courseLabels = {
-      gogetter1: "Go Getter 1",
-      gogetter2: "Go Getter 2",
-      gogetter3: "Go Getter 3",
-      gogetter4: "Go Getter 4"
-    };
-    const courseTitle = courseLabels[this.currentCourse] || "Go Getter";
-
-    const headerLogoBadge = document.getElementById("app-logo-badge");
-    if (headerLogoBadge && this.activeScreen === "start") {
-      headerLogoBadge.textContent = unitKey === "mid_year" ? "1–4" : (unitKey === "end_of_year" ? "1–8" : info.number);
-    }
-
-    const headerTitle = document.getElementById("app-header-title");
-    if (headerTitle && this.activeScreen === "start") {
-      if (unitKey === "mid_year") headerTitle.textContent = `${courseTitle} • Mid-Year (Units 1–4)`;
-      else if (unitKey === "end_of_year") headerTitle.textContent = `${courseTitle} • End-of-Year (Units 1–8)`;
-      else headerTitle.textContent = `${courseTitle} • Unit ${info.number}`;
-    }
-
-    const headerSubtitle = document.getElementById("app-header-subtitle");
-    if (headerSubtitle && this.activeScreen === "start") {
-      headerSubtitle.textContent = info.title;
     }
   },
 
@@ -812,9 +761,16 @@ const UI = {
     const target = document.getElementById(`screen-${screenName}`);
     if (target) target.classList.add("active");
 
-    // If returning to start screen with student already established, unlock all steps
-    if (screenName === "start" && this.student && this.student.fullName) {
-      if (typeof this.unlockAllStartSteps === "function") {
+    // If returning to start screen, reset app header to general brand
+    if (screenName === "start") {
+      const headerLogoBadge = document.getElementById("app-logo-badge");
+      const headerTitle = document.getElementById("app-header-title");
+      const headerSubtitle = document.getElementById("app-header-subtitle");
+      if (headerLogoBadge) headerLogoBadge.textContent = "📚";
+      if (headerTitle) headerTitle.textContent = "English Language Tests";
+      if (headerSubtitle) headerSubtitle.textContent = "Pearson Interactive Testing";
+
+      if (this.student && this.student.fullName && typeof this.unlockAllStartSteps === "function") {
         this.unlockAllStartSteps();
       }
     }
