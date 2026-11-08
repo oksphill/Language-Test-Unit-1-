@@ -107,6 +107,8 @@ const Illustrations = {
         return this.getImageMarkup("assets/images/gg1_mid_year_italy.png", "Rosanna in Italy", "Grandparents' House", "Read the text and answer the questions");
       case "gg1_eoy_monkey":
         return this.getImageMarkup("assets/images/gg1_eoy_monkey.png", "Spider Monkey", "Spider Monkey", "Read the text and answer the questions");
+      case "gg2_u5_town":
+        return this.getImageMarkup("assets/images/gg2_u5_town.png", "Town Map - Football stadium, bus stop, café, museum, library, park, houses", "Town Map", "Look at the picture to complete the sentences");
       default:
         return "";
     }

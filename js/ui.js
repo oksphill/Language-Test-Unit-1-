@@ -1061,9 +1061,12 @@ const UI = {
       return this.renderPersonalityTask(task);
     }
 
-    // 5. Grammar Gap (Verb in brackets)
-    if (task.type === "grammar-gap") {
-      return this.renderGrammarGapTask(task);
+    // 5. Grammar Gap / Fill Gaps (Verb in brackets, Past Simple, etc.)
+    if (task.type === "grammar-gap" || task.type === "fill-gaps") {
+      if (task.items && task.items.length > 0) {
+        return this.renderGrammarGapTask(task);
+      }
+      return this.renderWordBankOrGapTask(task);
     }
 
     // 6. Grammar Mix (Unit 1 Task 5)
@@ -1668,7 +1671,11 @@ const UI = {
    * Renders Grammar Gap items (single or double verb gaps)
    */
   renderGrammarGapTask(task) {
-    let html = `<div class="grammar-items-list">`;
+    let html = "";
+    if (task.storyText) {
+      html += `<div class="story-intro-text" style="margin: 0.75rem 0 1rem; font-weight: 500; color: #334155; line-height: 1.6; white-space: pre-line; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #6366f1;">${task.storyText}</div>`;
+    }
+    html += `<div class="grammar-items-list">`;
     for (const it of task.items) {
       let line = `<div class="grammar-item-row"><span class="gap-label">${it.label || ""}</span> `;
       const beforeText = it.before ?? it.textBefore ?? "";
@@ -1848,12 +1855,18 @@ const UI = {
       `;
     }
 
+    if (task.storyText) {
+      html += `<div class="story-intro-text" style="margin: 0.75rem 0 1rem; font-weight: 500; color: #334155; line-height: 1.6; white-space: pre-line; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #6366f1;">${task.storyText}</div>`;
+    }
+
     if (task.sentences && task.sentences.length > 0) {
       let sentencesHtml = "";
       for (const s of task.sentences) {
         sentencesHtml += this.renderSentenceWithGaps(s, task.id);
       }
       html += `<div class="story-text-flow">${sentencesHtml}</div>`;
+    } else if (task.items && task.items.length > 0) {
+      html += this.renderGrammarGapTask(task);
     }
 
     return html;
@@ -1863,16 +1876,20 @@ const UI = {
    * Helper to render a sentence item with 1 or 2 gaps
    */
   renderSentenceWithGaps(s, taskId) {
-    let line = `<p style="margin-bottom:0.75rem;">${s.textBefore || ""} `;
-    if (s.gapId) {
+    const textBefore = s.textBefore ?? s.before ?? "";
+    const gapId = s.gapId || s.id || "";
+    const label = s.label ?? s.num ?? "";
+    const textAfter = s.textAfter ?? s.after ?? "";
+    let line = `<p style="margin-bottom:0.75rem;">${textBefore} `;
+    if (gapId) {
       line += `
         <span class="gap-inline-wrapper">
-          <span class="gap-label">${s.label}</span>
-          <input type="text" class="gap-input test-gap" id="input-${s.gapId}" data-qid="${s.gapId}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false">
+          ${label ? `<span class="gap-label">${label}</span>` : ""}
+          <input type="text" class="gap-input test-gap" id="input-${gapId}" data-qid="${gapId}" data-task="${taskId}" autocomplete="off" autocorrect="off" spellcheck="false">
         </span>
       `;
     }
-    line += `${s.textAfter || ""} `;
+    line += `${textAfter} `;
     if (s.gapId2) {
       line += `
         <span class="gap-inline-wrapper">
